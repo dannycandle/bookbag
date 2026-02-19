@@ -117,6 +117,13 @@
 <div class="books-loading" id="books-loading">
   <div class="books-loading-spinner"></div>
 </div>
+
+<button class="fab-upload" onclick="window.location.href='{{ url_for('edit-book.upload') }}'">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ffffff" viewBox="0 0 256 256">
+    <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+  </svg>
+</button>
+
 </div><!-- end main-content -->
 </div><!-- end content-layout -->
 
@@ -142,6 +149,8 @@
     </button>
   </div>
 </div>
+
+
 
 {% endblock %}
 

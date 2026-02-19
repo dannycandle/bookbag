@@ -14,14 +14,14 @@ body {
     height: calc(100vh - 10px); 
     overflow: hidden; 
     border-radius: 10px;
-    background-color:#F94C4C;
+    background-color:#f94c4cf6;
     box-shadow: 0px 0px 5px 5px #00000025;
     gap:0px;
 }
 
 #navbar { 
     margin: 10px;
-    border-radius: 10px;
+    border-radius: 30px;
     width: auto; 
     display: flex; 
     flex-direction: column; 
@@ -178,7 +178,7 @@ details[open] .user-popover-menu {
     top:0;
     background-color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
-    border-radius: 10px;
+    border-radius: 30px;
     padding: 12px;
     margin: 0px;
     overflow-y: auto;
@@ -341,13 +341,13 @@ details[open] .sort-popover {
     width: 100%;
     aspect-ratio: 2 / 3;
     object-fit: cover;
-    border-radius: 10px; 
+    border-radius: 15px; 
 }
 
 .book-cover-fallback {
     width: 100%;
     aspect-ratio: 2 / 3;
-    border-radius: 10px;
+    border-radius: 15px;
     background: linear-gradient(135deg, #581C1C, #8A5353);
     display: flex;
     flex-direction: column;
@@ -525,4 +525,27 @@ details[open] .sort-popover {
     backdrop-filter: blur(3px);
     z-index: 50;
     display: none;
+}
+
+.fab-upload {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #00e09d;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    z-index: 40;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.fab-upload:hover {
+    background-color: #7a2828;
+    transform: scale(1.08);
 }
