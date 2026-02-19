@@ -5,17 +5,32 @@
 <div class="action-bar">
 
   <details class="sort-dropdown">
-    <summary class="sort-button">
+  <summary class="sort-button"><strong>Sort: </strong></summary>
+  <div class="sort-popover">
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='abc')}}">Title: A–Z</a>
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='zyx')}}">Title: Z–A</a>
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='authaz')}}">Author: A–Z</a>
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='authza')}}">Author: Z–A</a>
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='pubold')}}">Published: Old to New</a>
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='pubnew')}}">Published: New to Old</a>
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='new')}}">Added: New to Old</a>
+    <button class="sort-option" href="{{url_for('web.books_list', data=page, book_id=id, sort_param='old')}}">Added: Old to New</a>
+  </div>
+</details>
+
+  <!--details class="sort-dropdown">
+    <summary class="sort-button"> <strong>Sort: </strong>
       {% if order in ['old', 'zyx', 'authza', 'pubold'] %}&#x25BC;{% else %}&#x25B2;{% endif %}
-      {% if order == "new" %}{{_('Recently Added')}}
+      {% if order == "new" %}{{_('Recent')}}
       {% elif order == "old" %}{{_('Added First')}}
-      {% elif order in ["abc", "zyx"] %}{{_('Alphabetical')}}
+      {% elif order in ["abc"] %}{{_('A-Z')}}
+      {% elif order in ["zyx"] %}{{_('Z-A')}}
       {% elif order in ["authaz", "authza"] %}{{_('Author Name')}}
       {% elif order in ["pubnew", "pubold"] %}{{_('Publish Date')}}
       {% else %}{{_('Sort Books')}}
       {% endif %}
     </summary>
-    <ul class="sort-menu">
+    <div class="sort-menu">
 
       {# 1. DYNAMIC TOP SLOT: The reverse of the current sort #}
       {% if order == 'new' %}
@@ -60,7 +75,7 @@
       {% endif %}
 
     </ul>
-  </details>
+  </details-->
 
   <form class="search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
     <input type="text" class="search-input" name="query" placeholder="{{_('Search Library')}}" value="{{searchterm}}">
@@ -78,5 +93,6 @@
     {% endfor %}
   {% endif %}
 </div>
+
 
 {% endblock %}

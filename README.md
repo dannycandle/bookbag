@@ -1,32 +1,10 @@
-# Calibre-Web
+## Book Bag
 
-Calibre-Web is a web app that offers a clean and intuitive interface for browsing, reading, and downloading eBooks using a valid [Calibre](https://calibre-ebook.com) database.
+Book-Bag is a redesign of the amazing Calibre-Web. It focuses on creating modern UI/UX while retaining the core features of Calibre-Web.
 
-[![License](https://img.shields.io/github/license/janeczku/calibre-web?style=flat-square)](https://github.com/janeczku/calibre-web/blob/master/LICENSE)
-![Commit Activity](https://img.shields.io/github/commit-activity/w/janeczku/calibre-web?logo=github&style=flat-square&label=commits)
-[![All Releases](https://img.shields.io/github/downloads/janeczku/calibre-web/total?logo=github&style=flat-square)](https://github.com/janeczku/calibre-web/releases)
-[![PyPI](https://img.shields.io/pypi/v/calibreweb?logo=pypi&logoColor=fff&style=flat-square)](https://pypi.org/project/calibreweb/)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/calibreweb?logo=pypi&logoColor=fff&style=flat-square)](https://pypi.org/project/calibreweb/)
-[![Discord](https://img.shields.io/discord/838810113564344381?label=Discord&logo=discord&style=flat-square)](https://discord.gg/h2VsJ2NEfB)
+Book-Bag is in early builds, is unstable, and not ready to daily drive. Please do not request help with troublehsooting. It is offered AS IS.
 
-<details>
-<summary><strong>Table of Contents</strong> (click to expand)</summary>
-
-1. [About](#calibre-web)
-2. [Features](#features)
-3. [Installation](#installation)
-   - [Installation via pip (recommended)](#installation-via-pip-recommended)
-   - [Quick start](#quick-start)
-   - [Requirements](#requirements)
-4. [Docker Images](#docker-images)
-5. [Troubleshooting](#troubleshooting)
-6. [Contributor Recognition](#contributor-recognition)
-7. [Contact](#contact)
-8. [Contributing to Calibre-Web](#contributing-to-calibre-web)
-
-</details>
-
-*This software is a fork of [library](https://github.com/mutschler/calibreserver) and licensed under the GPL v3 License.*
+*This software is a fork of [library](https://github.com/janeczku/calibre-web) and licensed under the GPL v3 License.*
 
 ![Main screen](https://github.com/janeczku/calibre-web/wiki/images/main_screen.png)
 
