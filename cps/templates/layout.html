@@ -22,7 +22,7 @@
     <div id="bookbag-navbar">
       <div id="navbar-menus-wrapper">        
         <div class="navigation-items">
-            <button id="nav-books" class="nav-button" a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='stored')}}">
+            <button id="nav-books" class="nav-button" onclick="window.location.href='{{url_for('web.books_list', data='newest', book_id=1, sort_param='stored')}}'">
               <div class="nav-button-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M231.65,194.55,198.46,36.75a16,16,0,0,0-19-12.39L132.65,34.42a16.08,16.08,0,0,0-12.3,19l33.19,157.8A16,16,0,0,0,169.16,224a16.25,16.25,0,0,0,3.38-.36l46.81-10.06A16.09,16.09,0,0,0,231.65,194.55ZM136,50.15c0-.06,0-.09,0-.09l46.8-10,3.33,15.87L139.33,66Zm6.62,31.47,46.82-10.05,3.34,15.9L146,97.53Zm6.64,31.57,46.82-10.06,13.3,63.24-46.82,10.06ZM216,197.94l-46.8,10-3.33-15.87L212.67,182,216,197.85C216,197.91,216,197.94,216,197.94ZM104,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V48A16,16,0,0,0,104,32ZM56,48h48V64H56Zm0,32h48v96H56Zm48,128H56V192h48v16Z"></path></svg>
               </div>
@@ -30,7 +30,7 @@
                 Books
                 </div>
             </button>
-            <button id="nav-last" class="nav-button" a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='stored')}}">
+            <button id="nav-last" class="nav-button" onclick="goToLastBook()">
               <div class="nav-button-icon">
                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M232,48H160a40,40,0,0,0-32,16A40,40,0,0,0,96,48H24a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h72a8,8,0,0,0,8-8V56A8,8,0,0,0,232,48ZM96,192H32V64H96a24,24,0,0,1,24,24V200A39.81,39.81,0,0,0,96,192Zm128,0H160a39.81,39.81,0,0,0-24,8V88a24,24,0,0,1,24-24h64Z"></path></svg>
               </div>
@@ -38,7 +38,7 @@
                Last
               </div>
             </button>
-            <button id="nav-recent" class="nav-button" a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='stored')}}">
+            <button id="nav-recent" class="nav-button" onclick="window.location.href='{{url_for('web.books_list', data='newest', book_id=1, sort_param='new')}}'">
               <div class="nav-button-icon">
                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z"></path></svg>
               </div>
@@ -46,7 +46,7 @@
                Recent
               </div>
             </button>
-            <button id="nav-search" class="nav-button" a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='stored')}}">
+            <button id="nav-search" class="nav-button" onclick="window.location.href='{{url_for('search.advanced_search_form')}}'">
               <div class="nav-button-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
               </div>
@@ -79,21 +79,21 @@
             </summary>
             <div class="user-popover-menu">
               <h3>User Settings</h2>
-              <button class="user-popup-button" a href="{{url_for('web.profile')}}">
+              <button class="user-popup-button"  onclick="window.location.href='{{url_for('web.profile')}}'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path></svg>
                 Edit Profile
-                </button>
+              </button>
             {% if current_user.role_admin() %}
-            <button class="user-popup-button" a href="{{url_for('admin.admin')}}">
+            <button class="user-popup-button" onclick="window.location.href='{{url_for('admin.admin')}}'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M128,80a48,48,0,1,0,48,48A48.06,48.06,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm95.68-93.85L135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17h0a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,224,40,175.82V80.18L128,32l88,48.17v95.64Z"></path></svg>
                 Server Administration
             </button>
-            <button class="user-popup-button" a href="{{url_for('tasks.get_tasks_status')}}">
+            <button class="user-popup-button" onclick="window.location.href='{{url_for('tasks.get_tasks_status')}}'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M149.61,85.71l-89.6,88a8,8,0,0,1-11.22,0L10.39,136a8,8,0,1,1,11.22-11.41L54.4,156.79l84-82.5a8,8,0,1,1,11.22,11.42Zm96.1-11.32a8,8,0,0,0-11.32-.1l-84,82.5-18.83-18.5a8,8,0,0,0-11.21,11.42l24.43,24a8,8,0,0,0,11.22,0l89.6-88A8,8,0,0,0,245.71,74.39Z"></path></svg>
                 Server Tasks
             </button>            {% endif %}
             {% if not current_user.is_anonymous %}
-            <button class="user-popup-button" a href="{{url_for('web.logout')}}">
+            <button class="user-popup-button" onclick="window.location.href='{{url_for('web.logout')}}'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"></path></svg>
                 Sign Out
             </button> 
@@ -123,6 +123,18 @@
     
 
 
+    <script>
+      (function() {
+        if (window.location.pathname.match(/^\/read\/\d+\//)) {
+          localStorage.setItem('lastBookUrl', window.location.pathname);
+        }
+      })();
+
+      function goToLastBook() {
+        var last = localStorage.getItem('lastBookUrl');
+        window.location.href = last || '{{ url_for('web.books_list', data='newest', book_id=1, sort_param='stored') }}';
+      }
+    </script>
     {% block js %}{% endblock %}
 </div>
 <!--END MAIN APP-->
