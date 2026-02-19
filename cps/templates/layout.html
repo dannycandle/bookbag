@@ -12,11 +12,12 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" media="screen">
     <link href="{{ url_for('static', filename='css/upload.css') }}" rel="stylesheet" media="screen">
   </head>
-  <body class="{{ page }} {{ bodyClass }}">
+
 
 <!-- BEGIN MAIN APP-->    
+<body class="{{ page }} {{ bodyClass }}">
 <div class="app-wrapper">
-  {% if current_user.is_authenticated or g.allow_anonymous %}
+{% if current_user.is_authenticated or g.allow_anonymous %}
     <div id="navbar">
       <div id="navbar-menus-wrapper">        
         <div class="navigation-items">
@@ -52,23 +53,6 @@
                 Search
               </div>
             </button>
-
-          <!--DEPRECATED: SIDEBAR NAVIGATION-->
-          <!--<ul class="list-unstyled">
-            {% for element in sidebar %}
-              {% if current_user.check_visibility(element['visibility']) and element['public'] %}
-                <li id="nav_{{element['id']}}" {% if page == element['page'] %}class="active"{% endif %}>
-                  <a href="{% if element['no_param'] %}{{url_for(element['link'], data=element['page'])}}{%else%}{{url_for(element['link'], data=element['page'], sort_param='stored')}}{% endif %}">
-                    <span class="glyphicon {{element['glyph']}}"></span> {{_(element['text'])}}
-                  </a>
-                </li>
-              {% endif %}
-            {% endfor %}
-              -->
-            <!--<li class="nav-head public-shelves">{{_('Shelves')}}</li>
-            {% for shelf in g.shelves_access %}
-              <li><a href="{{url_for('shelf.show_shelf', shelf_id=shelf.id)}}"><span class="glyphicon glyphicon-list"></span> {{shelf.name|shortentitle(40)}}</a></li>
-            {% endfor %}-->
         </div>
         <div class="navigation-items">
           <details class="user-popover">
@@ -99,14 +83,60 @@
             </div>
           </details>
           </div>
-        </nav>
-        {% endif %}
+        </div>
       </div>
+{% endif %}
+
+<aside class="filter-sidebar">
+  <div id="filt-options-wrapper">
+  <p class="filter-heading">Filters</p>
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Genre</summary>
+    <div class="filter-options">
+      <label><input type="checkbox"> Fiction</label>
+      <label><input type="checkbox"> Non-Fiction</label>
+      <label><input type="checkbox"> Fantasy</label>
+      <label><input type="checkbox"> Science Fiction</label>
+      <label><input type="checkbox"> Mystery</label>
     </div>
+  </details>
+
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Published</summary>
+    <div class="filter-options">
+      <label><input type="checkbox"> Last 2 years</label>
+      <label><input type="checkbox"> 2–5 years ago</label>
+      <label><input type="checkbox"> 5–10 years ago</label>
+      <label><input type="checkbox"> 10–20 years ago</label>
+      <label><input type="checkbox"> 20+ years ago</label>
+    </div>
+  </details>
+
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Language</summary>
+    <div class="filter-options">
+      <label><input type="checkbox"> English</label>
+      <label><input type="checkbox"> Spanish</label>
+      <label><input type="checkbox"> French</label>
+      <label><input type="checkbox"> German</label>
+    </div>
+  </details>
+
+
+<details class="filter-section" open>
+    <summary class="filter-section-title">Tags</summary>
+    <div class="filter-options">
+      <label><input type="checkbox"> Award Winner</label>
+      <label><input type="checkbox"> Debut</label>
+      <label><input type="checkbox"> Series</label>
+    </div>
+  </details>
+  </div>
+</aside>
 
 
 
-    <div class="main-content-wrapper">
+<div class="main-content-wrapper">
       
       {% for category, message in get_flashed_messages(with_categories=True) %}
         <div class="alert alert-{{ 'danger' if category == 'error' else category }} text-center">{{ message }}</div>

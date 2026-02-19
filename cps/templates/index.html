@@ -3,54 +3,6 @@
 {% block body %}
 
 <div class="content-layout">
-
-<aside class="filter-sidebar">
-  <div id="filt-options-wrapper">
-  <p class="filter-heading">Filters</p>
-
-  <details class="filter-section" open>
-    <summary class="filter-section-title">Genre</summary>
-    <div class="filter-options">
-      <label><input type="checkbox"> Fiction</label>
-      <label><input type="checkbox"> Non-Fiction</label>
-      <label><input type="checkbox"> Fantasy</label>
-      <label><input type="checkbox"> Science Fiction</label>
-      <label><input type="checkbox"> Mystery</label>
-    </div>
-  </details>
-
-  <details class="filter-section" open>
-    <summary class="filter-section-title">Published</summary>
-    <div class="filter-options">
-      <label><input type="checkbox"> Last 2 years</label>
-      <label><input type="checkbox"> 2–5 years ago</label>
-      <label><input type="checkbox"> 5–10 years ago</label>
-      <label><input type="checkbox"> 10–20 years ago</label>
-      <label><input type="checkbox"> 20+ years ago</label>
-    </div>
-  </details>
-
-  <details class="filter-section" open>
-    <summary class="filter-section-title">Language</summary>
-    <div class="filter-options">
-      <label><input type="checkbox"> English</label>
-      <label><input type="checkbox"> Spanish</label>
-      <label><input type="checkbox"> French</label>
-      <label><input type="checkbox"> German</label>
-    </div>
-  </details>
-
-  <details class="filter-section" open>
-    <summary class="filter-section-title">Tags</summary>
-    <div class="filter-options">
-      <label><input type="checkbox"> Award Winner</label>
-      <label><input type="checkbox"> Debut</label>
-      <label><input type="checkbox"> Series</label>
-    </div>
-  </details>
-  </div>
-</aside>
-
 <div class="main-content">
 <div class="action-bar">
 
@@ -118,8 +70,14 @@
   <div class="books-loading-spinner"></div>
 </div>
 
-<button class="fab-upload" onclick="window.location.href='{{ url_for('edit-book.upload') }}'">
-  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ffffff" viewBox="0 0 256 256">
+<form id="upload-form" action="{{ url_for('edit-book.upload') }}" method="POST" enctype="multipart/form-data" style="display:none;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="book_id" value="-1">
+  <input type="file" id="upload-file-input" name="btn-upload-format" multiple>
+</form>
+
+<button class="fab-upload" onclick="document.getElementById('upload-file-input').click()">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256">
     <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
   </svg>
 </button>
@@ -318,6 +276,20 @@
     e.stopPropagation();
   });
 })();
+
+
+
+
+
+
+
+document.getElementById('upload-file-input').addEventListener('change', function() {
+  if (this.files.length > 0) {
+    document.getElementById('upload-form').submit();
+  }
+});
+
+
 
 
 </script>
