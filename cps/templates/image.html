@@ -7,7 +7,12 @@
         src="{{ url_for('web.get_cover', book_id=book.id, resolution='og', c=book|last_modified) }}"
         alt="{{ image_alt }}"
         loading="lazy"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
     />
+    <div class="book-cover-fallback" style="display:none;">
+    <span class="book-cover-fallback-title">{{ image_title }}</span>
+    <span class="book-cover-fallback-author">{{ book.authors | map(attribute='name') | join(', ') if book.authors else '' }}</span>
+</div>
 {%- endmacro %}
 
 {% macro series(series, alt=None) -%}

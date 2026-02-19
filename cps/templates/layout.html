@@ -19,7 +19,7 @@
 <!-- BEGIN MAIN APP-->    
 <div class="app-wrapper">
   {% if current_user.is_authenticated or g.allow_anonymous %}
-    <div id="bookbag-navbar">
+    <div id="navbar">
       <div id="navbar-menus-wrapper">        
         <div class="navigation-items">
             <button id="nav-books" class="nav-button" onclick="window.location.href='{{url_for('web.books_list', data='newest', book_id=1, sort_param='stored')}}'">

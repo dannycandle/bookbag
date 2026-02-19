@@ -5,6 +5,7 @@
 <div class="content-layout">
 
 <aside class="filter-sidebar">
+  <div id="filt-options-wrapper">
   <p class="filter-heading">Filters</p>
 
   <details class="filter-section" open>
@@ -47,6 +48,7 @@
       <label><input type="checkbox"> Series</label>
     </div>
   </details>
+  </div>
 </aside>
 
 <div class="main-content">
@@ -77,65 +79,6 @@
   </div>
 </details>
 
-  <!--details class="sort-dropdown">
-    <summary class="sort-button"> <strong>Sort: </strong>
-      {% if order in ['old', 'zyx', 'authza', 'pubold'] %}&#x25BC;{% else %}&#x25B2;{% endif %}
-      {% if order == "new" %}{{_('Recent')}}
-      {% elif order == "old" %}{{_('Added First')}}
-      {% elif order in ["abc"] %}{{_('A-Z')}}
-      {% elif order in ["zyx"] %}{{_('Z-A')}}
-      {% elif order in ["authaz", "authza"] %}{{_('Author Name')}}
-      {% elif order in ["pubnew", "pubold"] %}{{_('Publish Date')}}
-      {% else %}{{_('Sort Books')}}
-      {% endif %}
-    </summary>
-    <div class="sort-menu">
-
-      {# 1. DYNAMIC TOP SLOT: The reverse of the current sort #}
-      {% if order == 'new' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='old')}}">&#x25BC; {{_('Added First')}}</a></li>
-      {% elif order == 'old' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='new')}}">&#x25B2; {{_('Recently Added')}}</a></li>
-      {% elif order == 'abc' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='zyx')}}">&#x25BC; {{_('Alphabetical')}}</a></li>
-      {% elif order == 'zyx' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='abc')}}">&#x25B2; {{_('Alphabetical')}}</a></li>
-      {% elif order == 'authaz' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='authza')}}">&#x25BC; {{_('Author Name')}}</a></li>
-      {% elif order == 'authza' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='authaz')}}">&#x25B2; {{_('Author Name')}}</a></li>
-      {% elif order == 'pubnew' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='pubold')}}">&#x25BC; {{_('Publish Date')}}</a></li>
-      {% elif order == 'pubold' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='pubnew')}}">&#x25B2; {{_('Publish Date')}}</a></li>
-      {% endif %}
-
-      <li class="sort-divider" role="separator"></li>
-
-      {# 2. THE REST: All other sort options except the active pair #}
-      {% if order != 'new' and order != 'old' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='new')}}">&#x25B2; {{_('Recently Added')}}</a></li>
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='old')}}">&#x25BC; {{_('Added First')}}</a></li>
-      {% endif %}
-
-      {% if order != 'abc' and order != 'zyx' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='abc')}}">&#x25B2; {{_('Alphabetical')}}</a></li>
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='zyx')}}">&#x25BC; {{_('Alphabetical')}}</a></li>
-      {% endif %}
-
-      {% if order != 'authaz' and order != 'authza' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='authaz')}}">&#x25B2; {{_('Author Name')}}</a></li>
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='authza')}}">&#x25BC; {{_('Author Name')}}</a></li>
-      {% endif %}
-
-      {% if order != 'pubnew' and order != 'pubold' %}
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='pubnew')}}">&#x25B2; {{_('Publish Date')}}</a></li>
-        <li><a href="{{url_for('web.books_list', data=page, book_id=id, sort_param='pubold')}}">&#x25BC; {{_('Publish Date')}}</a></li>
-      {% endif %}
-
-    </ul>
-  </details-->
-
   <form class="search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
     <input type="text" class="search-input" name="query" placeholder="Search..." value="{{searchterm}}">
@@ -157,7 +100,15 @@
 >
   {% if entries[0] %}
     {% for entry in entries %}
-    <div class="book-cover">
+    <div class="book-cover"
+    data-book-id="{{ entry.Books.id }}"
+    data-title="{{ entry.Books.title }}"
+    data-author="{{ entry.Books.authors | map(attribute='name') | join(', ') }}"
+    data-rating="{{ (entry.Books.ratings[0].rating / 2) if entry.Books.rating else '' }}"
+    data-description="{{ entry.Books.comments[0].text | striptags | truncate(200, end='...') if entry.Books.comments else '' }}"
+    data-format="{{ entry.Books.data[0].format if entry.Books.data else '' }}"
+    data-read-url="{{ url_for('web.read_book', book_id=entry.Books.id, book_format=entry.Books.data[0].format) if entry.Books.data else '' }}"
+    data-detail-url="{{ url_for('web.show_book', book_id=entry.Books.id) }}"> 
       {{ image.book_cover(entry.Books) }}
     </div>
     {% endfor %}
@@ -169,7 +120,31 @@
 </div><!-- end main-content -->
 </div><!-- end content-layout -->
 
+<div id="popover-overlay"></div>
+<div id="book-popover">
+  <div id="book-popover-arrow"></div>
+  <h3 id="popover-title"></h3>
+  <h4 id="popover-author"></h4>
+  <p id="popover-rating"></p>
+  <p id="popover-description"></p>
+  <div id="popover-actions">
+    <button id="popover-read-btn" href="#">
+      <div id="read-btn-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M232,48H160a40,40,0,0,0-32,16A40,40,0,0,0,96,48H24a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h72a8,8,0,0,0,8-8V56A8,8,0,0,0,232,48ZM96,192H32V64H96a24,24,0,0,1,24,24V200A39.81,39.81,0,0,0,96,192Zm128,0H160a39.81,39.81,0,0,0-24,8V88a24,24,0,0,1,24-24h64Z"></path></svg>
+      </div>
+      Read Now
+    </button>
+    <button id="popover-details-btn" href="#">
+      Details
+      <div id="details-btn-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+      </div>
+    </button>
+  </div>
+</div>
+
 {% endblock %}
+
 
 {% block js %}
 <script>
@@ -221,5 +196,122 @@
     }
   });
 })();
+
+
+
+
+
+(function() {
+  var popover = document.getElementById('book-popover');
+  var grid = document.querySelector('.books-grid');
+  var overlay = document.getElementById('popover-overlay');
+  if (!popover || !grid) return;
+
+  var activeCard = null;
+
+  function showPopover(cover) {
+    document.querySelector('.main-content-wrapper').style.overflowY = 'hidden';
+    document.getElementById('popover-title').textContent = cover.dataset.title || '';
+    document.getElementById('popover-author').textContent = cover.dataset.author || '';
+    var rating = cover.dataset.rating;
+    document.getElementById('popover-rating').textContent = rating ? '★ ' + parseFloat(rating).toFixed(1) + ' / 5' : '';
+    document.getElementById('popover-description').textContent = cover.dataset.description || '';
+
+    var readBtn = document.getElementById('popover-read-btn');
+    var detailsBtn = document.getElementById('popover-details-btn');
+
+    var readUrl = cover.dataset.readUrl;
+    if (readUrl) {
+      readBtn.style.display = '';
+      readBtn.onclick = function() { window.location.href = readUrl; };
+    } else {
+      readBtn.style.display = 'none';
+    }
+
+    detailsBtn.onclick = function() {
+      var detailUrl = cover.dataset.detailUrl;
+      if (detailUrl) window.location.href = detailUrl;
+    };
+
+    // Measure height before positioning (hidden so no flash)
+    popover.classList.remove('arrow-right');
+    popover.style.visibility = 'hidden';
+    popover.style.display = 'block';
+
+    var pw = popover.offsetWidth;
+    var ph = popover.offsetHeight;
+    var rect = cover.getBoundingClientRect();
+    var gap = 12;
+
+    // Try placing to the right; flip left if it would overflow
+    var left = rect.right + gap;
+    if (left + pw > window.innerWidth - 8) {
+      left = rect.left - gap - pw;
+      popover.classList.add('arrow-right');
+    }
+
+    // Vertically center on the cover, clamped to viewport
+    var top = rect.top + rect.height / 2 - ph / 2;
+    top = Math.max(8, Math.min(top, window.innerHeight - ph - 8));
+
+    popover.style.top = top + 'px';
+    popover.style.left = left + 'px';
+    popover.style.visibility = '';
+    popover.classList.remove('animating');
+    void popover.offsetWidth; // forces the browser to reflow so the animation replays
+    popover.classList.add('animating');
+
+    activeCard = cover;
+    overlay.style.display = 'block';
+    activeCard.style.position = 'relative';
+    activeCard.style.zIndex = '51';
+  }
+
+  function hidePopover() {
+    document.querySelector('.main-content-wrapper').style.overflowY = '';
+    popover.style.display = 'none';
+    overlay.style.display = 'none';
+    if (activeCard) {
+    activeCard.style.position = '';
+    activeCard.style.zIndex = '';
+}
+
+    activeCard = null;
+  }
+
+  // Event delegation — works for covers loaded by infinite scroll too
+  grid.addEventListener('click', function(e) {
+    var cover = e.target.closest('.book-cover');
+    if (cover) {
+      if (activeCard === cover) {
+        hidePopover();
+      } else {
+        showPopover(cover);
+      }
+      e.stopPropagation();
+    }
+  });
+
+  // Click outside closes popover
+  document.addEventListener('click', function(e) {
+    if (activeCard && !popover.contains(e.target)) {
+      hidePopover();
+    }
+  });
+
+  // Escape key closes popover
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') hidePopover();
+  });
+
+  // Clicks inside the popover don't bubble up and close it
+  popover.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+})();
+
+
 </script>
+
+
 {% endblock %}
