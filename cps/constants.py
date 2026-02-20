@@ -27,7 +27,7 @@ APP_MODE             = os.environ.get('APP_MODE', 'production')
 HOME_CONFIG = os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.HOMEDIR'))
 
 # In executables updater is not available, so variable is set to False there
-UPDATER_AVAILABLE = True
+UPDATER_AVAILABLE = False  # Disabled in Book-Bag to prevent pulling from upstream Calibre-Web
 
 # Base dir is parent of current file, necessary if called from different folder
 BASE_DIR            = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
