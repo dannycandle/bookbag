@@ -1,3 +1,20 @@
+/* FONTS */
+@font-face {
+  font-family: 'Comfortaa';
+  src: url('../fonts/Comfortaa/Comfortaa-VariableFont_wght.ttf') format('truetype-variations'),
+       url('../fonts/Comfortaa/static/Comfortaa-Regular.ttf') format('truetype');
+  font-weight: 200 300 400 500 600 700 800 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations'),
+       url('../fonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+  font-weight: 100 900;
+  font-optical-sizing: auto;
+  font-display: swap;
+}
 
 /* TYPOGRAPHY */
 
@@ -6,7 +23,6 @@ h2, h3, h4, p {
 }
 
 h2 {
-    font-family: 'Roboto', sans-serif;
     font-size: x-large;
     font-weight: 500;
     color: #581C1C;
@@ -14,7 +30,6 @@ h2 {
 }
 
 h3 {
-    font-family: 'Roboto', sans-serif;
     font-size: large;
     font-weight: 500;
     color: #581C1C;
@@ -22,7 +37,6 @@ h3 {
 }
 
 h4 {
-    font-family: 'Roboto', sans-serif;
     font-size: medium;
     font-weight: 500;
     color: #8A5353;
@@ -30,7 +44,6 @@ h4 {
 }
 
 p {
-    font-family: 'Roboto', sans-serif;
     font-size: medium;
     font-weight: 300;
     color: #581C1C;
@@ -39,13 +52,13 @@ p {
 }
 
 /* LAYOUT & NAVBAR */
-body { 
-    display: flex; 
-    overflow-x: hidden; 
-    margin: 0; 
+body {
+    display: flex;
+    overflow-x: hidden;
+    margin: 0;
     background-color: black;
     padding: 0;
-
+    font-family: 'Inter', sans-serif;
 }
 .app-wrapper { 
     display: flex; 
@@ -103,6 +116,8 @@ body {
 
 .nav-button-text {
     font-family: 'Comfortaa', sans-serif;
+    font-size: small;
+    font-weight: 500;
     color: #581C1C;
 }
 
@@ -132,7 +147,6 @@ body {
 .user-popover-menu h3 {
     margin-top:0;
     padding-top:0px;
-    font-family: 'Roboto', sans-serif;
     font-size:large;
 }
 
@@ -150,11 +164,10 @@ details[open] .user-popover-menu {
     padding:5px 5px;
     border-color: transparent;
     background-color: transparent;
-    font-family: 'Roboto', sans-serif;
     gap: 10px;
     font-weight: 400;
     font-size: medium;
-    text-decoration: none;   
+    text-decoration: none;
     color: #581C1C;
     cursor: pointer;
     }
@@ -248,7 +261,6 @@ details[open] .user-popover-menu {
 
 .filter-heading {
     color: #581C1C;
-    font-family: 'Roboto', sans-serif;
     margin: 0 0 10px 0;
     font-size: medium;
     font-weight: 400;
@@ -260,7 +272,6 @@ details[open] .user-popover-menu {
 }
 
 .filter-section-title {
-    font-family: 'Roboto', sans-serif;
     font-weight: 500;
     color: #581C1C;
     font-size: small;
@@ -282,7 +293,6 @@ details[open] .user-popover-menu {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-family: 'Roboto', sans-serif;
     font-size: small;
     color: #581C1C;
     cursor: pointer;
@@ -311,7 +321,6 @@ details[open] .user-popover-menu {
     border: 1px solid transparent;
     border-radius: 10px;
     padding: 6px 14px;
-    font-family: 'Comfortaa', sans-serif;
     color: #581C1C;
     backdrop-filter: blur(10px);
         cursor:pointer;
@@ -334,7 +343,6 @@ summary {
     padding:5px 5px;
     border-color: transparent;
     background-color: transparent;
-    font-family: 'Roboto', sans-serif;
     gap: 10px;
     font-weight: 400;
     font-size: medium;
@@ -358,7 +366,6 @@ summary {
     background: transparent;
     border: none;
     outline: none;
-    font-family: 'Comfortaa', sans-serif;
     color: #581C1C;
     font-size: medium;
 }
@@ -445,14 +452,12 @@ details[open] .sort-popover {
 }
 
 .book-cover-fallback-title {
-    font-family: 'Roboto', sans-serif;
     color: white;
     font-size:x-large;
     font-weight: 700;
 }
 
 .book-cover-fallback-author {
-    font-family: 'Roboto', sans-serif;
     color: rgba(255, 255, 255, 0.75);
     font-size:large;
 }
@@ -479,7 +484,6 @@ details[open] .sort-popover {
 /* SEARCH RESULT COUNT */
 
 .result-count {
-    font-family: 'Roboto', sans-serif;
     font-size: small;
     font-weight: 600;
     color: #581C1C;
@@ -530,7 +534,6 @@ details[open] .sort-popover {
 }
 
 #popover-title {
-    font-family: 'Roboto', sans-serif;
     font-size:x-large;
     font-weight: 500;
     color:#581C1C;    
@@ -538,7 +541,6 @@ details[open] .sort-popover {
 }
 
 #popover-author {
-    font-family: 'Roboto', sans-serif;
     font-weight: 500;
     color:#8A5353;
     margin: 0 0 6px 0;
@@ -552,7 +554,6 @@ details[open] .sort-popover {
 
 #popover-description {
     font-size:medium;
-    font-family: 'Roboto', sans-serif;
     line-height: 1.5;
     color:#581C1C;
     margin: 0 0 14px 0;
@@ -576,7 +577,6 @@ details[open] .sort-popover {
     border: none;
     border-radius: 10px;
     padding: 10px 16px;
-    font-family: 'Comfortaa', sans-serif;
     font-size: medium;
     cursor: pointer;
 }
@@ -604,7 +604,6 @@ details[open] .sort-popover {
     border-radius: 10px;
     border-style:solid;
     padding: 10px 16px;
-    font-family: 'Roboto', sans-serif;
     font-size: medium;
     cursor: pointer;
 }
@@ -734,150 +733,14 @@ or design guidelines. I am in the process of updating them. */
 /*   FORMS   */
 /*-----------*/
 
-/* Form container — replaces Bootstrap .well */
-.well {
-    background-color: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(12px);
-    border: none;
-    border-radius: 20px;
-    padding: 36px 40px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
-}
-
-.well h1, .well h2, .well h3 {
-    font-family: 'Comfortaa', sans-serif;
-    color: #581C1C;
-    margin-top: 0;
-}
-
-/* Labels */
-.form-group {
-    margin-bottom: 24px;
-}
-
-.form-group > label {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    font-size: 13px;
-    color: #581C1C;
-    margin-bottom: 6px;
-    display: block;
-}
-
-.form-group.required > label::after {
-    content: ' *';
-    color: #F94C4C;
-}
 
 
 
-/* Inputs, selects, textareas */
-.form-control {
-    background-color: transparent !important;
-    border: none !important;
-    border-bottom: 1.5px solid rgba(88, 28, 28, 0.25) !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    padding: 8px 2px !important;
-    font-family: 'Roboto', sans-serif !important;
-    font-size: 14px !important;
-    color: #581C1C !important;
-    width: 100%;
-    transition: border-color 0.2s;
-}
-
-.form-control::placeholder {
-    color: rgba(88, 28, 28, 0.35) !important;
-    font-style: italic;
-}
-
-.form-control:focus {
-    background-color: transparent !important;
-    border-bottom-color: #F94C4C !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-
-
-/* Select arrow */
-select.form-control {
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23581C1C' fill-opacity='.45' d='M5 6L0 0h10z'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 6px center !important;
-    padding-right: 26px !important;
-    cursor: pointer;
-}
-
-
-
-/* Checkboxes */
-.checkbox label,
-.form-group .checkbox label {
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    color: #581C1C;
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-    accent-color: #F94C4C;
-}
-
-
-
-/* Buttons */
-
-.btn-primary {
-    background-color: #F94C4C !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 10px 22px !important;
-    font-family: 'Comfortaa', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.15s;
-    box-shadow: none !important;
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-    background-color: #d93a3a !important;
-    transform: translateY(-1px);
-    box-shadow: none !important;
-}
-
-.btn-default {
-    background-color: transparent !important;
-    color: #581C1C !important;
-    border: 1px solid rgba(88, 28, 28, 0.28) !important;
-    border-radius: 10px !important;
-    padding: 10px 22px !important;
-    font-family: 'Comfortaa', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    box-shadow: none !important;
-}
-
-.btn-default:hover,
-.btn-default:focus {
-    background-color: rgba(88, 28, 28, 0.06) !important;
-    border-color: rgba(88, 28, 28, 0.4) !important;
-    color: #581C1C !important;
-    box-shadow: none !important;
-}
 
 /* Alerts */
 .alert {
     border-radius: 10px;
     border: none;
-    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     padding: 12px 16px;
 }
@@ -932,7 +795,6 @@ input[type="radio"] {
     backdrop-filter: blur(12px);
     border-radius: 12px;
     padding: 12px 22px;
-    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     font-weight: 500;
     color: #581C1C;
@@ -989,7 +851,6 @@ input[type="radio"] {
 }
 
 .author-goodreads-link {
-    font-family: 'Roboto', sans-serif;
     font-size: 13px;
     color: #8A5353;
     text-decoration: none;
@@ -1080,7 +941,6 @@ input[type="radio"] {
 /* Title & author */
 
 .book-detail-title {
-    font-family: 'Roboto', sans-serif;
     font-size: 2rem;
     font-weight: 700;
     color: #581C1C;
@@ -1097,7 +957,6 @@ input[type="radio"] {
 }
 
 .book-detail-author-link {
-    font-family: 'Roboto', sans-serif;
     font-size: 1.05rem;
     font-weight: 500;
     color: #8A5353;
@@ -1110,7 +969,6 @@ input[type="radio"] {
 
 .book-detail-author-sep {
     color: #8A5353;
-    font-family: 'Roboto', sans-serif;
     opacity: 0.6;
 }
 
@@ -1121,7 +979,6 @@ input[type="radio"] {
 }
 
 .book-detail-series {
-    font-family: 'Roboto', sans-serif;
     font-size: 0.9rem;
     color: #8A5353;
     margin-bottom: 12px;
@@ -1165,7 +1022,6 @@ input[type="radio"] {
     color: #581C1C;
     border-radius: 50px;
     padding: 4px 12px;
-    font-family: 'Roboto', sans-serif;
     font-size: 13px;
     font-weight: 500;
     text-decoration: none;
@@ -1182,7 +1038,6 @@ input[type="radio"] {
 /* Publisher & date */
 
 .book-detail-pubinfo {
-    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     color: #581C1C;
     opacity: 0.7;
@@ -1202,7 +1057,6 @@ input[type="radio"] {
 /* Languages & identifiers */
 
 .book-detail-languages {
-    font-family: 'Roboto', sans-serif;
     font-size: 13px;
     color: #8A5353;
     margin-bottom: 12px;
@@ -1217,7 +1071,6 @@ input[type="radio"] {
 }
 
 .book-detail-identifier-link {
-    font-family: 'Roboto', sans-serif;
     font-size: 12px;
     color: #581C1C;
     background-color: rgba(88, 28, 28, 0.07);
@@ -1234,7 +1087,6 @@ input[type="radio"] {
 /* Custom columns */
 
 .book-detail-custom-col {
-    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     color: #581C1C;
     margin-bottom: 8px;
@@ -1249,7 +1101,6 @@ input[type="radio"] {
 /* Description */
 
 .book-detail-description {
-    font-family: 'Roboto', sans-serif;
     font-size: 15px;
     line-height: 1.65;
     color: #581C1C;
@@ -1280,7 +1131,6 @@ input[type="radio"] {
     gap: 8px;
     padding: 11px 22px;
     border-radius: 50px;
-    font-family: 'Comfortaa', sans-serif;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -1293,7 +1143,7 @@ input[type="radio"] {
 
 .detail-action-btn-primary {
     background-color: #F94C4C;
-    color: white !important;
+    color: white;
 }
 
 .detail-action-btn-primary svg {
@@ -1308,8 +1158,8 @@ input[type="radio"] {
 
 .detail-action-btn-secondary {
     background-color: transparent;
-    color: #581C1C !important;
-    border: 1.5px solid rgba(88, 28, 28, 0.3) !important;
+    color: #581C1C;
+    border: 1.5px solid rgba(88, 28, 28, 0.3);
 }
 
 .detail-action-btn-secondary svg {
@@ -1318,7 +1168,7 @@ input[type="radio"] {
 
 .detail-action-btn-secondary:hover {
     background-color: rgba(88, 28, 28, 0.05);
-    border-color: rgba(88, 28, 28, 0.5) !important;
+    border-color: rgba(88, 28, 28, 0.5);
     color: #581C1C;
     transform: translateY(-1px);
 }
@@ -1327,7 +1177,6 @@ input[type="radio"] {
     background-color: transparent;
     color: #581C1C !important;
     border: 1px solid rgba(88, 28, 28, 0.18) !important;
-    font-family: 'Roboto', sans-serif !important;
     font-weight: 400 !important;
     font-size: 13px !important;
     padding: 7px 14px !important;
@@ -1378,7 +1227,6 @@ details[open] .detail-icon-popover {
 
 .detail-action-popover-item,
 .detail-icon-popover-item {
-    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     color: #581C1C;
     padding: 8px 12px;
@@ -1422,34 +1270,12 @@ details[open] .detail-icon-popover {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     color: #581C1C;
     cursor: pointer;
     opacity: 0.75;
 }
 
-/* Responsive */
-
-@media (max-width: 768px) {
-    .book-detail-layout {
-        flex-direction: column;
-        padding: 20px;
-        gap: 24px;
-    }
-
-    .book-detail-cover-col {
-        flex: none;
-        width: 55%;
-        max-width: 260px;
-        margin: 0 auto;
-        position: static;
-    }
-
-    .book-detail-title {
-        font-size: 1.6rem;
-    }
-}
 
 /* ADMIN PAGES */
 
@@ -1475,7 +1301,6 @@ background-color: rgba(255, 255, 255, 0.9);
 }
 
 .admin-card-title {
-    font-family: 'Comfortaa', sans-serif;
     font-size: 1rem;
     font-weight: 700;
     color: #581C1C;
@@ -1483,214 +1308,3 @@ background-color: rgba(255, 255, 255, 0.9);
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(88, 28, 28, 0.1);
 }
-
-.admin-kv-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 32px;
-    margin-bottom: 16px;
-}
-
-.admin-kv-row {
-    display: contents;
-}
-
-.admin-kv-label {
-    font-family: 'Roboto', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: #581C1C;
-    opacity: 0.65;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(88, 28, 28, 0.06);
-}
-
-.admin-kv-value {
-    font-family: 'Roboto', sans-serif;
-    font-size: 13px;
-    color: #581C1C;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(88, 28, 28, 0.06);
-}
-
-.admin-bool-yes {
-    color: #1a6e3a;
-    font-weight: 600;
-}
-
-.admin-bool-no {
-    color: rgba(88, 28, 28, 0.3);
-    font-weight: 600;
-}
-
-.admin-actions-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
-    align-items: center;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Roboto', sans-serif;
-    font-size: 13px;
-    margin-bottom: 4px;
-}
-
-.admin-table th {
-    font-weight: 500;
-    color: #581C1C;
-    text-align: left;
-    padding: 8px 10px;
-    border-bottom: 1.5px solid rgba(88, 28, 28, 0.15);
-    opacity: 0.7;
-    white-space: nowrap;
-}
-
-.admin-table td {
-    padding: 9px 10px;
-    color: #581C1C;
-    border-bottom: 1px solid rgba(88, 28, 28, 0.06);
-    vertical-align: middle;
-}
-
-.admin-table tr:last-child td {
-    border-bottom: none;
-}
-
-.admin-table a {
-    color: #F94C4C;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.admin-table a:hover {
-    text-decoration: underline;
-}
-
-.admin-checkbox-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 32px;
-    margin-bottom: 20px;
-}
-
-.admin-checkbox-group .form-group {
-    margin-bottom: 10px;
-}
-
-.btn-danger {
-    background-color: rgba(249, 76, 76, 0.1) !important;
-    color: #F94C4C !important;
-    border: 1px solid rgba(249, 76, 76, 0.35) !important;
-    border-radius: 10px !important;
-    padding: 10px 22px !important;
-    font-family: 'Comfortaa', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    box-shadow: none !important;
-}
-
-.btn-danger:hover,
-.btn-danger:focus {
-    background-color: rgba(249, 76, 76, 0.2) !important;
-    border-color: rgba(249, 76, 76, 0.55) !important;
-    color: #F94C4C !important;
-    box-shadow: none !important;
-}
-
-/* Modals */
-
-.modal-content {
-    background-color: rgba(255, 255, 255, 0.97) !important;
-    backdrop-filter: blur(12px);
-    border-radius: 16px !important;
-    border: none !important;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18) !important;
-}
-
-.modal-header {
-    border-bottom: 1px solid rgba(88, 28, 28, 0.1) !important;
-    border-radius: 16px 16px 0 0 !important;
-    padding: 16px 20px !important;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    color: #581C1C;
-    min-height: auto !important;
-}
-
-.modal-header.bg-info {
-    background-color: rgba(88, 28, 28, 0.04) !important;
-    color: #581C1C !important;
-}
-
-.modal-header.bg-danger {
-    background-color: rgba(249, 76, 76, 0.08) !important;
-    color: #F94C4C !important;
-}
-
-.modal-body {
-    padding: 20px 24px !important;
-    font-family: 'Roboto', sans-serif;
-    color: #581C1C;
-}
-
-.modal-footer {
-    border-top: 1px solid rgba(88, 28, 28, 0.1) !important;
-    padding: 12px 24px !important;
-}
-
-.modal-body p {
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    color: #581C1C;
-    opacity: 0.85;
-}
-
-/* Bootstrap-table overrides for tasks page */
-
-.bootstrap-table {
-    font-family: 'Roboto', sans-serif;
-    font-size: 13px;
-    color: #581C1C;
-}
-
-.bootstrap-table .table {
-    border-collapse: collapse;
-}
-
-.bootstrap-table .table thead th {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    color: #581C1C;
-    border-bottom: 1.5px solid rgba(88, 28, 28, 0.15);
-    border-top: none;
-    padding: 10px 12px;
-    opacity: 0.7;
-    background-color: transparent;
-}
-
-.bootstrap-table .table tbody td {
-    padding: 10px 12px;
-    color: #581C1C;
-    border-top: 1px solid rgba(88, 28, 28, 0.07);
-    vertical-align: middle;
-}
-
-.bootstrap-table .table-no-bordered {
-    border: none;
-}
-
-.bootstrap-table .fixed-table-container {
-    border: none !important;
-}
-
-.bootstrap-table .fixed-table-toolbar .btn {
-    font-family: 'Comfortaa', sans-serif;
-    font-size: 13px;
-}
-
