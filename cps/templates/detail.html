@@ -1,29 +1,29 @@
 {% extends is_xhr|yesno("fragment.html", "layout.html") %}
 {% block header %}
-    <meta property="og:type" content="book" />
-    <meta property="og:title" content="{{ entry.title|truncate(35) }}" />
-    {% if entry.comments|length > 0 and entry.comments[0].text|length > 0 %}
-      <meta property="og:description" content="{{ entry.comments[0].text|striptags|truncate(65) }}" />
-      <meta property="og:image" content="{{url_for('web.get_cover', book_id=entry.id, resolution='og', c=entry|last_modified)}}" />
-    {% endif %}
+<meta property="og:type" content="book" />
+<meta property="og:title" content="{{ entry.title|truncate(35) }}" />
+{% if entry.comments|length > 0 and entry.comments[0].text|length > 0 %}
+<meta property="og:description" content="{{ entry.comments[0].text|striptags|truncate(65) }}" />
+<meta property="og:image" content="{{url_for('web.get_cover', book_id=entry.id, resolution='og', c=entry|last_modified)}}" />
+{% endif %}
 {% endblock %}
+
 {% block body %}
 <div class="book-detail-layout">
-
   <!-- Cover column -->
   <div class="book-detail-cover-col">
-    <img class="book-detail-cover-img" title="{{ entry.title }}"
-         src="{{ url_for('web.get_cover', book_id=entry.id, resolution='og', c=entry|last_modified) }}"
-         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <img class="book-detail-cover-img" title="{{ entry.title }}" src="{{ url_for('web.get_cover', book_id=entry.id, resolution='og', c=entry|last_modified) }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
     <div class="book-cover-fallback" style="display:none;">
-      <div class="book-cover-fallback-title">{{ entry.title }}</div>
-      <div class="book-cover-fallback-author">{% for author in entry.ordered_authors %}{{ author.name.replace('|',',') }}{% if not loop.last %}, {% endif %}{% endfor %}</div>
+      <div class="book-cover-fallback-title">
+        {{ entry.title }}
+      </div>
+      <div class="book-cover-fallback-author">
+        {% for author in entry.ordered_authors %}{{ author.name.replace('|',',') }}{% if not loop.last %}, {% endif %}{% endfor %}
+      </div>
     </div>
   </div>
-
   <!-- Metadata column -->
   <div class="book-detail-meta-col">
-
     <!-- Icon action row -->
     <div class="book-detail-icon-actions">
       {% if not current_user.is_anonymous %}
@@ -64,10 +64,9 @@
         {% endif %}
       {% endif %}
     </div>
-
+  <div id="book-details-content">
     <!-- Title -->
     <h1 class="book-detail-title">{{ entry.title }}</h1>
-
     <!-- Authors -->
     <div class="book-detail-author">
       {% for author in entry.ordered_authors %}
@@ -77,14 +76,12 @@
       {% endfor %}
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" class="book-detail-author-arrow"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
     </div>
-
     <!-- Series -->
     {% if entry.series|length > 0 %}
     <div class="book-detail-series">
       {{ _("Book %(index)s of %(range)s", index=entry.series_index|formatfloat(2), range=(url_for('web.books_list', data='series', sort_param='stored', book_id=entry.series[0].id)|escapedlink(entry.series[0].name))|safe) }}
     </div>
     {% endif %}
-
     <!-- Ratings -->
     {% if entry.ratings|length > 0 %}
     <div class="book-detail-rating">
@@ -93,7 +90,6 @@
       {% endfor %}
     </div>
     {% endif %}
-
     <!-- Tags / Genre pills -->
     {% if entry.tags|length > 0 %}
     <div class="book-detail-tags">
@@ -104,7 +100,6 @@
       {% endfor %}
     </div>
     {% endif %}
-
     <!-- Publisher & Date -->
     {% if entry.publishers|length > 0 or (entry.pubdate|string)[:10] != '0101-01-01' %}
     <div class="book-detail-pubinfo">
@@ -120,14 +115,12 @@
       {% endif %}
     </div>
     {% endif %}
-
     <!-- Languages -->
     {% if entry.languages|length > 0 %}
     <div class="book-detail-languages">
       {{ _('Language') }}: {% for language in entry.languages %}{{ language.language_name }}{% if not loop.last %}, {% endif %}{% endfor %}
     </div>
     {% endif %}
-
     <!-- Identifiers -->
     {% if entry.identifiers|length > 0 %}
     <div class="book-detail-identifiers">
@@ -136,7 +129,6 @@
       {% endfor %}
     </div>
     {% endif %}
-
     <!-- Custom columns -->
     {% if cc|length > 0 %}
       {% for c in cc %}
@@ -157,14 +149,12 @@
         {% endif %}
       {% endfor %}
     {% endif %}
-
     <!-- Description -->
     {% if entry.comments|length > 0 and entry.comments[0].text|length > 0 %}
     <div class="book-detail-description">
       {{ entry.comments[0].text|safe }}
     </div>
     {% endif %}
-
     <!-- Primary action buttons -->
     <div class="book-detail-actions">
 
@@ -243,7 +233,6 @@
       {% endif %}
 
     </div>
-
     <!-- Shelf management -->
     {% if current_user.is_authenticated and (current_user.shelf.all() or g.shelves_access) %}
     <div id="shelf-actions" class="book-detail-shelf-actions">
@@ -285,7 +274,6 @@
       <div id="shelf-action-errors" role="alert"></div>
     </div>
     {% endif %}
-
     <!-- Archive & read checkboxes (hidden inputs for JS compatibility) -->
     {% if not current_user.is_anonymous %}
     <div class="book-detail-toggles">
@@ -305,11 +293,10 @@
       {% endif %}
     </div>
     {% endif %}
-
+    </div>
   </div>
 </div>
 {% endblock %}
-
 {% block js %}
 <script type="text/template" id="template-shelf-add">
     <li>
