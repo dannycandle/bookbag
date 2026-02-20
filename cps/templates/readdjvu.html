@@ -18,6 +18,7 @@
     <script src="{{ url_for('static', filename='js/reading/djvu_reader.js') }}"></script>
   </head>
   <body>
+    <script>localStorage.setItem('lastBookUrl', window.location.pathname);</script>
 	<div id="djvuContainer" file="{{ url_for('web.serve_book', book_id=djvufile, book_format=extension) }}"></div>
   </body>
 </html>

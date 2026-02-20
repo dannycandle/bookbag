@@ -1,16 +1,15 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="well col-sm-6 col-sm-offset-2">
-  <h2 style="margin-top: 0">{{_('Login')}}</h2>
+<div id="login-wrapper">
+<div id="log-form-wrapper">
+  <h2>{{_('Login')}}</h2>
   <form method="POST" role="form">
     <input type="hidden" name="next" value="{{next_url}}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
-      <label for="username">{{_('Username')}}</label>
       <input type="text" class="form-control" id="username" name="username" autocapitalize="off" placeholder="{{_('Username')}}" value="{{ username }}">
     </div>
     <div class="form-group">
-      <label for="password">{{_('Password')}}</label>
       <input type="password" class="form-control" id="password" name="password" placeholder="{{_('Password')}}" value="{{ password }}">
     </div>
     <div class="checkbox">
@@ -56,5 +55,7 @@
   <div class="col-sm-6 col-sm-offset-2">
     <div class="alert alert-danger">{{error}}</div>
   </div>
+
+</div>
   {% endif %}
 {% endblock %}

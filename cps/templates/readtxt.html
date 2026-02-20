@@ -25,6 +25,7 @@
         <script src="{{ url_for('static', filename='js/reading/txt_reader.js') }}"></script>
     </head>
     <body>
+      <script>localStorage.setItem('lastBookUrl', window.location.pathname);</script>
       <div id="readmain" data-load="{{ url_for('web.serve_book', book_id=txtfile, book_format='txt') }}">
         <div id="left" class="arrow" >‹</div>
         <div id="area"><pre id="content" class="content"></pre></div>

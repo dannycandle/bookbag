@@ -21,6 +21,7 @@
 </head>
 
 <body>
+    <script>localStorage.setItem('lastBookUrl', window.location.pathname);</script>
     <div id="sidebar">
         <div id="panels">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

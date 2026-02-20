@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1 class="{{page}}">{{title}}</h1>
-
-<div class="search-container">
+<div id="search-wrapper">
+<div id="search-form-wrapper">
+  <h2>{{title}}</h2>
   <form role="form" id="search" action="{{ url_for('search.advanced_search_form') }}" method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -144,6 +144,7 @@
       <button type="submit" id="adv_submit" class="btn btn-primary">{{_('Search')}}</button>
     </div>
   </form>
+</div>
 </div>
 {% endblock %}
 

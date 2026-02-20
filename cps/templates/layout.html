@@ -85,7 +85,9 @@
           </div>
         </div>
       </div>
-{% endif %}
+
+
+{% if request.endpoint == 'web.index' or request.endpoint == 'web.books_list' %}
 
 <aside class="filter-sidebar">
   <div id="filt-options-wrapper">
@@ -134,58 +136,46 @@
   </div>
 </aside>
 
+{% endif %}
 
+{% endif %}
 
 <div class="main-content-wrapper">
-      
-      {% for category, message in get_flashed_messages(with_categories=True) %}
-        <div class="alert alert-{{ 'danger' if category == 'error' else category }} text-center">{{ message }}</div>
-      {% endfor %}
-
       {% block body %}{% endblock %}
-
-
     </div>
 
     {% block modal %}{% endblock %}
-    
 
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <div id="toast-container">
+          {% for category, message in messages %}
+            <div class="toast toast-{{ 'danger' if category == 'error' else category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
     <script>
-      (function() {
-        if (window.location.pathname.match(/^\/read\/\d+\//)) {
-          localStorage.setItem('lastBookUrl', window.location.pathname);
-        }
-      })();
-
       function goToLastBook() {
         var last = localStorage.getItem('lastBookUrl');
         window.location.href = last || '{{ url_for('web.books_list', data='newest', book_id=1, sort_param='stored') }}';
       }
+
+      document.querySelectorAll('.toast').forEach(function(toast) {
+        setTimeout(function() {
+          toast.classList.add('toast-hiding');
+          toast.addEventListener('animationend', function() { toast.remove(); });
+        }, 3000);
+      });
     </script>
     {% block js %}{% endblock %}
 </div>
 <!--END MAIN APP-->
 
 
-<!-- POPOVERS/MODAL DIALOGS (WIP)-->
-
-<!-- Deprecated: Modal Dialogs
-    <div class="modal fade" id="bookDetailsModal" tabindex="-1" role="dialog" aria-labelledby="bookDetailsModalLabel">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="bookDetailsModalLabel">{{_('Book Details')}}</h4>
-          </div>
-          <div class="modal-body">...</div>
-          <div class="modal-footer">
-            <button type="button" id="details_close" class="btn btn-default" data-dismiss="modal">{{_('Close')}}</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  -->
 
 
 </body>

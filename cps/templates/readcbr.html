@@ -23,6 +23,7 @@
   <script src="{{ url_for('static', filename='js/kthoom.js') }}"></script>
 </head>
 <body>
+<script>localStorage.setItem('lastBookUrl', window.location.pathname);</script>
 <div id="sidebar">
   <div id="tocView" class="view" tabindex="-1">
     <ul id="thumbnails"></ul>
