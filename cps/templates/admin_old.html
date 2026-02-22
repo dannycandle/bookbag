@@ -1,0 +1,237 @@
+{% extends "layout.html" %}
+{% macro display_bool_setting(setting_value) -%}
+  {% if setting_value %}<span class="admin-bool-yes">✓</span>{% else %}<span class="admin-bool-no">✗</span>{% endif %}
+{%- endmacro %}
+{% block body %}
+<div class="admin-page-wrapper">
+
+  <!-- Users -->
+  <div class="admin-card">
+    <h3 class="admin-card-title">{{_('Users')}}</h3>
+    {% if allUser.__len__() < 10 %}
+    <table class="admin-table" id="table_user">
+      <thead>
+        <tr>
+          <th>{{_('Username')}}</th>
+          <th>{{_('Email')}}</th>
+          <th>{{_('eReader Email')}}</th>
+          <th>{{_('Downloads')}}</th>
+          <th>{{_('Admin')}}</th>
+          <th>{{_('Password')}}</th>
+          {% if config.config_uploading %}
+          <th>{{_('Upload')}}</th>
+          {% endif %}
+          <th>{{_('Download')}}</th>
+          <th>{{_('View')}}</th>
+          <th>{{_('Edit')}}</th>
+          <th>{{_('Delete')}}</th>
+          <th>{{_('Public Shelf')}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in allUser %}
+          {% if not user.role_anonymous() or config.config_anonbrowse %}
+          <tr>
+            <td><a class="session" href="{{url_for('admin.edit_user', user_id=user.id)}}">{{user.name}}</a></td>
+            <td>{{user.email}}</td>
+            <td>{{user.kindle_mail}}</td>
+            <td>{{user.downloads.count()}}</td>
+            <td>{{ display_bool_setting(user.role_admin()) }}</td>
+            <td>{{ display_bool_setting(user.role_passwd()) }}</td>
+            {% if config.config_uploading %}
+            <td>{{ display_bool_setting(user.role_upload()) }}</td>
+            {% endif %}
+            <td>{{ display_bool_setting(user.role_download()) }}</td>
+            <td>{{ display_bool_setting(user.role_viewer()) }}</td>
+            <td>{{ display_bool_setting(user.role_edit()) }}</td>
+            <td>{{ display_bool_setting(user.role_delete_books()) }}</td>
+            <td>{{ display_bool_setting(user.role_edit_shelfs()) }}</td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    <div class="admin-actions-row">
+      {% if not simple %}
+        <a class="btn btn-default" id="admin_user_table" href="{{url_for('admin.edit_user_table')}}">{{_('Edit Users')}}</a>
+      {% endif %}
+      <a class="btn btn-default" id="admin_new_user" href="{{url_for('admin.new_user')}}">{{_('Add New User')}}</a>
+      {% if (config.config_login_type == 1) %}
+        <div class="btn btn-default" id="import_ldap_users" data-toggle="modal" data-target="#StatusDialog">{{_('Import LDAP Users')}}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Email Server -->
+  <div class="admin-card">
+    <h3 class="admin-card-title">{{_('Email Server Settings')}}</h3>
+    {% if config.get_mail_server_configured() %}
+      {% if config.mail_server_type == 0 %}
+      <div class="admin-kv-grid">
+        <div class="admin-kv-label">{{_('SMTP Hostname')}}</div><div class="admin-kv-value">{{config.mail_server}}</div>
+        <div class="admin-kv-label">{{_('SMTP Port')}}</div><div class="admin-kv-value">{{config.mail_port}}</div>
+        <div class="admin-kv-label">{{_('Encryption')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.mail_use_ssl) }}</div>
+        <div class="admin-kv-label">{{_('SMTP Login')}}</div><div class="admin-kv-value">{{config.mail_login}}</div>
+        <div class="admin-kv-label">{{_('From Email')}}</div><div class="admin-kv-value">{{config.mail_from}}</div>
+      </div>
+      {% else %}
+      <div class="admin-kv-grid">
+        <div class="admin-kv-label">{{_('Email Service')}}</div><div class="admin-kv-value">{{_('Gmail via Oauth2')}}</div>
+        <div class="admin-kv-label">{{_('From Email')}}</div><div class="admin-kv-value">{{config.mail_gmail_token['email']}}</div>
+      </div>
+      {% endif %}
+    {% endif %}
+    <div class="admin-actions-row">
+      <a class="btn btn-default emailconfig" id="admin_edit_email" href="{{url_for('admin.edit_mailsettings')}}">{{_('Edit Email Server Settings')}}</a>
+    </div>
+  </div>
+
+  <!-- Configuration -->
+  <div class="admin-card">
+    <h3 class="admin-card-title">{{_('Configuration')}}</h3>
+    <div class="admin-kv-grid">
+      <div class="admin-kv-label">{{_('Calibre Database Directory')}}</div><div class="admin-kv-value">{{config.config_calibre_dir}}</div>
+      <div class="admin-kv-label">{{_('Log Level')}}</div><div class="admin-kv-value">{{config.get_log_level()}}</div>
+      <div class="admin-kv-label">{{_('Port')}}</div><div class="admin-kv-value">{{config.config_port}}</div>
+      {% if kobo_support and config.config_port != config.config_external_port %}
+      <div class="admin-kv-label">{{_('External Port')}}</div><div class="admin-kv-value">{{config.config_external_port}}</div>
+      {% endif %}
+      <div class="admin-kv-label">{{_('Books per Page')}}</div><div class="admin-kv-value">{{config.config_books_per_page}}</div>
+      <div class="admin-kv-label">{{_('Uploads')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.config_uploading) }}</div>
+      <div class="admin-kv-label">{{_('Anonymous Browsing')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.config_anonbrowse) }}</div>
+      <div class="admin-kv-label">{{_('Public Registration')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.config_public_reg) }}</div>
+      <div class="admin-kv-label">{{_('Magic Link Remote Login')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.config_remote_login) }}</div>
+      <div class="admin-kv-label">{{_('Reverse Proxy Login')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.config_allow_reverse_proxy_header_login) }}</div>
+      {% if config.config_allow_reverse_proxy_header_login %}
+      <div class="admin-kv-label">{{_('Reverse Proxy Header Name')}}</div><div class="admin-kv-value">{{ config.config_reverse_proxy_login_header_name }}</div>
+      {% endif %}
+    </div>
+    <div class="admin-actions-row">
+      <a class="btn btn-default" id="db_config" href="{{url_for('admin.db_configuration')}}">{{_('Edit Calibre Database Configuration')}}</a>
+      <a class="btn btn-default" id="basic_config" href="{{url_for('admin.configuration')}}">{{_('Edit Basic Configuration')}}</a>
+      <a class="btn btn-default" id="view_config" href="{{url_for('admin.view_configuration')}}">{{_('Edit UI Configuration')}}</a>
+    </div>
+  </div>
+
+  <!-- Scheduled Tasks -->
+  {% if feature_support['scheduler'] %}
+  <div class="admin-card">
+    <h3 class="admin-card-title">{{_('Scheduled Tasks')}}</h3>
+    <div class="admin-kv-grid scheduled_tasks_details">
+      <div class="admin-kv-label">{{_('Start Time')}}</div><div class="admin-kv-value">{{schedule_time}}</div>
+      <div class="admin-kv-label">{{_('Maximum Duration')}}</div><div class="admin-kv-value">{{schedule_duration}}</div>
+      <div class="admin-kv-label">{{_('Generate Thumbnails')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.schedule_generate_book_covers) }}</div>
+      <div class="admin-kv-label">{{_('Reconnect Calibre Database')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.schedule_reconnect) }}</div>
+      <div class="admin-kv-label">{{_('Generate Metadata Backup Files')}}</div><div class="admin-kv-value">{{ display_bool_setting(config.schedule_metadata_backup) }}</div>
+    </div>
+    <div class="admin-actions-row">
+      <a class="btn btn-default scheduledtasks" id="admin_edit_scheduled_tasks" href="{{url_for('admin.edit_scheduledtasks')}}">{{_('Edit Scheduled Tasks Settings')}}</a>
+      {% if config.schedule_generate_book_covers %}
+        <a class="btn btn-default" id="admin_refresh_cover_cache">{{_('Refresh Thumbnail Cache')}}</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Administration -->
+  <div class="admin-card">
+    <h3 class="admin-card-title">{{_('Administration')}}</h3>
+    <div class="admin-actions-row">
+      <a class="btn btn-default" id="debug" href="{{url_for('admin.download_debug')}}">{{_('Download Debug Package')}}</a>
+      <a class="btn btn-default" id="logfile" href="{{url_for('admin.view_logfile')}}">{{_('View Logs')}}</a>
+      <div class="btn btn-default" id="restart_database" data-toggle="modal" data-target="#StatusDialog">{{_('Reconnect Calibre Database')}}</div>
+    </div>
+    <div class="admin-actions-row">
+      <div class="btn btn-default" id="admin_restart" data-toggle="modal" data-target="#RestartDialog">{{_('Restart')}}</div>
+      <div class="btn btn-danger" id="admin_stop" data-toggle="modal" data-target="#ShutdownDialog">{{_('Shutdown')}}</div>
+    </div>
+    {% if config.schedule_metadata_backup %}
+    <div class="admin-actions-row">
+      <div class="btn btn-default" id="metadata_backup" data-toggle="modal" data-target="#StatusDialog">{{_('Queue all books for metadata backup')}}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Version Information -->
+  <div class="admin-card">
+    <h3 class="admin-card-title">{{_('Version Information')}}</h3>
+    <table class="admin-table" id="update_table">
+      <thead>
+        <tr>
+          <th>{{_('Version')}}</th>
+          <th>{{_('Details')}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="current_version">
+          <td>{{commit}}</td>
+          <td><i>{{_('Current Version')}}</i></td>
+        </tr>
+      </tbody>
+    </table>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if feature_support['updater'] %}
+    <div class="hidden" id="update_error"><span>{{update_error}}</span></div>
+    <div class="admin-actions-row">
+      <div class="btn btn-default" id="check_for_update">{{_('Check for Update')}}</div>
+      <div class="btn btn-primary hidden" id="perform_update" data-toggle="modal" data-target="#StatusDialog">{{_('Perform Update')}}</div>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Modals -->
+<div id="RestartDialog" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-info"></div>
+      <div class="modal-body text-center">
+        <p>{{_('Are you sure you want to restart?')}}</p>
+        <div id="spinner" class="spinner" style="display:none;">
+          <img id="img-spinner" src="{{ url_for('static', filename='css/libs/images/loading-icon.gif') }}"/>
+        </div>
+        <p></p>
+        <button type="button" class="btn btn-default" id="restart">{{_('OK')}}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{_('Cancel')}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ShutdownDialog" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-info"></div>
+      <div class="modal-body text-center">
+        <p>{{_('Are you sure you want to shutdown?')}}</p>
+        <button type="button" class="btn btn-default" id="shutdown" data-dismiss="modal">{{_('OK')}}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{_('Cancel')}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="StatusDialog" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-center">
+        <span id="DialogHeader">{{_('Updating, please do not reload this page')}}</span>
+      </div>
+      <div class="modal-body text-center">
+        <div id="spinner2" class="spinner2" style="display:none;">
+          <img id="img-spinner2" src="{{ url_for('static', filename='css/libs/images/loading-icon.gif') }}"/>
+        </div>
+        <p></p>
+        <div id="DialogContent"></div>
+        <p></p>
+        <button type="button" class="btn btn-default hidden" id="DialogFinished" data-dismiss="modal">{{_('OK')}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block modal %}
+{% endblock %}

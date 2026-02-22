@@ -1,4 +1,5 @@
-/* FONTS */
+/* General Styles */
+
 @font-face {
   font-family: 'Comfortaa';
   src: url('../fonts/Comfortaa/Comfortaa-VariableFont_wght.ttf') format('truetype-variations'),
@@ -16,7 +17,6 @@
   font-display: swap;
 }
 
-/* TYPOGRAPHY */
 
 h2, h3, h4, p {
     margin-top: 0;
@@ -51,6 +51,34 @@ p {
     opacity: 0.85;
 }
 
+
+li {
+    list-style: none;
+    margin: 8px 0;
+}
+
+ul { padding:0;
+margin: 0;}
+
+
+a {
+    text-decoration: none;
+    color: #581C1C;
+    font-weight: 500;
+    font-size: medium;
+    display: block;
+    padding: 6px 10px;
+    border-radius: 10px;
+}
+
+/* Global Styling */
+
+#navbar, .sidebar, .admin-page-wrapper {
+        box-shadow: inset 3px 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+
+
 /* LAYOUT & NAVBAR */
 body {
     display: flex;
@@ -66,32 +94,32 @@ body {
     width: 100%; 
     height: calc(100vh - 20px); 
     overflow: hidden; 
-    border-radius: 50px;
-    background-color:#f94c4cf6;
-    box-shadow: 0px 0px 5px 5px #00000025;
-    gap:10px;
+    border-radius: 40px !important;
+    background-color:#DB4040;
+    gap:12px;
     border-style: solid;
     border-width: 10px;
     border-color:transparent;
-    border-radius: 20px;
+    border-radius: 43px;
 }
 
 #navbar { 
     margin: 0px;
-    border-radius: 20px;
+    border-radius: 40px;
     width: auto; 
     display: flex; 
     flex-direction: column; 
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.9); 
+    background: rgba(255, 255, 255, .99); 
     border-right: 1px solid #ddd; 
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
 }
 #navbar-menus-wrapper { 
     display: flex; 
     flex-direction: column; 
     flex-grow: 1;
-    justify-content: space-between;}
+    justify-content: space-between;
+    padding: 10px 0;
+}
 
 .nav-button {
     display: flex;
@@ -124,7 +152,7 @@ body {
 .navigation-items {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     padding: 10px;
   }
 
@@ -205,7 +233,7 @@ details[open] .user-popover-menu {
     display: block; 
     overflow-x: hidden;
     margin: 0;
-    border-radius: 20px;
+    border-radius: 40px;
 }
       
 .navbar-left-vertical { 
@@ -218,7 +246,7 @@ details[open] .user-popover-menu {
     margin-bottom: 5px; }
 
 
-/* FILTER SIDEBAR */
+/* SIDEBAR */
 
 .content-layout {
     display: flex;
@@ -231,39 +259,53 @@ details[open] .user-popover-menu {
     min-width: 0;
 }
 
-.filter-sidebar {
-    width: 216px;
+.sidebar {
+    width: 278px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     flex-shrink: 0;
     height: calc(100vh - 20px);
     position: sticky;
     top:0;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.99);
     backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 12px;
+    border-radius: 40px;
+    padding: 25px 30px;
     margin: 0;
     overflow-y: auto;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
 }
 
-#filt-options-wrapper {
-    padding: 10px;
-    background-color: rgba(0,0,0,.05);
-    border-radius: 10px;
+.side-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: rgba(0,0,0,.02);
+    border-radius: 20px;
 }
 
-#filt-head {
+
+.set-cat {font-size:15px}
+
+.side-head {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 10px;
 }
 
-.filter-heading {
+.sidebar-header {
     color: #581C1C;
-    margin: 0 0 10px 0;
-    font-size: medium;
-    font-weight: 400;
+    font-weight: 600;
+    font-size: 24;
+    margin: 0;
+}
+
+.side-head-text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .filter-section {
@@ -271,16 +313,6 @@ details[open] .user-popover-menu {
     padding: 6px 0;
 }
 
-.filter-section-title {
-    font-weight: 500;
-    color: #581C1C;
-    font-size: small;
-    cursor: pointer;
-    list-style: none;
-    padding: 4px 0;
-}
-
-.filter-section-title::-webkit-details-marker { display: none; }
 
 .filter-options {
     display: flex;
@@ -297,6 +329,9 @@ details[open] .user-popover-menu {
     color: #581C1C;
     cursor: pointer;
 }
+
+
+
 
 /* ACTION BAR */
 
@@ -323,7 +358,7 @@ details[open] .user-popover-menu {
     padding: 6px 14px;
     color: #581C1C;
     backdrop-filter: blur(10px);
-        cursor:pointer;
+    cursor:pointer;
 
 }
 
@@ -409,13 +444,43 @@ details[open] .sort-popover {
     animation: pop-in 0.05s cubic-bezier(0.04, 0, 0.2, 1.25) forwards;
 }
 
+.cover-size-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100px;
+    height: 4px;
+    background: rgba(88, 28, 28, 0.2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.cover-size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #581C1C;
+    cursor: pointer;
+}
+
+.cover-size-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #581C1C;
+    border: none;
+    cursor: pointer;
+}
+
 .search-form:focus-within, .sort-button:hover {
     background-color: rgba(255, 255, 255, 1);
 }
 
 .books-grid {
+    --cover-size: 275px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--cover-size), 1fr));
     gap: 15px;
 }
 
@@ -629,12 +694,12 @@ details[open] .sort-popover {
 /* Floating Upload Button */
 /*------------------------*/
 
-.fab-upload {
+.fab-button {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(5px);
@@ -651,7 +716,7 @@ details[open] .sort-popover {
 .fab-upload svg {
     fill:#000000;
 }
-.fab-upload:hover {
+.fab-button:hover {
     background-color: #00e764;
     transform: scale(1.08);
 }
@@ -688,7 +753,7 @@ or design guidelines. I am in the process of updating them. */
     background-color: transparent;
     min-height: 85vh;
     padding: 40px 20px;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.99);
 
 }
 
@@ -737,33 +802,6 @@ or design guidelines. I am in the process of updating them. */
 
 
 
-/* Alerts */
-.alert {
-    border-radius: 10px;
-    border: none;
-    font-size: 14px;
-    padding: 12px 16px;
-}
-
-.alert-danger {
-    background-color: rgba(249, 76, 76, 0.12);
-    color: #c0392b;
-}
-
-.alert-success {
-    background-color: rgba(0, 180, 80, 0.12);
-    color: #1a6e3a;
-}
-
-.alert-info {
-    background-color: rgba(88, 28, 28, 0.07);
-    color: #581C1C;
-}
-
-.alert-warning {
-    background-color: rgba(232, 191, 94, 0.2);
-    color: #6b4c00;
-}
 
 /* TOASTS */
 
@@ -791,7 +829,7 @@ or design guidelines. I am in the process of updating them. */
 }
 
 .toast {
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(12px);
     border-radius: 12px;
     padding: 12px 22px;
@@ -804,7 +842,7 @@ or design guidelines. I am in the process of updating them. */
     white-space: nowrap;
 }
 
-.toast-danger  { border-left-color: #F94C4C; color: #c0392b; }
+.toast-error  { border-left-color: #F94C4C; color: #c0392b; }
 .toast-success { border-left-color: #00b450; color: #1a6e3a; }
 .toast-warning { border-left-color: #e8bf5e; color: #6b4c00; }
 .toast-info    { border-left-color: #581C1C; color: #581C1C; }
@@ -868,7 +906,7 @@ or design guidelines. I am in the process of updating them. */
 /* BOOK DETAIL PAGE */
 
 .book-detail-layout {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.99);
     display: flex;
     flex-direction: row;
     gap: 48px;
@@ -1281,9 +1319,7 @@ details[open] .detail-icon-popover {
 
 .admin-page-wrapper {
     display: flex;
-    /*flex-direction: column;
-    align-items: stretch;*/
-background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.99);
     flex-direction: column;
     gap: 48px;
     padding: 40px;
@@ -1295,16 +1331,145 @@ background-color: rgba(255, 255, 255, 0.9);
 
 }
 
-.admin-card {
-    margin-bottom: 16px;
+.admin-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.admin-section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-section-title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 400;
+    color: #581C1C;
+}
+
+.admin-section-body {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.admin-subsection-title {
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.user-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.user-card-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.user-card-info {
+    min-width: 0;
+}
+
+.user-card:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.user-card-add {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 2px dashed rgba(88, 28, 28, 0.2);
     background-color: transparent;
 }
 
-.admin-card-title {
-    font-size: 1rem;
-    font-weight: 700;
+.user-card-add-text {
+    font-size: small;
+    font-weight: 500;
     color: #581C1C;
-    margin: 0 0 16px 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(88, 28, 28, 0.1);
 }
+
+.user-card-add:hover {
+    border-color: rgba(88, 28, 28, 0.4);
+}
+
+.user-card-name {
+    margin: 0 0 4px 0;
+}
+
+.user-card-role {
+    margin: 0;
+    font-size: small;
+}
+
+
+
+
+
+
+
+/* Hide the real checkbox */
+#toggle-boolean {
+    display: none;
+}
+
+/* The pill track */
+.toggle-span {
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: inset 0 0 4px 0px rgba(0, 0, 0, .1);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/* The sliding thumb */
+.toggle-span::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25),
+                inset 0 0 6px 0 rgba(0, 0, 0, .1);
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+/* Checked state: subtle track tint + thumb goes red and slides right */
+
+.toggle-label input:checked + .toggle-span::after {
+    background: #80C900;
+    transform: translateX(20px);
+}
+
+
+

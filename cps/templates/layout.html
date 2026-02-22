@@ -86,14 +86,37 @@
       </div>
 
 
+{% if request.endpoint == 'web.index' or request.endpoint == 'web.books_list'  or request.endpoint == 'admin.admin' %}
+
+<aside class="sidebar">
+
+
+  {% if request.endpoint == 'admin.admin' and current_user.role_admin() %}
+  <div class="side-head">
+    <div><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M128,80a48,48,0,1,0,48,48A48.06,48.06,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm95.68-93.85L135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17h0a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,224,40,175.82V80.18L128,32l88,48.17v95.64Z"></path></svg></div>
+    <div class="side-head-text"><h3 class="sidebar-header">Settings</h3></div>
+  </div>
+<nav class="side-wrapper">
+  <ul>
+    <li><a class="set-cat" href="#users">Users & Permissions</a></li>
+    <li><a class="set-cat" href="#data">Files & Metadata</a></li>
+    <li><a class="set-cat" href="#integrations">Integrations</a></li>
+    <li><a class="set-cat" href="#security">Security</a></li>
+    <li><a class="set-cat" href="#server">Server Settings</a></li>
+    <li><a class="set-cat" href="#about">About</a></li>
+  </ul>
+</nav>
+
+{% endif %}
+
 {% if request.endpoint == 'web.index' or request.endpoint == 'web.books_list' %}
 
-<aside class="filter-sidebar">
-  <div id="filt-options-wrapper">
-  <div id="filt-head">
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M64,105V40a8,8,0,0,0-16,0v65a32,32,0,0,0,0,62v49a8,8,0,0,0,16,0V167a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,56,152Zm80-95V40a8,8,0,0,0-16,0V57a32,32,0,0,0,0,62v97a8,8,0,0,0,16,0V119a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,128,104Zm104,64a32.06,32.06,0,0,0-24-31V40a8,8,0,0,0-16,0v97a32,32,0,0,0,0,62v17a8,8,0,0,0,16,0V199A32.06,32.06,0,0,0,232,168Zm-32,16a16,16,0,1,1,16-16A16,16,0,0,1,200,184Z"></path></svg>
-    <p class="filter-heading">Filters</p>
+  
+  <div class="side-head">
+    <div><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M64,105V40a8,8,0,0,0-16,0v65a32,32,0,0,0,0,62v49a8,8,0,0,0,16,0V167a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,56,152Zm80-95V40a8,8,0,0,0-16,0V57a32,32,0,0,0,0,62v97a8,8,0,0,0,16,0V119a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,128,104Zm104,64a32.06,32.06,0,0,0-24-31V40a8,8,0,0,0-16,0v97a32,32,0,0,0,0,62v17a8,8,0,0,0,16,0V199A32.06,32.06,0,0,0,232,168Zm-32,16a16,16,0,1,1,16-16A16,16,0,0,1,200,184Z"></path></svg></div>
+    <div class="side-head-text"><h3 class="sidebar-header">Filters</h3></div>
   </div>
+  <div class="side-wrapper">
   <details class="filter-section" open>
     <summary class="filter-section-title">Genre</summary>
     <div class="filter-options">
@@ -136,7 +159,13 @@
     </div>
   </details>
   </div>
+{% endif %}
+
 </aside>
+
+
+
+ 
 
 {% endif %}
 
@@ -146,13 +175,13 @@
       {% block body %}{% endblock %}
     </div>
 
-    {% block modal %}{% endblock %}
 
-    {% with messages = get_flashed_messages(with_categories=True) %}
+
+   {% with messages = get_flashed_messages(with_categories=True) %}
       {% if messages %}
         <div id="toast-container">
           {% for category, message in messages %}
-            <div class="toast toast-{{ 'danger' if category == 'error' else category }}">
+            <div class="toast toast-{{ category }}">
               {{ message }}
             </div>
           {% endfor %}
@@ -160,12 +189,16 @@
       {% endif %}
     {% endwith %}
 
-    <script>
+
+
+        <script>
       function goToLastBook() {
         var last = localStorage.getItem('lastBookUrl');
         window.location.href = last || '{{ url_for('web.books_list', data='newest', book_id=1, sort_param='stored') }}';
       }
+    </script>
 
+        <script>
       document.querySelectorAll('.toast').forEach(function(toast) {
         setTimeout(function() {
           toast.classList.add('toast-hiding');
@@ -173,8 +206,9 @@
         }, 3000);
       });
     </script>
+
     {% block js %}{% endblock %}
-</div>
+
 <!--END MAIN APP-->
 
 
