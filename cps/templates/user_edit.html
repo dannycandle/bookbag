@@ -146,7 +146,7 @@
       </div>
 
       <div class="admin-actions-row">
-        <div id="user_submit" class="btn btn-primary">{{_('Save')}}</div>
+        <button type="submit" id="user_submit" class="btn btn-primary">{{_('Save')}}</button>
         {% if not profile %}
           <div class="btn btn-default" data-back="{{ url_for('admin.admin') }}" id="back">{{_('Cancel')}}</div>
         {% endif %}
