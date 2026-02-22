@@ -82,26 +82,731 @@
             <div class="radio-group">
                 <div class="radio-group-thumb"></div>
                 <label class="radio-card">
-                    <input type="radio" name="role" value="owner">
+                    <input type="radio" name="admin_role" value="admin_role" {% if config.role_admin() %}checked{% endif %}>
                     Library Owner
                 </label>
                 <label class="radio-card">
-                    <input type="radio" name="role" value="reader" checked>
+                    <input type="radio" name="admin_role" value="reader" {% if not config.role_admin() %}checked{% endif %}>
                     Reader
                 </label>
             </div>
+        </div>
 
+        <!-- BEGIN DEFAULT PERMISSIONS FOR NEW READERS SUBSECTION -->
+        <div class="admin-subsection-wrapper">
+            <h3 class="admin-subsection-title">
+                Default Permissions for New Readers
+            </h3>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean role-toggle" type="checkbox" name="download_role" {% if config.role_download() %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Download books</h4></div>
+                    <div><p class="toggle-desc">When enabled, default to allowing new users to download any book in Book Bag.</p></div>
+                </div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean role-toggle" type="checkbox" name="viewer_role" {% if config.role_viewer() %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Read books in browser</h4></div>
+                    <div><p class="toggle-desc">When enabled, default to allowing new users to download any book in Book Bag.</p></div>
+                </div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean role-toggle" type="checkbox" name="edit_role" {% if config.role_edit() %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Edit book details</h4></div>
+                    <div><p class="toggle-desc">When enabled, default to allowing new users can edit book details such as Title and Description.</p></div>
+                </div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean role-toggle" type="checkbox" name="edit_shelf_role" {% if config.role_edit_shelfs() %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Edit shared bookshelves</h4></div>
+                    <div><p class="toggle-desc">When enabled, default to allowing new users to edit which books appear on shared books shelves.</p></div>
+                </div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean role-toggle" type="checkbox" name="passwd_role" {% if config.role_passwd() %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Change password</h4></div>
+                    <div><p class="toggle-desc">When enabled, default to allowing new users to reset their password via the “Forgot Password?” link on the sign in screen.</p></div>
+                </div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean role-toggle" type="checkbox" name="upload_role" {% if config.role_upload() %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Upload books</h4></div>
+                    <div><p class="toggle-desc">When enabled, default to allowing new users to upload books to Book Bag.</p></div>
+                </div>
+            </div>
+        </div>
+        <!-- BEGIN SUBSECTION ACCESS AND REGISTRATION -->
+        <div class="admin-subsection-wrapper">
+            <h3 class="admin-subsection-title">
+                Access and Registration
+            </h3>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean config-toggle" type="checkbox" name="config_public_reg" {% if config.config_public_reg %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Let anyone create an account</h4></div>
+                    <div><p class="toggle-desc">Default User Role must be set to Reader to enable this feature.</p></div>
+                </div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean config-toggle" type="checkbox" name="config_anonbrowse" {% if config.config_anonbrowse %}checked{% endif %}>
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Allow browsing without an account</h4></div>
+                    <div><p class="toggle-desc">When enabled, anyone that can access this Book Bag’s URL can view library contents and book details. Users without accounts can’t download or read books within the app, but can do so through a reading app that supports ODPS.</p></div>
+                </div>
+            </div>
+        </div>
+        <!-- BEGIN SUBSECTION USER AUTHENTICATION -->
+        <div class="admin-subsection-wrapper">
+            <h3 class="admin-subsection-title">
+                User Authentication
+            </h3>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean" type="checkbox">
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Let users login with “magic link”</h4></div>
+                    <div><p class="toggle-desc">Not available if <a href="#email">Email Integration</a> is not setup.</p></div>
+                </div>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-wrapper">
+                    <label class="toggle-label">
+                    <input class="toggle-boolean" type="checkbox">
+                    <span class="toggle-span"></span>
+                </div>
+                <div class="toggle-info-wrapper">
+                    <div><h3 class="toggle-name">Allow browsing without an account</h4></div>
+                    <div><p class="toggle-desc">When enabled, anyone that can access this Book Bag’s URL can view library contents and book details. Users without accounts can’t download or read books within the app, but can do so through a reading app that supports ODPS.</p></div>
+                </div>
+            </div>
+        </div>
 
+    </section>
 
-        <!--Toggle code
-      <label class="toggle-label">
-        <input id="toggle-boolean" type="checkbox">
-        <span class="toggle-span"></span>
-      </label>
+    <!-- ============================================ -->
+    <!-- FILES AND METADATA SECTION                   -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="files">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M128,24C74.17,24,32,48.6,32,80v96c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm80,104c0,9.62-7.88,19.43-21.61,26.92C170.93,163.35,150.19,168,128,168s-42.93-4.65-58.39-13.08C55.88,147.43,48,137.62,48,128V111.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64ZM69.61,53.08C85.07,44.65,105.81,40,128,40s42.93,4.65,58.39,13.08C200.12,60.57,208,70.38,208,80s-7.88,19.43-21.61,26.92C170.93,115.35,150.19,120,128,120s-42.93-4.65-58.39-13.08C55.88,99.43,48,89.62,48,80S55.88,60.57,69.61,53.08ZM186.39,202.92C170.93,211.35,150.19,216,128,216s-42.93-4.65-58.39-13.08C55.88,195.43,48,185.62,48,176V159.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64V176C208,185.62,200.12,195.43,186.39,202.92Z"></path></svg>
+            <h2 class="admin-section-title">Files &amp; Metadata</h2>
+        </div>
+        <div class="admin-section-body">
 
-        -->
-    </div>
-  </section>
+            <!-- Book Files Location -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Book Files Location</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_custom_book_location">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Customize the Location Books are Stored</h3></div>
+                        <div><p class="toggle-desc">Turn off if you want to store books on a separate volume that is larger but slower while keeping your metadata database on the faster default volume.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Server path to book files:</span>
+                    <span class="setting-path-value">/books</span>
+                </div>
+                <div class="radio-group-row">
+                    <label class="radio-card-block">
+                        <input type="radio" name="book_storage_type" value="local" checked>
+                        <span class="radio-card-dot"></span>
+                        Other Location
+                    </label>
+                    <label class="radio-card-block">
+                        <input type="radio" name="book_storage_type" value="gdrive">
+                        <span class="radio-card-dot"></span>
+                        <!-- Warning icon -->
+                        <svg class="radio-card-warning" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg>
+                        Google Drive
+                    </label>
+                </div>
+            </div>
+
+            <!-- Metadata Database Location -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Metadata Database Location</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_custom_metadata_location" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Customize the location of the metadata database</h3></div>
+                        <div><p class="toggle-desc">When enabled, you can move the metadata database to a different location than the book files.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Path to metadata database:</span>
+                    <span class="setting-path-value">/books.metadata.db</span>
+                </div>
+                <div class="radio-group-row">
+                    <label class="radio-card-block">
+                        <input type="radio" name="metadata_storage_type" value="gdrive">
+                        <span class="radio-card-dot"></span>
+                        Google Drive
+                    </label>
+                    <label class="radio-card-block">
+                        <input type="radio" name="metadata_storage_type" value="local" checked>
+                        <span class="radio-card-dot"></span>
+                        Other Location
+                    </label>
+                </div>
+            </div>
+
+            <!-- Allowed Book Filetypes -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Allowed Book Filetypes</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="filetype_epub">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Epub Formats</h3></div>
+                        <div><p class="toggle-desc">Allow uploads of Epub formats: .epub and .kepub.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="filetype_kindle">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Modern Kindle Formats</h3></div>
+                        <div><p class="toggle-desc">Allow uploads of Amazon Kindle formats: .azw3, .azw.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="filetype_comic">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Comic Formats</h3></div>
+                        <div><p class="toggle-desc">Allow uploads of comic formats: Cbz, Cbr, Cb7, and Cbt.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="filetype_pdf">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Pdf Files</h3></div>
+                        <div><p class="toggle-desc">No, not Donald Trump. Actual PDF files.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="filetype_legacy">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Legacy Formats</h3></div>
+                        <div><p class="toggle-desc">Turn off if you want to store books on a separate volume that is larger but slower while keeping your metadata database on the faster default volume.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audiobooks -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Audiobooks</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="filetype_audiobook">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Allow Upload and Playback of Audiobooks</h3></div>
+                        <div><p class="toggle-desc">Allows uploads and playback of the following files: mp3, m4a, m4b, opus, flac, ogg.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automated File Handling -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Automated File Handling</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_auto_ingest">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Automatic File Ingestion</h3></div>
+                        <div><p class="toggle-desc">Automatically add books added to a folder on your server into Book Bag.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_unicode_filename">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Remove accents and special characters from filenames</h3></div>
+                        <div><p class="toggle-desc">Useful if you intend to place your books on legacy devices and network shares to prevent filesystem errors.</p></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- INTEGRATIONS SECTION                         -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="integrations">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M237.66,18.34a8,8,0,0,0-11.32,0l-52.4,52.41-5.37-5.38a32.05,32.05,0,0,0-45.26,0L100,88.69l-6.34-6.35A8,8,0,0,0,82.34,93.66L88.69,100,65.37,123.31a32,32,0,0,0,0,45.26l5.38,5.37-52.41,52.4a8,8,0,0,0,11.32,11.32l52.4-52.41,5.37,5.38a32,32,0,0,0,45.26,0L156,167.31l6.34,6.35a8,8,0,0,0,11.32-11.32L167.31,156l23.32-23.31a32,32,0,0,0,0-45.26l-5.38-5.37,52.41-52.4A8,8,0,0,0,237.66,18.34Zm-116.29,161a16,16,0,0,1-22.62,0L76.69,157.25a16,16,0,0,1,0-22.62L100,111.31,144.69,156Zm57.94-57.94L156,144.69,111.31,100l23.32-23.31a16,16,0,0,1,22.62,0l22.06,22A16,16,0,0,1,179.31,121.37ZM88.57,35A8,8,0,0,1,103.43,29l8,20A8,8,0,0,1,96.57,55ZM24.57,93A8,8,0,0,1,35,88.57l20,8A8,8,0,0,1,49,111.43l-20-8A8,8,0,0,1,24.57,93ZM231.43,163a8,8,0,0,1-10.4,4.46l-20-8A8,8,0,1,1,207,144.57l20,8A8,8,0,0,1,231.43,163Zm-64,58.06A8,8,0,0,1,152.57,227l-8-20A8,8,0,0,1,159.43,201Z"></path></svg>
+            <h2 class="admin-section-title">Integrations</h2>
+        </div>
+        <div class="admin-section-body">
+
+            <!-- Automatic Metadata Fetching -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Automatic Metadata Fetching (Coming Soon)</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_hardcover_fetch" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Fetch book and author data from hardcover.app</h3></div>
+                        <div><p class="toggle-desc">Provides additional meta data including author bio and book ratings from Hardcover.app.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Integration -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Email Integration</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_email_enabled" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Allow book bag to send email</h3></div>
+                        <div><p class="toggle-desc">When enabled, Book Bag will be able to send Password Reset emails, Magic Link login becomes available, and eMail.</p></div>
+                    </div>
+                </div>
+                <div class="radio-group-row">
+                    <label class="radio-card-block">
+                        <input type="radio" name="email_provider" value="smtp" checked>
+                        <span class="radio-card-dot"></span>
+                        Standard (SMTP)
+                    </label>
+                    <label class="radio-card-block">
+                        <input type="radio" name="email_provider" value="gmail">
+                        <span class="radio-card-dot"></span>
+                        Gmail
+                    </label>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Mail Server URL</span>
+                    <input class="setting-input" type="text" name="mail_server" placeholder="mail.example.com">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Port</span>
+                    <input class="setting-input" type="text" name="mail_port" placeholder="25">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Encryption Type</span>
+                    <input class="setting-input" type="text" name="mail_encryption" placeholder="SSL/TLS">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Username</span>
+                    <input class="setting-input" type="text" name="mail_login" placeholder="user@example.com">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">"From" Name</span>
+                    <input class="setting-input" type="text" name="mail_from" placeholder="Book Bag">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Attachment File Size Limit</span>
+                    <input class="setting-input" type="text" name="mail_size" placeholder="25">
+                </div>
+                <div style="padding: 8px 10px;">
+                    <button type="button" class="btn btn-primary" id="btn-test-email">Save and Send Test Email</button>
+                </div>
+            </div>
+
+            <!-- Kobo Sync -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Kobo Sync</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_kobo_sync" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Allow Book Sync with Kobo Ereaders</h3></div>
+                        <div><p class="toggle-desc">Experimental. Users must edit the configuration text files on their Kobo device to change the API Endpoint.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">External Port for Kobo Syncing</span>
+                    <input class="setting-input" type="text" name="config_external_port" placeholder="25">
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_kobo_proxy" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Pass unrecognized Kobo requests to Kobo Store</h3></div>
+                        <div><p class="toggle-desc">Requests received from a Kobo device that are not supported or understood by Book Bag will relay the request to Kobo's book store.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Good Reads -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Good Reads</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_goodreads">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Fetch Author Data from GoodReads (Legacy)</h3></div>
+                        <div><p class="toggle-desc">GoodReads has ramped down their API service, a legacy API Key is required.</p></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECURITY SECTION                             -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="security">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"></path></svg>
+            <h2 class="admin-section-title">Security</h2>
+        </div>
+        <div class="admin-section-body">
+
+            <!-- Brute Force Protection -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Brute Force Protection</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_ratelimiter" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Limit failed login attempts</h3></div>
+                        <div><p class="toggle-desc">Temporarily locks out users after repeated failed login attempts to prevent brute force attacks.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_password_policy" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Require Complex Passwords</h3></div>
+                        <div><p class="toggle-desc">Enforce minimum password complexity requirements for all user accounts.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_limiter_uri">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Customize Storage Location of Login Attempts</h3></div>
+                        <div><p class="toggle-desc">Useful for multi-instance deployments.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Login Attempt Storage</span>
+                    <input class="setting-input" type="text" name="config_limiter_uri_value" placeholder="i.e. redis://localhost:6379">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Options for Limiter Backend</span>
+                    <input class="setting-input" type="text" name="config_limiter_options" placeholder="mail.example.com">
+                </div>
+            </div>
+
+            <!-- Content Hijacking Protection -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Content Hijacking Protection</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_check_extensions" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Check if file extensions matches file content on upload</h3></div>
+                        <div><p class="toggle-desc">Prevents malicious files from being disguised as book formats.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Hijacking Protection -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Session Hijacking Protection</h3>
+                <div class="radio-group-row">
+                    <label class="radio-card-block radio-card-descriptive">
+                        <input type="radio" name="config_session_protection" value="strong" checked>
+                        <span class="radio-card-dot"></span>
+                        <span class="radio-card-content">
+                            <span class="radio-card-title">Strong</span>
+                            <span class="radio-card-description">Requires new login for all authenticated pages if IP address or user-agent changes.</span>
+                        </span>
+                    </label>
+                    <label class="radio-card-block radio-card-descriptive">
+                        <input type="radio" name="config_session_protection" value="basic">
+                        <span class="radio-card-dot"></span>
+                        <span class="radio-card-content">
+                            <span class="radio-card-title">Standard</span>
+                            <span class="radio-card-description">Requires new login for sensitive pages if IP address or user-agent changes.</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SERVER SETTINGS SECTION                      -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="server">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M232,112H136V88h8a16,16,0,0,0,16-16V40a16,16,0,0,0-16-16H112A16,16,0,0,0,96,40V72a16,16,0,0,0,16,16h8v24H24a8,8,0,0,0,0,16H56v32H48a16,16,0,0,0-16,16v32a16,16,0,0,0,16,16H80a16,16,0,0,0,16-16V176a16,16,0,0,0-16-16H72V128H184v32h-8a16,16,0,0,0-16,16v32a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V176a16,16,0,0,0-16-16h-8V128h32a8,8,0,0,0,0-16ZM112,40h32V72H112ZM80,208H48V176H80Zm128,0H176V176h32Z"></path></svg>
+            <h2 class="admin-section-title">Server Settings</h2>
+        </div>
+        <div class="admin-section-body">
+
+            <!-- Server Action Buttons -->
+            <div class="server-action-buttons">
+                <button type="button" class="server-action-btn" id="btn-restart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M224,48V96a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h28.69L182.06,73.37a79.56,79.56,0,0,0-56.13-23.43h-.45A79.52,79.52,0,0,0,69.59,72.71,8,8,0,0,1,58.33,61.29,96,96,0,0,1,192.93,60.4L208,75.52V48a8,8,0,0,1,16,0Zm-24.49,131.49a96,96,0,0,1-134.6,1.11L50,166.48V192a8,8,0,0,1-16,0V144a8,8,0,0,1,8-8H88a8,8,0,0,1,0,16H60.52L75.21,166.4a80,80,0,0,0,112.2-.93,8,8,0,1,1,12.1,10.52Z"></path></svg>
+                    <span>Restart</span>
+                </button>
+                <button type="button" class="server-action-btn" id="btn-shutdown">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M120,128V48a8,8,0,0,1,16,0v80a8,8,0,0,1-16,0Zm60.37-78.7a8,8,0,0,0-8.74,13.4C194.74,79.49,208,102.36,208,128a80,80,0,0,1-160,0c0-25.64,13.26-48.51,36.37-65.3a8,8,0,0,0-8.74-13.4C49.26,67.58,32,95.31,32,128a96,96,0,0,0,192,0C224,95.31,206.74,67.58,180.37,49.3Z"></path></svg>
+                    <span>Shut Down</span>
+                </button>
+                <button type="button" class="server-action-btn" id="btn-viewlogs">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"></path></svg>
+                    <span>View Logs</span>
+                </button>
+                <button type="button" class="server-action-btn" id="btn-viewtasks">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg>
+                    <span>View Tasks</span>
+                </button>
+            </div>
+
+            <!-- Server Port -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Server Port</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_custom_port" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Customize Server Port</h3></div>
+                        <div><p class="toggle-desc">Default Port is :8084</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Server Port Number</span>
+                    <input class="setting-input" type="text" name="config_port" placeholder="8084">
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_ssl">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Enable SSL Handling</h3></div>
+                        <div><p class="toggle-desc">Only required if you are not using a mesh VPN or Reverse Proxy to access Book Bag.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">SSL Certfile Path</span>
+                    <input class="setting-input" type="text" name="config_certfile" placeholder="/path/to/SSL/certfile">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">SSL Keyfile Path</span>
+                    <input class="setting-input" type="text" name="config_keyfile" placeholder="/path/to/SSL/keyfile">
+                </div>
+            </div>
+
+            <!-- Installed Extras -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Installed Extras</h3>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Path to Calibre Binaries</span>
+                    <input class="setting-input" type="text" name="config_calibre_dir" placeholder="/path/to/calibre/cli-tools">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Path to Calibre Ebook Converter</span>
+                    <input class="setting-input" type="text" name="config_converterpath" placeholder="path/to/calibre/converter">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Path to Kepubify E-Book Converter</span>
+                    <input class="setting-input" type="text" name="config_kepubifypath" placeholder="/usr/bin/kepubify">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Location of unrar binary</span>
+                    <input class="setting-input" type="text" name="config_rarfile_location" placeholder="/usr/bin/unrar">
+                </div>
+            </div>
+
+            <!-- Server Logs -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Server Logs</h3>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Log Level</span>
+                    <input class="setting-input" type="text" name="config_log_level" placeholder="INFO">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Log File Location</span>
+                    <input class="setting-input" type="text" name="config_logfile" placeholder="/path/to/logfile">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Access Log File Location</span>
+                    <input class="setting-input" type="text" name="config_access_logfile" placeholder="/path/to/access.log">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Access Log Format</span>
+                    <input class="setting-input" type="text" name="config_access_log_format" placeholder="%(message)s">
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- ABOUT SECTION                                -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="about">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"></path></svg>
+            <h2 class="admin-section-title">About Book Bag</h2>
+        </div>
+        <div class="admin-section-body">
+            <div class="about-text">
+                <p>Book Bag is a passion project of Daniel Candelaria. It is forked from Calibre-Web and merges many of the changes from Calibre-Web Automated. It is self-hostable and open source. For more information and to see the source code, please visit <a href="https://github.com/dannycandle/Book-Bag" target="_blank">https://github.com/dannycandle/Book-Bag</a></p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function saveRoles() {
+            var formData = new FormData();
+            formData.append('csrf_token', '{{ csrf_token() }}');
+            var adminRadio = document.querySelector('input[name="admin_role"][value="admin_role"]');
+            if (adminRadio && adminRadio.checked) {
+                formData.append('admin_role', 'on');
+            }
+            document.querySelectorAll('.role-toggle').forEach(function(toggle) {
+                if (toggle.checked) {
+                    formData.append(toggle.name, 'on');
+                }
+            });
+            fetch('{{ url_for("admin.update_view_configuration") }}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+                body: formData
+            });
+        }
+        document.querySelectorAll('input[name="admin_role"]').forEach(function(radio) {
+            radio.addEventListener('change', saveRoles);
+        });
+        document.querySelectorAll('.role-toggle').forEach(function(toggle) {
+            toggle.addEventListener('change', saveRoles);
+        });
+
+        function saveConfig() {
+            var formData = new FormData();
+            formData.append('csrf_token', '{{ csrf_token() }}');
+            document.querySelectorAll('.config-toggle').forEach(function(toggle) {
+                if (toggle.checked) {
+                    formData.append(toggle.name, 'on');
+                }
+            });
+            fetch('{{ url_for("admin.ajax_config") }}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+                body: formData
+            });
+        }
+        document.querySelectorAll('.config-toggle').forEach(function(toggle) {
+            toggle.addEventListener('change', saveConfig);
+        });
+    </script>
 
 
   

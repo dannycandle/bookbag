@@ -98,14 +98,25 @@
   </div>
 <nav class="side-wrapper">
   <ul>
-    <li><a class="set-cat" href="#users">Users & Permissions</a></li>
-    <li><a class="set-cat" href="#data">Files & Metadata</a></li>
-    <li><a class="set-cat" href="#integrations">Integrations</a></li>
-    <li><a class="set-cat" href="#security">Security</a></li>
-    <li><a class="set-cat" href="#server">Server Settings</a></li>
-    <li><a class="set-cat" href="#about">About</a></li>
+    <li><a class="admin-section-link" href="#users">Users & Permissions</a></li>
+    <li><a class="admin-section-link" href="#data">Files & Metadata</a></li>
+    <li><a class="admin-section-link" href="#integrations">Integrations</a></li>
+    <li><a class="admin-section-link" href="#security">Security</a></li>
+    <li><a class="admin-section-link" href="#server">Server Settings</a></li>
+    <li><a class="admin-section-link" href="#about">About</a></li>
   </ul>
 </nav>
+<script>
+  document.querySelectorAll('.admin-section-link').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
 
 {% endif %}
 
@@ -113,52 +124,119 @@
 
   
   <div class="side-head">
-    <div><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M64,105V40a8,8,0,0,0-16,0v65a32,32,0,0,0,0,62v49a8,8,0,0,0,16,0V167a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,56,152Zm80-95V40a8,8,0,0,0-16,0V57a32,32,0,0,0,0,62v97a8,8,0,0,0,16,0V119a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,128,104Zm104,64a32.06,32.06,0,0,0-24-31V40a8,8,0,0,0-16,0v97a32,32,0,0,0,0,62v17a8,8,0,0,0,16,0V199A32.06,32.06,0,0,0,232,168Zm-32,16a16,16,0,1,1,16-16A16,16,0,0,1,200,184Z"></path></svg></div>
+    <div><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"></path></svg></div>
     <div class="side-head-text"><h3 class="sidebar-header">Filters</h3></div>
   </div>
-  <div class="side-wrapper">
+  <button class="clear-filters-btn" id="clear-filters" style="display:none;">Clear Filters</button>
+  <div class="side-wrapper" id="sidebar-filters">
+
+  {% if filter_tags %}
   <details class="filter-section" open>
-    <summary class="filter-section-title">Genre</summary>
+    <summary class="filter-section-title">Tags</summary>
+    <div class="filter-options" data-max-visible="5">
+      {% for tag in filter_tags %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="tags" data-filter-value="{{ tag.name }}"> {{ tag.name }}</label>
+      {% endfor %}
+      {% if filter_tags|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ filter_tags|length - 5 }} more</button>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
+
+  {% if filter_authors %}
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Authors</summary>
+    <div class="filter-options" data-max-visible="5">
+      {% for author in filter_authors %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="author" data-filter-value="{{ author.name }}"> {{ author.name }}</label>
+      {% endfor %}
+      {% if filter_authors|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ filter_authors|length - 5 }} more</button>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
+
+  {% if filter_series %}
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Series</summary>
+    <div class="filter-options" data-max-visible="5">
+      {% for s in filter_series %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="series" data-filter-value="{{ s.name }}"> {{ s.name }}</label>
+      {% endfor %}
+      {% if filter_series|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ filter_series|length - 5 }} more</button>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
+
+  {% if filter_languages %}
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Language</summary>
+    <div class="filter-options" data-max-visible="5">
+      {% for lang in filter_languages %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="languages" data-filter-value="{{ lang.lang_code }}"> {{ lang.display_name }}</label>
+      {% endfor %}
+      {% if filter_languages|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ filter_languages|length - 5 }} more</button>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
+
+  {% if filter_publishers %}
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Publishers</summary>
+    <div class="filter-options" data-max-visible="5">
+      {% for pub in filter_publishers %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="publishers" data-filter-value="{{ pub.name }}"> {{ pub.name }}</label>
+      {% endfor %}
+      {% if filter_publishers|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ filter_publishers|length - 5 }} more</button>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
+
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Rating</summary>
     <div class="filter-options">
-      <label><input type="checkbox"> Fiction</label>
-      <label><input type="checkbox"> Non-Fiction</label>
-      <label><input type="checkbox"> Fantasy</label>
-      <label><input type="checkbox"> Science Fiction</label>
-      <label><input type="checkbox"> Mystery</label>
+      {% for stars in [5, 4, 3, 2, 1] %}
+      <label><input type="checkbox" data-filter-type="rating" data-filter-value="{{ stars }}"> {{ '★' * stars }}{{ '☆' * (5 - stars) }}</label>
+      {% endfor %}
     </div>
   </details>
 
   <details class="filter-section" open>
     <summary class="filter-section-title">Published</summary>
     <div class="filter-options">
-      <label><input type="checkbox"> Last 2 years</label>
-      <label><input type="checkbox"> 2–5 years ago</label>
-      <label><input type="checkbox"> 5–10 years ago</label>
-      <label><input type="checkbox"> 10–20 years ago</label>
-      <label><input type="checkbox"> 20+ years ago</label>
+      <label><input type="checkbox" data-filter-type="pubdate" data-filter-value="2"> Last 2 years</label>
+      <label><input type="checkbox" data-filter-type="pubdate" data-filter-value="5"> 2–5 years ago</label>
+      <label><input type="checkbox" data-filter-type="pubdate" data-filter-value="10"> 5–10 years ago</label>
+      <label><input type="checkbox" data-filter-type="pubdate" data-filter-value="20"> 10–20 years ago</label>
+      <label><input type="checkbox" data-filter-type="pubdate" data-filter-value="999"> 20+ years ago</label>
     </div>
   </details>
 
-  <details class="filter-section" open>
-    <summary class="filter-section-title">Language</summary>
-    <div class="filter-options">
-      <label><input type="checkbox"> English</label>
-      <label><input type="checkbox"> Spanish</label>
-      <label><input type="checkbox"> French</label>
-      <label><input type="checkbox"> German</label>
-    </div>
-  </details>
-
-
-<details class="filter-section" open>
-    <summary class="filter-section-title">Tags</summary>
-    <div class="filter-options">
-      <label><input type="checkbox"> Award Winner</label>
-      <label><input type="checkbox"> Debut</label>
-      <label><input type="checkbox"> Series</label>
-    </div>
-  </details>
   </div>
+  <script>
+  (function() {
+    var btns = document.querySelectorAll('.filter-show-more');
+    btns.forEach(function(btn) {
+      var container = btn.closest('.filter-options');
+      var overflow = container.querySelectorAll('.filter-overflow');
+      var expanded = false;
+      var count = overflow.length;
+      btn.addEventListener('click', function() {
+        expanded = !expanded;
+        overflow.forEach(function(el) { el.style.display = expanded ? '' : 'none'; });
+        btn.textContent = expanded ? 'Show less' : 'Show ' + count + ' more';
+      });
+    });
+  })();
+  </script>
 {% endif %}
 
 </aside>

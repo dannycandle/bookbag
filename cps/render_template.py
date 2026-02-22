@@ -109,6 +109,8 @@ def get_sidebar_config(kwargs=None):
 # Returns the template for rendering and includes the instance name
 def render_title_template(*args, **kwargs):
     sidebar, simple = get_sidebar_config(kwargs)
+    if args and args[0] == 'index.html':
+        kwargs.update(_get_filter_data())
     try:
         return render_template(instance=config.config_calibre_web_title, sidebar=sidebar, simple=simple,
                                accept=config.config_upload_formats.split(','),
@@ -116,3 +118,34 @@ def render_title_template(*args, **kwargs):
     except PermissionError:
         log.error("No permission to access {} file.".format(args[0]))
         abort(403)
+
+
+def _get_filter_data():
+    from . import calibre_db, db, isoLanguages
+    from babel import Locale
+    try:
+        locale = Locale.parse(str(g.get('babel_locale', 'en')))
+    except Exception:
+        locale = Locale('en')
+    try:
+        session = calibre_db.session
+        filter_tags = session.query(db.Tags).order_by(db.Tags.name).all()
+        filter_authors = session.query(db.Authors).order_by(db.Authors.sort).all()
+        filter_series = session.query(db.Series).order_by(db.Series.sort).all()
+        filter_publishers = session.query(db.Publishers).order_by(db.Publishers.name).all()
+        raw_languages = session.query(db.Languages).order_by(db.Languages.lang_code).all()
+        filter_languages = []
+        for lang in raw_languages:
+            lang.display_name = isoLanguages.get_language_name(locale, lang.lang_code)
+            filter_languages.append(lang)
+        filter_languages.sort(key=lambda l: l.display_name)
+    except Exception as e:
+        log.warning("Could not load filter data from calibre database: %s", e, exc_info=True)
+        return {}
+    return {
+        'filter_tags': filter_tags,
+        'filter_authors': filter_authors,
+        'filter_series': filter_series,
+        'filter_publishers': filter_publishers,
+        'filter_languages': filter_languages,
+    }

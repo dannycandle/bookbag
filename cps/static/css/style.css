@@ -39,14 +39,14 @@ h3 {
 h4 {
     font-size: medium;
     font-weight: 500;
-    color: #8A5353;
+    color: #808080;
     line-height: 1.3;
 }
 
 p {
     font-size: medium;
     font-weight: 300;
-    color: #581C1C;
+    color: #555555;
     line-height: 1.5;
     opacity: 0.85;
 }
@@ -55,6 +55,11 @@ p {
 li {
     list-style: none;
     margin: 8px 0;
+    color: #581C1C !important;
+    font-weight: 500 !important;
+    font-size: medium !important;
+    display: block !important;
+    padding: 6px 10px !important;
 }
 
 ul { padding:0;
@@ -63,12 +68,7 @@ margin: 0;}
 
 a {
     text-decoration: none;
-    color: #581C1C;
-    font-weight: 500;
-    font-size: medium;
-    display: block;
-    padding: 6px 10px;
-    border-radius: 10px;
+    color: #535fe8;
 }
 
 /* Global Styling */
@@ -260,10 +260,10 @@ details[open] .user-popover-menu {
 }
 
 .sidebar {
-    width: 278px;
+    width: 230px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
     flex-shrink: 0;
     height: calc(100vh - 20px);
     position: sticky;
@@ -271,7 +271,7 @@ details[open] .user-popover-menu {
     background-color: rgba(255, 255, 255, 0.99);
     backdrop-filter: blur(10px);
     border-radius: 40px;
-    padding: 25px 30px;
+    padding: 25px 15px 10px 15px;
     margin: 0;
     overflow-y: auto;
     box-sizing: border-box;
@@ -280,9 +280,12 @@ details[open] .user-popover-menu {
 .side-wrapper {
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 15px 20px;
+    margin: 0;
     background-color: rgba(0,0,0,.02);
     border-radius: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 140px);
 }
 
 
@@ -293,6 +296,7 @@ details[open] .user-popover-menu {
     flex-direction: row;
     align-items: center;
     gap: 10px;
+    padding-left: 20px;
 }
 
 .sidebar-header {
@@ -309,29 +313,96 @@ details[open] .user-popover-menu {
 }
 
 .filter-section {
-    border-top: 1px solid rgba(88, 28, 28, 0.15);
     padding: 6px 0;
 }
-
 
 .filter-options {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     padding: 6px 0 2px 4px;
+}
+
+/* Hide native checkbox */
+.filter-options input[type="checkbox"] {
+    display: none;
 }
 
 .filter-options label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-size: small;
     color: #581C1C;
     cursor: pointer;
+    transition: color 0.15s, font-weight 0.15s;
+    padding: 2px 0;
 }
 
+.filter-options label::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    min-width: 7px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 0.15s ease;
+}
 
+/* Selected: green dot + bold */
+.filter-options label:has(input:checked)::before {
+    background: #80C900;
+}
 
+.filter-options label:has(input:checked) {
+    font-weight: 600;
+}
+
+/* Show more/less toggle */
+.filter-show-more {
+    background: none;
+    border: none;
+    color: rgba(88, 28, 28, 0.6);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 3px 4px;
+    margin-top: 2px;
+    text-align: left;
+    transition: color 0.15s;
+}
+
+.filter-show-more:hover {
+    color: #581C1C;
+}
+
+.clear-filters-btn {
+    background: none;
+    border: 1px solid rgba(88, 28, 28, 0.3);
+    border-radius: 8px;
+    padding: 4px 12px;
+    color: #581C1C;
+    font-size: small;
+    cursor: pointer;
+    margin: 8px 0 4px 0;
+    transition: background-color 0.15s;
+}
+
+.clear-filters-btn:hover {
+    background-color: rgba(88, 28, 28, 0.08);
+}
+
+.filter-section-title {
+    cursor: pointer;
+    font-size: small;
+    font-weight: 600;
+    color: #581C1C;
+    padding: 4px 0;
+}
+
+.books-grid .book-cover {
+    transition: opacity 0.2s ease;
+}
 
 /* ACTION BAR */
 
@@ -1317,36 +1388,50 @@ details[open] .detail-icon-popover {
 
 /* ADMIN PAGES */
 
+.admin-section-link {
+ color: inherit;
+}
+
 .admin-page-wrapper {
+    flex-grow: 1;
+    padding: 10px 0 10px 0;
+    overflow-y: auto;
+    scroll-behavior: smooth;
     display: flex;
+    overflow-x: hidden;
+    margin: 0;
+    border-radius: 40px;
     background-color: rgba(255, 255, 255, 0.99);
     flex-direction: column;
-    gap: 48px;
+    gap: 128px;
     padding: 40px;
     margin: -10px 0;
     height: calc(100% + 20px);
     box-sizing: border-box;
-    overflow: hidden;
-    border-radius: 20px;
-
 }
 
 .admin-section {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    scroll-margin-top: 30px;
 }
 
 .admin-section-header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+}
+
+.admin-section-header svg {
+    width: 36px;
+    height: 36px;
 }
 
 .admin-section-title {
     margin: 0;
-    font-size: 2rem;
+    font-size: 2.6rem;
     font-weight: 400;
     color: #581C1C;
 }
@@ -1361,7 +1446,8 @@ details[open] .detail-icon-popover {
 }
 
 .admin-subsection-wrapper{
-    
+    display: flex;
+    flex-direction: column;    
 }
 
 .admin-subsection-title {
@@ -1376,6 +1462,9 @@ details[open] .detail-icon-popover {
     border-radius: 999px;
     background: white;
     box-shadow: inset 0 0 4px 0px rgba(0, 0, 0, .1);
+    border-width:1px;
+    border-style:solid;
+    border-color:#e1e1e1;
 }
 
 /* Thumb */
@@ -1484,11 +1573,33 @@ details[open] .detail-icon-popover {
 
 
 
+.toggle-group {
+    display: flex;
+    flex-direction: row;
+}
 
+.toggle-wrapper {
+    padding: 10px;
+}
 
+.toggle-info-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    padding: 10px;
+}
+
+.toggle-name {
+    padding: 0;
+    margin: 0;
+}
+.toggle-desc {
+    padding: 0;
+    margin: 0;
+}
 
 /* Hide the real checkbox */
-#toggle-boolean {
+.toggle-boolean {
     display: none;
 }
 
@@ -1503,6 +1614,9 @@ details[open] .detail-icon-popover {
     position: relative;
     cursor: pointer;
     transition: background 0.2s;
+    border-width:1px;
+    border-style:solid;
+    border-color:#e1e1e1;
 }
 
 /* The sliding thumb */
@@ -1525,6 +1639,188 @@ details[open] .detail-icon-popover {
 .toggle-label input:checked + .toggle-span::after {
     background: #80C900;
     transform: translateX(20px);
+}
+
+/* Setting path row (label + value inline) */
+.setting-path-row {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 10px;
+}
+
+.setting-path-label {
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.setting-path-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #000;
+    font-family: monospace;
+}
+
+.setting-input {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #000;
+    font-family: monospace;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e1e1e1;
+    padding: 2px 0;
+    outline: none;
+    min-width: 120px;
+    transition: border-color 0.2s;
+}
+
+.setting-input:focus {
+    border-bottom-color: #082dff;
+}
+
+.setting-input::placeholder {
+    color: rgba(0, 0, 0, 0.25);
+    font-weight: 400;
+}
+
+/* Radio card blocks (horizontal row of pill-shaped options) */
+.radio-group-row {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    padding: 0 10px;
+}
+
+.radio-card-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    border: 1.5px solid #e1e1e1;
+    background: white;
+    color: rgba(0, 0, 0, 0.45);
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    user-select: none;
+}
+
+.radio-card-block:first-child {
+    border-radius: 12px 0 0 12px;
+    border-right: none;
+}
+
+.radio-card-block:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.radio-card-block:has(input:checked) {
+    background: #f0f0ff;
+    border-color: #082dff;
+    color: #000;
+}
+
+.radio-card-block input {
+    display: none;
+}
+
+/* Custom radio dot */
+.radio-card-dot {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    position: relative;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+}
+
+.radio-card-block:has(input:checked) .radio-card-dot {
+    border-color: #082dff;
+}
+
+.radio-card-dot::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 0.2s;
+}
+
+.radio-card-block:has(input:checked) .radio-card-dot::after {
+    background: #082dff;
+}
+
+/* Warning icon in radio card */
+.radio-card-warning {
+    color: #d4a017;
+    flex-shrink: 0;
+}
+
+/* Descriptive radio cards (with title + description) */
+.radio-card-descriptive {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 14px 16px;
+    flex: 1;
+}
+
+.radio-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.radio-card-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.radio-card-description {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Server action buttons */
+.server-action-buttons {
+    display: flex;
+    gap: 12px;
+    padding: 4px 0;
+}
+
+.server-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 18px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #333;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.server-action-btn:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.server-action-btn svg {
+    opacity: 0.7;
 }
 
 
