@@ -33,13 +33,10 @@
 
   <input type="range" class="cover-size-slider" id="cover-size-slider" min="150" max="300" value="225">
 
-  <form class="action-item search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
+  <div class="action-item search-form">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
-    <input type="text" class="search-input" name="query" placeholder="Search..." value="{{searchterm}}">
-    <button type="submit" class="search-submit">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
-    </button>
-  </form>
+    <input type="text" class="search-input" id="live-search" placeholder="Search..." autocomplete="off">
+  </div>
 
 </div>
 
@@ -98,6 +95,7 @@
 <div id="popover-overlay"></div>
 <div id="book-popover">
   <div id="book-popover-arrow"></div>
+  <button id="popover-close" type="button" aria-label="Close">&times;</button>
   <h3 id="popover-title"></h3>
   <h4 id="popover-author"></h4>
   <p id="popover-rating"></p>
@@ -131,10 +129,12 @@
   var spinner = document.getElementById('books-loading');
   var clearBtn = document.getElementById('clear-filters');
   var filterContainer = document.getElementById('sidebar-filters');
+  var searchInput = document.getElementById('live-search');
   if (!grid || !wrapper || !spinner) return;
 
   var loading = false;
   var MIN_VISIBLE = 20;
+  var searchTerm = '';
 
   // --- Infinite Scroll ---
   function loadMore(callback) {
@@ -246,28 +246,142 @@
     return true;
   }
 
+  function bookMatchesSearch(cover) {
+    if (!searchTerm) return true;
+    var title = (cover.dataset.title || '').toLowerCase();
+    var author = (cover.dataset.author || '').toLowerCase();
+    var tags = (cover.dataset.tags || '').toLowerCase();
+    var series = (cover.dataset.series || '').toLowerCase();
+    return title.indexOf(searchTerm) !== -1
+        || author.indexOf(searchTerm) !== -1
+        || tags.indexOf(searchTerm) !== -1
+        || series.indexOf(searchTerm) !== -1;
+  }
+
+  var ANIM_DURATION = 250;
+  var animating = false;
+
   function applyFilters(autoLoad) {
     var filters = getActiveFilters();
     var hasFilters = Object.keys(filters).length > 0;
+    var hasSearch = searchTerm.length > 0;
+    var isFiltering = hasFilters || hasSearch;
     if (clearBtn) clearBtn.style.display = hasFilters ? '' : 'none';
 
-    var covers = grid.querySelectorAll('.book-cover');
-    var visibleCount = 0;
+    var covers = Array.from(grid.querySelectorAll('.book-cover'));
+
+    // FLIP step 1: record current positions of all visible covers
+    var firstPositions = {};
     covers.forEach(function(cover) {
-      if (!hasFilters || bookMatchesFilters(cover, filters)) {
-        cover.style.display = '';
-        visibleCount++;
-      } else {
-        cover.style.display = 'none';
+      if (cover.style.display !== 'none' && !cover.classList.contains('filter-hiding')) {
+        var rect = cover.getBoundingClientRect();
+        firstPositions[cover.dataset.bookId] = { x: rect.left, y: rect.top };
       }
     });
 
-    // Auto-load more if too few visible and more pages exist
-    if (autoLoad !== false && hasFilters && visibleCount < MIN_VISIBLE && grid.dataset.nextUrl) {
-      loadMore(function(loaded) {
-        if (loaded) applyFilters(true);
+    // Determine which should be visible vs hidden
+    var toShow = [];
+    var toHide = [];
+    var visibleCount = 0;
+
+    covers.forEach(function(cover) {
+      var matchesCheckbox = !hasFilters || bookMatchesFilters(cover, filters);
+      var matchesSearch = bookMatchesSearch(cover);
+      var wasHidden = cover.style.display === 'none' || cover.classList.contains('filter-hiding');
+
+      if (matchesCheckbox && matchesSearch) {
+        visibleCount++;
+        if (wasHidden) toShow.push(cover);
+      } else {
+        if (!wasHidden) toHide.push(cover);
+      }
+    });
+
+    // If no changes or currently mid-animation, apply instantly
+    if (animating || (toShow.length === 0 && toHide.length === 0)) {
+      covers.forEach(function(cover) {
+        var matchesCheckbox = !hasFilters || bookMatchesFilters(cover, filters);
+        var matchesSearch = bookMatchesSearch(cover);
+        cover.style.display = (matchesCheckbox && matchesSearch) ? '' : 'none';
+        cover.classList.remove('filter-hiding', 'filter-showing');
+        cover.style.transform = '';
       });
+      if (autoLoad !== false && isFiltering && visibleCount < MIN_VISIBLE && grid.dataset.nextUrl) {
+        loadMore(function(loaded) { if (loaded) applyFilters(true); });
+      }
+      return;
     }
+
+    animating = true;
+
+    // Animate out: fade + shrink
+    toHide.forEach(function(cover) {
+      cover.classList.add('filter-hiding');
+    });
+
+    // After fade-out completes, remove from flow and animate remaining into new positions
+    setTimeout(function() {
+      // Remove hidden items from flow
+      toHide.forEach(function(cover) {
+        cover.style.display = 'none';
+        cover.classList.remove('filter-hiding');
+      });
+
+      // Show new items (initially invisible for fade-in)
+      toShow.forEach(function(cover) {
+        cover.style.display = '';
+        cover.classList.add('filter-showing');
+      });
+
+      // FLIP step 2: record new positions
+      var lastPositions = {};
+      covers.forEach(function(cover) {
+        if (cover.style.display !== 'none') {
+          var rect = cover.getBoundingClientRect();
+          lastPositions[cover.dataset.bookId] = { x: rect.left, y: rect.top };
+        }
+      });
+
+      // FLIP step 3: invert — apply transform from old position
+      covers.forEach(function(cover) {
+        if (cover.style.display === 'none') return;
+        var id = cover.dataset.bookId;
+        var first = firstPositions[id];
+        var last = lastPositions[id];
+        if (first && last && (first.x !== last.x || first.y !== last.y)) {
+          var dx = first.x - last.x;
+          var dy = first.y - last.y;
+          cover.style.transition = 'none';
+          cover.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+        }
+      });
+
+      // Force reflow so the inverse transforms are applied before animating
+      void grid.offsetHeight;
+
+      // FLIP step 4: play — animate to final position
+      covers.forEach(function(cover) {
+        if (cover.style.display === 'none') return;
+        cover.style.transition = 'transform ' + ANIM_DURATION + 'ms ease, opacity ' + ANIM_DURATION + 'ms ease';
+        cover.style.transform = '';
+      });
+
+      // Clean up after animation
+      setTimeout(function() {
+        covers.forEach(function(cover) {
+          cover.style.transition = '';
+          cover.style.transform = '';
+          cover.classList.remove('filter-showing');
+        });
+        animating = false;
+
+        // Auto-load more if too few visible
+        if (autoLoad !== false && isFiltering && visibleCount < MIN_VISIBLE && grid.dataset.nextUrl) {
+          loadMore(function(loaded) { if (loaded) applyFilters(true); });
+        }
+      }, ANIM_DURATION);
+
+    }, ANIM_DURATION);
   }
 
   // Listen for checkbox changes
@@ -279,13 +393,27 @@
     });
   }
 
+  // Live search
+  if (searchInput) {
+    var searchTimer;
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(function() {
+        searchTerm = searchInput.value.trim().toLowerCase();
+        applyFilters(true);
+      }, 150);
+    });
+  }
+
   // Clear filters button
   if (clearBtn) {
     clearBtn.addEventListener('click', function() {
-      if (!filterContainer) return;
-      filterContainer.querySelectorAll('input[type="checkbox"]:checked').forEach(function(cb) {
-        cb.checked = false;
-      });
+      if (filterContainer) {
+        filterContainer.querySelectorAll('input[type="checkbox"]:checked').forEach(function(cb) {
+          cb.checked = false;
+        });
+      }
+      if (searchInput) { searchInput.value = ''; searchTerm = ''; }
       applyFilters(false);
     });
   }
@@ -373,6 +501,35 @@
     activeCard = null;
   }
 
+  function scrollToCover(cover, callback) {
+    var wrapper = document.querySelector('.main-content-wrapper');
+    var rect = cover.getBoundingClientRect();
+    var wrapperRect = wrapper.getBoundingClientRect();
+    var coverCenter = rect.top + rect.height / 2;
+    var wrapperCenter = wrapperRect.top + wrapperRect.height / 2;
+    var offset = coverCenter - wrapperCenter;
+
+    if (Math.abs(offset) < 20) {
+      callback();
+      return;
+    }
+
+    wrapper.scrollBy({ top: offset, behavior: 'smooth' });
+
+    // Wait for scroll to settle, then fire callback
+    var settled = 0;
+    var lastTop = wrapper.scrollTop;
+    var check = setInterval(function() {
+      if (wrapper.scrollTop === lastTop) {
+        settled++;
+        if (settled >= 3) { clearInterval(check); callback(); }
+      } else {
+        settled = 0;
+        lastTop = wrapper.scrollTop;
+      }
+    }, 30);
+  }
+
   // Event delegation — works for covers loaded by infinite scroll too
   grid.addEventListener('click', function(e) {
     var cover = e.target.closest('.book-cover');
@@ -380,7 +537,7 @@
       if (activeCard === cover) {
         hidePopover();
       } else {
-        showPopover(cover);
+        scrollToCover(cover, function() { showPopover(cover); });
       }
       e.stopPropagation();
     }
@@ -396,6 +553,12 @@
   // Escape key closes popover
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') hidePopover();
+  });
+
+  // Close button
+  document.getElementById('popover-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    hidePopover();
   });
 
   // Clicks inside the popover don't bubble up and close it
