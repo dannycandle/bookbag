@@ -436,7 +436,7 @@
     // Close all other popovers (sort, user settings, etc.)
     window.Popovers.closeAll(bookPopoverClose);
 
-    document.querySelector('.main-content-wrapper').style.overflowY = 'hidden';
+    document.querySelector('.main-content').style.overflowY = 'hidden';
     document.getElementById('popover-title').textContent = cover.dataset.title || '';
     document.getElementById('popover-author').textContent = cover.dataset.author || '';
     var rating = cover.dataset.rating;
@@ -494,7 +494,7 @@
   }
 
   function hidePopover() {
-    document.querySelector('.main-content-wrapper').style.overflowY = '';
+    document.querySelector('.main-content').style.overflowY = '';
     popover.style.display = 'none';
     overlay.style.display = 'none';
     if (activeCard) {
@@ -506,7 +506,7 @@
   }
 
   function scrollToCover(cover, callback) {
-    var wrapper = document.querySelector('.main-content-wrapper');
+    var wrapper = document.querySelector('.main-content');
     var rect = cover.getBoundingClientRect();
     var wrapperRect = wrapper.getBoundingClientRect();
     var coverCenter = rect.top + rect.height / 2;
@@ -530,7 +530,7 @@
       if (t < 1) {
         requestAnimationFrame(step);
       } else {
-        callback();
+        requestAnimationFrame(callback);
       }
     }
     requestAnimationFrame(step);

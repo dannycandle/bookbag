@@ -278,7 +278,6 @@ details[open] .user-popover-menu {
     flex-grow: 1;
     padding: 70px 0 40px 0;
     overflow-y: auto;
-    scroll-behavior: smooth;
     display: flex;
     overflow-x: hidden;
     margin: 0;
