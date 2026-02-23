@@ -249,11 +249,11 @@
 
 {% endif %}
 
-<div class="main-content-wrapper">
-      {% block body %}{% endblock %}
-    </div>
-
-
+<div id="popover-overlay"></div>
+<div class="main-content-area">
+    <div class="action-bar">{% block action_bar %}{% endblock %}</div>
+      <div class="main-content-wrapper">{% block body %}{% endblock %}</div>
+</div>
 
    {% with messages = get_flashed_messages(with_categories=True) %}
       {% if messages %}
@@ -286,12 +286,61 @@
     </script>
 
     <script>
-      document.addEventListener('click', function(e) {
-        if (e.target.closest('summary')) return;
-        document.querySelectorAll('details.user-popover[open], details.sort-dropdown[open]').forEach(function(d) {
-          if (!d.contains(e.target)) d.removeAttribute('open');
+      // Unified popover manager — only one popover open at a time
+      window.Popovers = (function() {
+        var overlay = document.getElementById('popover-overlay');
+        var closers = [];
+
+        function showOverlay() { overlay.style.display = 'block'; }
+        function hideOverlay() { overlay.style.display = 'none'; }
+
+        function closeAll(except) {
+          closers.forEach(function(c) { if (c !== except) c(); });
+        }
+
+        function register(closeFn) {
+          closers.push(closeFn);
+          return closeFn;
+        }
+
+        // Details-based popovers (user settings, sort menu)
+        var useScrim = { 'user-popover': true };
+        document.querySelectorAll('details.user-popover, details.sort-dropdown').forEach(function(d) {
+          var hasScrim = d.classList.contains('user-popover');
+          var close = register(function() {
+            d.removeAttribute('open');
+            if (hasScrim) hideOverlay();
+          });
+          d.querySelector('summary').addEventListener('click', function() {
+            if (!d.open) {
+              closeAll(close);
+              if (hasScrim) showOverlay();
+            } else {
+              if (hasScrim) hideOverlay();
+            }
+          });
         });
-      });
+
+        // Overlay click closes everything
+        overlay.addEventListener('click', function() {
+          closeAll();
+        });
+
+        // Click outside closes details popovers (for non-scrim popovers like sort)
+        document.addEventListener('click', function(e) {
+          if (e.target.closest('summary')) return;
+          document.querySelectorAll('details.sort-dropdown[open]').forEach(function(d) {
+            if (!d.contains(e.target)) d.removeAttribute('open');
+          });
+        });
+
+        // Escape closes everything
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') closeAll();
+        });
+
+        return { closeAll: closeAll, register: register, showOverlay: showOverlay, hideOverlay: hideOverlay };
+      })();
     </script>
 
     {% block js %}{% endblock %}

@@ -2,22 +2,21 @@
 {% macro display_bool_setting(setting_value) -%}
   {% if setting_value %}<span class="admin-bool-yes">✓</span>{% else %}<span class="admin-bool-no">✗</span>{% endif %}
 {%- endmacro %}
+{% block action_bar %}
+    <div></div> <!-- EMPTY CONTAINER TO ALIGN SEARCHBOX RIGHT -->
+    <form class="search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+        <input type="text" class="search-input" name="query" placeholder="Search..." value="{{searchterm}}">
+        <button type="submit" class="search-submit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+        </button>
+    </form>
+{% endblock %}
+
 {% block body %}
 
 <!-- BEGIN PAGE WRAPPER -->
 <div class="admin-page-wrapper">
-    <!-- BEGIN ACTION BAR -->
-    <div class="action-bar">
-        <div></div> <!-- EMPTY CONTAINER TO ALIGN SEARCHBOX RIGHT -->
-        <!-- BEGIN SEARCHBOX -->
-        <form class="search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
-            <input type="text" class="search-input" name="query" placeholder="Search..." value="{{searchterm}}">
-            <button type="submit" class="search-submit">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
-            </button>
-        </form> <!-- END SEARCHBOX -->
-        </div> <!-- END ACTION BAR -->
 
     <!-- BEGIN MAIN ADMIN SETTINGS CONTENT AREA -->
     <section class="admin-section" id="users">
@@ -299,6 +298,22 @@
                 </div>
             </div>
 
+            <!-- Book Uploads -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Book Uploads</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_uploading" id="config_uploading" data-inverted="true" {% if not config.config_uploading %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Disable uploads</h3></div>
+                        <div><p class="toggle-desc">Disables the upload of ebooks altogether.</p></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Allowed Book Filetypes -->
             <div class="admin-subsection-wrapper">
                 <h3 class="admin-subsection-title">Allowed Book Filetypes</h3>
@@ -437,7 +452,7 @@
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_email_enabled" checked>
+                        <input class="toggle-boolean" type="checkbox" id="config_email_enabled" {% if config.get_mail_server_configured() %}checked{% endif %}>
                         <span class="toggle-span"></span>
                     </div>
                     <div class="toggle-info-wrapper">
@@ -445,44 +460,57 @@
                         <div><p class="toggle-desc">When enabled, Book Bag will be able to send Password Reset emails, Magic Link login becomes available, and eMail.</p></div>
                     </div>
                 </div>
-                <div class="radio-group-row">
-                    <label class="radio-card-block">
-                        <input type="radio" name="email_provider" value="smtp" checked>
-                        <span class="radio-card-dot"></span>
-                        Standard (SMTP)
-                    </label>
-                    <label class="radio-card-block">
-                        <input type="radio" name="email_provider" value="gmail">
-                        <span class="radio-card-dot"></span>
-                        Gmail
-                    </label>
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Mail Server URL</span>
-                    <input class="setting-input" type="text" name="mail_server" placeholder="mail.example.com">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Port</span>
-                    <input class="setting-input" type="text" name="mail_port" placeholder="25">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Encryption Type</span>
-                    <input class="setting-input" type="text" name="mail_encryption" placeholder="SSL/TLS">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Username</span>
-                    <input class="setting-input" type="text" name="mail_login" placeholder="user@example.com">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">"From" Name</span>
-                    <input class="setting-input" type="text" name="mail_from" placeholder="Book Bag">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Attachment File Size Limit</span>
-                    <input class="setting-input" type="text" name="mail_size" placeholder="25">
-                </div>
-                <div style="padding: 8px 10px;">
-                    <button type="button" class="btn btn-primary" id="btn-test-email">Save and Send Test Email</button>
+                <div id="email-settings-fields" {% if not config.get_mail_server_configured() %}style="display:none"{% endif %}>
+                    <div class="radio-group-row">
+                        <label class="radio-card-block">
+                            <input type="radio" name="mail_server_type" value="0" {% if config.mail_server_type == 0 %}checked{% endif %}>
+                            <span class="radio-card-dot"></span>
+                            Standard (SMTP)
+                        </label>
+                        <label class="radio-card-block">
+                            <input type="radio" name="mail_server_type" value="1" {% if config.mail_server_type == 1 %}checked{% endif %}>
+                            <span class="radio-card-dot"></span>
+                            Gmail
+                        </label>
+                    </div>
+                    <div id="smtp-fields">
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Mail Server URL</span>
+                            <input class="setting-input email-field" type="text" name="mail_server" placeholder="mail.example.com" value="{{ config.mail_server }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Port</span>
+                            <input class="setting-input email-field" type="number" name="mail_port" placeholder="25" min="1" max="65535" value="{{ config.mail_port }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Encryption Type</span>
+                            <select class="setting-input email-field" name="mail_use_ssl">
+                                <option value="0" {% if config.mail_use_ssl == 0 %}selected{% endif %}>None</option>
+                                <option value="1" {% if config.mail_use_ssl == 1 %}selected{% endif %}>STARTTLS</option>
+                                <option value="2" {% if config.mail_use_ssl == 2 %}selected{% endif %}>SSL/TLS</option>
+                            </select>
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Username</span>
+                            <input class="setting-input email-field" type="text" name="mail_login" placeholder="user@example.com" value="{{ config.mail_login }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Password</span>
+                            <input class="setting-input email-field" type="password" name="mail_password_e" placeholder="{% if config.mail_password_e %}(unchanged){% endif %}" value="">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">"From" Address</span>
+                            <input class="setting-input email-field" type="text" name="mail_from" placeholder="Book Bag <mail@example.com>" value="{{ config.mail_from }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Attachment File Size Limit (MB)</span>
+                            <input class="setting-input email-field" type="number" name="mail_size" placeholder="25" value="{{ config.mail_size // 1048576 }}">
+                        </div>
+                    </div>
+                    <div style="padding: 8px 10px;">
+                        <button type="button" class="btn btn-primary" id="btn-save-email">Save</button>
+                        <button type="button" class="btn btn-primary" id="btn-test-email">Save and Send Test Email</button>
+                    </div>
                 </div>
             </div>
 
@@ -806,6 +834,69 @@
         document.querySelectorAll('.config-toggle').forEach(function(toggle) {
             toggle.addEventListener('change', saveConfig);
         });
+
+        // "Disable uploads" toggle — inverted: checked means uploads OFF
+        var uploadToggle = document.getElementById('config_uploading');
+        if (uploadToggle) {
+            uploadToggle.addEventListener('change', function() {
+                var formData = new FormData();
+                formData.append('csrf_token', '{{ csrf_token() }}');
+                if (!this.checked) {
+                    formData.append('config_uploading', 'on');
+                }
+                fetch('{{ url_for("admin.ajax_config") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+                    body: formData
+                });
+            });
+        }
+
+        // Email Integration — show/hide fields
+        var emailToggle = document.getElementById('config_email_enabled');
+        var emailFields = document.getElementById('email-settings-fields');
+        if (emailToggle && emailFields) {
+            emailToggle.addEventListener('change', function() {
+                emailFields.style.display = this.checked ? '' : 'none';
+            });
+        }
+
+        // Email Integration — save and test
+        function collectEmailFormData(includeTest) {
+            var formData = new FormData();
+            formData.append('csrf_token', '{{ csrf_token() }}');
+            var serverType = document.querySelector('input[name="mail_server_type"]:checked');
+            formData.append('mail_server_type', serverType ? serverType.value : '0');
+            document.querySelectorAll('.email-field').forEach(function(field) {
+                formData.append(field.name, field.value);
+            });
+            if (includeTest) {
+                formData.append('test', '1');
+            }
+            return formData;
+        }
+
+        function saveEmailSettings(includeTest) {
+            var formData = collectEmailFormData(includeTest);
+            fetch('{{ url_for("admin.update_mailsettings") }}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+                body: formData
+            }).then(function(response) {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        var btnSaveEmail = document.getElementById('btn-save-email');
+        if (btnSaveEmail) {
+            btnSaveEmail.addEventListener('click', function() { saveEmailSettings(false); });
+        }
+        var btnTestEmail = document.getElementById('btn-test-email');
+        if (btnTestEmail) {
+            btnTestEmail.addEventListener('click', function() { saveEmailSettings(true); });
+        }
     </script>
 
 

@@ -1,33 +1,7 @@
 {% import 'image.html' as image %}
 {% extends "layout.html" %}
-{% block body %}
 
-{% if author is not none %}
-<div class="author-header">
-  {% if author.image_url is not none %}
-  <img title="{{ author.name }}" src="{{ author.image_url }}" alt="{{ author.name }}" class="author-photo">
-  {% endif %}
-  <div class="author-bio-text">
-    <h2>{{ title }}</h2>
-    {% if author.safe_about is not none %}
-    <p>{{ author.safe_about|safe }}</p>
-    {% endif %}
-    <a href="{{ author.link }}" class="author-goodreads-link" target="_blank" rel="noopener">
-      <img src="{{ url_for('static', filename='img/goodreads.svg') }}" alt="Goodreads" style="height:16px; vertical-align:middle; opacity:0.6;">
-      Goodreads
-    </a>
-  </div>
-</div>
-{% else %}
-<div style="padding: 20px 20px 0;">
-  <h2>{{ title }}</h2>
-</div>
-{% endif %}
-
-<div class="content-layout">
-<div class="main-content">
-
-<div class="action-bar">
+{% block action_bar %}
   <details class="sort-dropdown">
     <summary class="sort-button">
       {% if order == 'abc' %}Title: A–Z
@@ -56,7 +30,34 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
     </button>
   </form>
+{% endblock %}
+
+{% block body %}
+
+{% if author is not none %}
+<div class="author-header">
+  {% if author.image_url is not none %}
+  <img title="{{ author.name }}" src="{{ author.image_url }}" alt="{{ author.name }}" class="author-photo">
+  {% endif %}
+  <div class="author-bio-text">
+    <h2>{{ title }}</h2>
+    {% if author.safe_about is not none %}
+    <p>{{ author.safe_about|safe }}</p>
+    {% endif %}
+    <a href="{{ author.link }}" class="author-goodreads-link" target="_blank" rel="noopener">
+      <img src="{{ url_for('static', filename='img/goodreads.svg') }}" alt="Goodreads" style="height:16px; vertical-align:middle; opacity:0.6;">
+      Goodreads
+    </a>
+  </div>
 </div>
+{% else %}
+<div style="padding: 20px 20px 0;">
+  <h2>{{ title }}</h2>
+</div>
+{% endif %}
+
+<div class="content-layout">
+<div class="main-content">
 
 {% if author is not none %}
 <div style="padding: 0 10px 8px;">
@@ -118,7 +119,6 @@
 </div>
 {% endif %}
 
-<div id="popover-overlay"></div>
 <div id="book-popover">
   <div id="book-popover-arrow"></div>
   <h3 id="popover-title"></h3>

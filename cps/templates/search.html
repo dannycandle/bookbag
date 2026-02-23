@@ -1,12 +1,6 @@
 {% import 'image.html' as image %}
 {% extends "layout.html" %}
-{% block body %}
-
-<div class="content-layout">
-<div class="main-content">
-
-<div class="action-bar">
-
+{% block action_bar %}
   <details class="sort-dropdown">
     <summary class="sort-button">
       {% if order == 'abc' %}Title: A–Z
@@ -35,8 +29,12 @@
   {% if entries %}
     <span class="result-count">{{ result_count }} result{{ 's' if result_count != 1 else '' }} for "{{ adv_searchterm }}"</span>
   {% endif %}
+{% endblock %}
 
-</div>
+{% block body %}
+
+<div class="content-layout">
+<div class="main-content">
 
 {% if entries|length < 1 %}
   <div style="padding: 40px 10px;">
@@ -64,7 +62,6 @@
 </div><!-- end main-content -->
 </div><!-- end content-layout -->
 
-<div id="popover-overlay"></div>
 <div id="book-popover">
   <div id="book-popover-arrow"></div>
   <h3 id="popover-title"></h3>

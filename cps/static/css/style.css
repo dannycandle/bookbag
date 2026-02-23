@@ -1,3 +1,10 @@
+/*$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$/*
+8==D~~                                                    8==D~~
+8==D~~                 WELCOME! :D                        8==D~~
+8==D~~                                                    8==D~~
+/*$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$*/
+
+
 /* General Styles */
 
 @font-face {
@@ -168,7 +175,7 @@ body {
     border-radius:10px;
     border-color:#581C1C;
     box-shadow: -1px 2px 10px #00000033;
-    z-index: 40;
+    z-index: 51;
 }
 
 
@@ -226,15 +233,8 @@ details[open] .user-popover-menu {
 
 .user-popover {position: relative}
 
-.main-content-wrapper { 
-    flex-grow: 1; 
-    padding: 10px 0 10px 0; 
-    overflow-y: auto; 
-    display: block; 
-    overflow-x: hidden;
-    margin: 0;
-    border-radius: 40px;
-}
+
+
       
 .navbar-left-vertical { 
     padding: 15px; }
@@ -246,7 +246,7 @@ details[open] .user-popover-menu {
     margin-bottom: 5px; }
 
 
-/* SIDEBAR */
+
 
 .content-layout {
     display: flex;
@@ -254,10 +254,47 @@ details[open] .user-popover-menu {
     align-items: flex-start;
 }
 
+
+.main-content-area {
+    display:flex;
+    flex-direction: column;
+    width:100%;
+    margin:0;
+    padding:0;
+    position:relative;
+}
+
+.main-content-wrapper { 
+    flex-grow: 1; 
+    padding: 0px 0 10px 0; 
+    overflow-y: auto; 
+    display: block; 
+    overflow-x: hidden;
+    margin: 0;
+    border-radius: 40px;
+}
+
 .main-content {
     flex-grow: 1;
-    min-width: 0;
+    padding: 70px 0 40px 0;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    display: flex;
+    overflow-x: hidden;
+    margin: 0;
+    border-radius: 40px;
+    flex-direction: column;
+    gap: 128px;
+    margin: -10px 0;
+    height: calc(100% + 20px);
+    box-sizing: border-box;
 }
+
+
+
+/*===================/*
+/*    /* SIDEBAR */  /*
+/*===================*/
 
 .sidebar {
     width: 230px;
@@ -322,6 +359,11 @@ details[open] .user-popover-menu {
     gap: 2px;
     padding: 6px 0 2px 4px;
 }
+
+
+
+
+
 
 /* Hide native checkbox */
 .filter-options input[type="checkbox"] {
@@ -423,19 +465,19 @@ details[open] .user-popover-menu {
 /* ACTION BAR */
 
 .action-bar {
-    position: sticky;
-    top: 0;
     z-index: 10;
+    left:0;
+    right:0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: transparent;
-    margin-top: 0px;
-    margin-right: 0px;
-    margin-left: 0px;
-    margin-bottom: 10px;
-    padding: 0px 10px 10px 10px;
-    isolation: isolate;
+    position: absolute;
+    padding: 15px;
+}
+
+.action-bar:empty {
+    display: none;
 }
 
 .sort-button {
@@ -1430,7 +1472,7 @@ details[open] .detail-icon-popover {
 
 .admin-page-wrapper {
     flex-grow: 1;
-    padding: 10px 0 10px 0;
+    padding: 100px 40px;
     overflow-y: auto;
     scroll-behavior: smooth;
     display: flex;
@@ -1440,7 +1482,6 @@ details[open] .detail-icon-popover {
     background-color: rgba(255, 255, 255, 0.99);
     flex-direction: column;
     gap: 128px;
-    padding: 40px;
     margin: -10px 0;
     height: calc(100% + 20px);
     box-sizing: border-box;
