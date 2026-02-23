@@ -285,6 +285,15 @@
       });
     </script>
 
+    <script>
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('summary')) return;
+        document.querySelectorAll('details.user-popover[open], details.sort-dropdown[open]').forEach(function(d) {
+          if (!d.contains(e.target)) d.removeAttribute('open');
+        });
+      });
+    </script>
+
     {% block js %}{% endblock %}
 
 <!--END MAIN APP-->
