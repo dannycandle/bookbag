@@ -228,7 +228,8 @@ def admin():
     schedule_duration = format_timedelta(t, threshold=.99)
 
     return render_title_template("admin.html", allUser=all_user, config=config, commit=commit,
-                                 feature_support=feature_support, schedule_time=schedule_time,
+                                 feature_support=feature_support, provider=oauthblueprints,
+                                 schedule_time=schedule_time,
                                  schedule_duration=schedule_duration,
                                  title=_("Admin page"), page="admin")
 
@@ -1105,6 +1106,8 @@ def pathchooser():
 
 
 def _config_int(to_save, x, func=int):
+    if x in to_save and to_save[x] == '':
+        to_save[x] = '0'
     return config.set_from_dictionary(to_save, x, func)
 
 
@@ -1880,6 +1883,13 @@ def _configuration_update_helper():
             unrar_status = helper.check_unrar(config.config_rarfile_location)
             if unrar_status:
                 return _configuration_result(unrar_status)
+
+        # Google Drive configuration
+        if to_save.get("config_use_google_drive"):
+            if not os.path.isfile(gdriveutils.CLIENT_SECRETS):
+                return _configuration_result(_('client_secrets.json is not configured for web application'))
+        _config_checkbox_int(to_save, "config_use_google_drive")
+
     except (OperationalError, InvalidRequestError) as e:
         ub.session.rollback()
         log.error_or_exception("Settings Database error: {}".format(e))

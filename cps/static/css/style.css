@@ -1983,15 +1983,17 @@ details[open] .detail-icon-popover {
 .setting-path-row {
     display: flex;
     flex-direction: row;
-    align-items: baseline;
-    gap: 10px;
-    padding: 8px 10px;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 10px;
 }
 
 .setting-path-label {
     font-size: 0.9rem;
     color: rgba(0, 0, 0, 0.5);
     white-space: nowrap;
+    min-width: 220px;
+    flex-shrink: 0;
 }
 
 .setting-path-value {
@@ -2002,26 +2004,34 @@ details[open] .detail-icon-popover {
 }
 
 .setting-input {
+    flex: 1;
     font-size: 0.9rem;
     font-weight: 500;
     color: #000;
     font-family: monospace;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #e1e1e1;
-    padding: 2px 0;
+    background: #fff;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    padding: 6px 12px;
+    height: 40px;
     outline: none;
     min-width: 120px;
+    box-sizing: border-box;
     transition: border-color 0.2s;
 }
 
 .setting-input:focus {
-    border-bottom-color: #082dff;
+    border-color: #F94C4C;
 }
 
 .setting-input::placeholder {
-    color: rgba(0, 0, 0, 0.25);
+    color: #aaa;
     font-weight: 400;
+}
+
+select.setting-input {
+    appearance: auto;
+    cursor: pointer;
 }
 
 /* Radio card blocks (horizontal row of pill-shaped options) */
