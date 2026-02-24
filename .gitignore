@@ -24,6 +24,7 @@ vendor/
 *.db
 *.log
 cps/cache
+cps/static/img/login-illustration.png
 
 .idea/
 *.bak

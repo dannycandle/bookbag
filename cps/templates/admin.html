@@ -101,9 +101,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean role-toggle" type="checkbox" name="download_role" {% if config.role_download() %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Download books</h4></div>
+                    <div><h3 class="toggle-name">Download books</h3></div>
                     <div><p class="toggle-desc">When enabled, default to allowing new users to download any book in Book Bag.</p></div>
                 </div>
             </div>
@@ -112,9 +113,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean role-toggle" type="checkbox" name="viewer_role" {% if config.role_viewer() %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Read books in browser</h4></div>
+                    <div><h3 class="toggle-name">Read books in browser</h3></div>
                     <div><p class="toggle-desc">When enabled, default to allowing new users to download any book in Book Bag.</p></div>
                 </div>
             </div>
@@ -123,9 +125,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean role-toggle" type="checkbox" name="edit_role" {% if config.role_edit() %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Edit book details</h4></div>
+                    <div><h3 class="toggle-name">Edit book details</h3></div>
                     <div><p class="toggle-desc">When enabled, default to allowing new users can edit book details such as Title and Description.</p></div>
                 </div>
             </div>
@@ -134,9 +137,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean role-toggle" type="checkbox" name="edit_shelf_role" {% if config.role_edit_shelfs() %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Edit shared bookshelves</h4></div>
+                    <div><h3 class="toggle-name">Edit shared bookshelves</h3></div>
                     <div><p class="toggle-desc">When enabled, default to allowing new users to edit which books appear on shared books shelves.</p></div>
                 </div>
             </div>
@@ -145,10 +149,11 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean role-toggle" type="checkbox" name="passwd_role" {% if config.role_passwd() %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Change password</h4></div>
-                    <div><p class="toggle-desc">When enabled, default to allowing new users to reset their password via the “Forgot Password?” link on the sign in screen.</p></div>
+                    <div><h3 class="toggle-name">Change password</h3></div>
+                    <div><p class="toggle-desc">When enabled, default to allowing new users to reset their password via the "Forgot Password?" link on the sign in screen.</p></div>
                 </div>
             </div>
             <div class="toggle-group">
@@ -156,9 +161,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean role-toggle" type="checkbox" name="upload_role" {% if config.role_upload() %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Upload books</h4></div>
+                    <div><h3 class="toggle-name">Upload books</h3></div>
                     <div><p class="toggle-desc">When enabled, default to allowing new users to upload books to Book Bag.</p></div>
                 </div>
             </div>
@@ -173,9 +179,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean config-toggle" type="checkbox" name="config_public_reg" {% if config.config_public_reg %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Let anyone create an account</h4></div>
+                    <div><h3 class="toggle-name">Let anyone create an account</h3></div>
                     <div><p class="toggle-desc">Default User Role must be set to Reader to enable this feature.</p></div>
                 </div>
             </div>
@@ -184,9 +191,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean config-toggle" type="checkbox" name="config_anonbrowse" {% if config.config_anonbrowse %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Allow browsing without an account</h4></div>
+                    <div><h3 class="toggle-name">Allow browsing without an account</h3></div>
                     <div><p class="toggle-desc">When enabled, anyone that can access this Book Bag’s URL can view library contents and book details. Users without accounts can’t download or read books within the app, but can do so through a reading app that supports ODPS.</p></div>
                 </div>
             </div>
@@ -199,11 +207,12 @@
             <div class="toggle-group">
                 <div class="toggle-wrapper">
                     <label class="toggle-label">
-                    <input class="toggle-boolean" type="checkbox">
+                    <input class="toggle-boolean config-toggle" type="checkbox" name="config_remote_login" {% if config.config_remote_login %}checked{% endif %}>
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Let users login with “magic link”</h4></div>
+                    <div><h3 class="toggle-name">Let users login with "magic link"</h3></div>
                     <div><p class="toggle-desc">Not available if <a href="#email">Email Integration</a> is not setup.</p></div>
                 </div>
             </div>
@@ -212,9 +221,10 @@
                     <label class="toggle-label">
                     <input class="toggle-boolean" type="checkbox">
                     <span class="toggle-span"></span>
+                    </label>
                 </div>
                 <div class="toggle-info-wrapper">
-                    <div><h3 class="toggle-name">Allow browsing without an account</h4></div>
+                    <div><h3 class="toggle-name">Allow browsing without an account</h3></div>
                     <div><p class="toggle-desc">When enabled, anyone that can access this Book Bag’s URL can view library contents and book details. Users without accounts can’t download or read books within the app, but can do so through a reading app that supports ODPS.</p></div>
                 </div>
             </div>
@@ -551,7 +561,7 @@
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_goodreads">
+                        <input class="toggle-boolean" type="checkbox" name="config_use_goodreads">
                         <span class="toggle-span"></span>
                     </div>
                     <div class="toggle-info-wrapper">
@@ -591,12 +601,77 @@
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_password_policy" checked>
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_policy" {% if config.config_password_policy %}checked{% endif %}>
                         <span class="toggle-span"></span>
+                        </label>
                     </div>
                     <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Require Complex Passwords</h3></div>
+                        <div><h3 class="toggle-name">Disable complex password requirement</h3></div>
                         <div><p class="toggle-desc">Enforce minimum password complexity requirements for all user accounts.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Minimum Password Length</span>
+                    <input class="setting-input config-field" type="number" name="config_password_min_length" min="1" max="40" value="{{ config.config_password_min_length }}">
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_number" {% if config.config_password_number %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Require a number</h3></div>
+                        <div><p class="toggle-desc">Passwords must contain at least one digit (0-9).</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_lower" {% if config.config_password_lower %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Require a lowercase letter</h3></div>
+                        <div><p class="toggle-desc">Passwords must contain at least one lowercase letter (a-z).</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_upper" {% if config.config_password_upper %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Require an uppercase letter</h3></div>
+                        <div><p class="toggle-desc">Passwords must contain at least one uppercase letter (A-Z).</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_character" {% if config.config_password_character %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Require a letter</h3></div>
+                        <div><p class="toggle-desc">Passwords must contain at least one letter of any case.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_special" {% if config.config_password_special %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Require a special character</h3></div>
+                        <div><p class="toggle-desc">Passwords must contain at least one special character (!@#$%^&amp;* etc.).</p></div>
                     </div>
                 </div>
                 <div class="toggle-group">
@@ -786,10 +861,15 @@
         </div>
         <div class="admin-section-body">
             <div class="about-text">
-                <p>Book Bag is a passion project of Daniel Candelaria. It is forked from Calibre-Web and merges many of the changes from Calibre-Web Automated. It is self-hostable and open source. For more information and to see the source code, please visit <a href="https://github.com/dannycandle/Book-Bag" target="_blank">https://github.com/dannycandle/Book-Bag</a></p>
+                <p>Bookbag is a passion project of Daniel Candelaria. It is forked from Calibre-Web and merges many of the changes from Calibre-Web Automated. It is self-hostable and open source. For more information and to see the source code, please visit <a href="https://github.com/dannycandle/Book-Bag" target="_blank">https://github.com/dannycandle/Book-Bag</a></p>
             </div>
         </div>
     </section>
+
+
+    <!-- ============================================ -->
+    <!-- Javascript (move to refernced scripts later) -->
+    <!-- ============================================ -->
 
     <script>
         function saveRoles() {
@@ -825,6 +905,9 @@
                     formData.append(toggle.name, 'on');
                 }
             });
+            document.querySelectorAll('.config-field').forEach(function(field) {
+                formData.append(field.name, field.value);
+            });
             fetch('{{ url_for("admin.ajax_config") }}', {
                 method: 'POST',
                 headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
@@ -833,6 +916,9 @@
         }
         document.querySelectorAll('.config-toggle').forEach(function(toggle) {
             toggle.addEventListener('change', saveConfig);
+        });
+        document.querySelectorAll('.config-field').forEach(function(field) {
+            field.addEventListener('change', saveConfig);
         });
 
         // "Disable uploads" toggle — inverted: checked means uploads OFF
