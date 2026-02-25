@@ -721,8 +721,19 @@ if (uploadInput) {
   });
 })();
 
-
-
+// Keyboard shortcut: "/" to focus search
+document.addEventListener('keydown', function(e) {
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+    e.preventDefault();
+    var si = document.getElementById('live-search');
+    if (si) si.focus();
+  }
+  if (e.key === 'Escape' && e.target.id === 'live-search') {
+    e.target.blur();
+  }
+});
 
 </script>
 
