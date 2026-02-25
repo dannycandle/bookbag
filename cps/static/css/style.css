@@ -190,6 +190,17 @@ details[open] .user-popover-menu {
     animation: pop-in 0.05s cubic-bezier(0.04, 0, 0.2, 1.25) forwards;
 }
 
+.user-popover-arrow {
+    position: absolute;
+    bottom: 12px;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid rgba(255, 255, 255, 0.75);
+}
+
 .user-popup-button {
     display:flex;
     justify-content: left;
@@ -480,14 +491,14 @@ details[open] .user-popover-menu {
 }
 
 .sort-button {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.5);
     border: 1px solid transparent;
     border-radius: 10px;
     padding: 6px 14px;
     color: #581C1C;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     cursor:pointer;
-
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 /* Remove default caret symbol from drop down button */
@@ -518,11 +529,12 @@ summary {
     display: flex;
     align-items: center;
     gap: 6px;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.5);
     border: 1px solid transparent;
     border-radius: 10px;
     padding: 4px 10px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .search-input {
@@ -570,6 +582,27 @@ summary {
 
 details[open] .sort-popover {
     animation: pop-in 0.05s cubic-bezier(0.04, 0, 0.2, 1.25) forwards;
+}
+
+.sort-popover-arrow {
+    position: absolute;
+    top: -8px;
+    left: 16px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(255, 255, 255, 0.7);
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    padding: 8px 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .cover-size-slider {

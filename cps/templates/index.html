@@ -1,7 +1,7 @@
 {% import 'image.html' as image %}
 {% extends "layout.html" %}
 {% block action_bar %}
-  <details class="sort-dropdown">
+  <details class="sort-dropdown" data-current-sort="{{ order or 'new' }}">
   <summary class="sort-button">
     {% if order == 'abc' %}Title: A–Z
     {% elif order == 'zyx' %}Title: Z–A
@@ -15,18 +15,21 @@
     {% endif %}
   </summary>
   <div class="sort-popover">
-    {% if order != 'abc' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='abc')}}'">Title: A–Z</button>{% endif %}
-    {% if order != 'zyx' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='zyx')}}'">Title: Z–A</button>{% endif %}
-    {% if order != 'authaz' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='authaz')}}'">Author: A–Z</button>{% endif %}
-    {% if order != 'authza' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='authza')}}'">Author: Z–A</button>{% endif %}
-    {% if order != 'pubold' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='pubold')}}'">Published: Old to New</button>{% endif %}
-    {% if order != 'pubnew' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='pubnew')}}'">Published: New to Old</button>{% endif %}
-    {% if order != 'new' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='new')}}'">Added: New to Old</button>{% endif %}
-    {% if order != 'old' %}<button class="sort-option" onclick="window.location.href='{{url_for('web.books_list', data=page, book_id=id, sort_param='old')}}'">Added: Old to New</button>{% endif %}
+    <div class="sort-popover-arrow"></div>
+    <button class="sort-option" data-sort="abc">Title: A–Z</button>
+    <button class="sort-option" data-sort="zyx">Title: Z–A</button>
+    <button class="sort-option" data-sort="authaz">Author: A–Z</button>
+    <button class="sort-option" data-sort="authza">Author: Z–A</button>
+    <button class="sort-option" data-sort="pubold">Published: Old to New</button>
+    <button class="sort-option" data-sort="pubnew">Published: New to Old</button>
+    <button class="sort-option" data-sort="new">Added: New to Old</button>
+    <button class="sort-option" data-sort="old">Added: Old to New</button>
   </div>
 </details>
 
-  <input type="range" class="cover-size-slider" id="cover-size-slider" min="150" max="300" value="225">
+  <div class="action-item slider-container">
+    <input type="range" class="cover-size-slider" id="cover-size-slider" min="150" max="300" value="225">
+  </div>
 
   <div class="action-item search-form">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
@@ -53,7 +56,9 @@
     <div class="book-cover"
     data-book-id="{{ entry.Books.id }}"
     data-title="{{ entry.Books.title }}"
+    data-sort-title="{{ entry.Books.sort }}"
     data-author="{{ entry.Books.authors | map(attribute='name') | join(', ') }}"
+    data-author-sort="{{ entry.Books.author_sort }}"
     data-rating="{{ (entry.Books.ratings[0].rating / 2) if entry.Books.rating else '' }}"
     data-description="{{ entry.Books.comments[0].text | striptags | truncate(200, end='...') if entry.Books.comments else '' }}"
     data-format="{{ entry.Books.data[0].format if entry.Books.data else '' }}"
@@ -63,7 +68,8 @@
     data-languages="{{ entry.Books.languages | map(attribute='lang_code') | join('||') }}"
     data-series="{{ entry.Books.series | map(attribute='name') | join('||') }}"
     data-publishers="{{ entry.Books.publishers | map(attribute='name') | join('||') }}"
-    data-pubdate="{{ entry.Books.pubdate }}">
+    data-pubdate="{{ entry.Books.pubdate }}"
+    data-timestamp="{{ entry.Books.timestamp }}">
       {{ image.book_cover(entry.Books) }}
     </div>
     {% endfor %}
@@ -418,6 +424,118 @@
 })();
 
 
+// --- Sort Handler (AJAX, no page reload) ---
+(function() {
+  var sortDropdown = document.querySelector('.sort-dropdown');
+  var sortPopover = document.querySelector('.sort-popover');
+  if (!sortDropdown || !sortPopover) return;
+
+  var grid = document.querySelector('.books-grid');
+  var spinner = document.getElementById('books-loading');
+  var currentSort = sortDropdown.dataset.currentSort || 'new';
+
+  var sortLabels = {
+    abc: 'Title: A\u2013Z', zyx: 'Title: Z\u2013A',
+    authaz: 'Author: A\u2013Z', authza: 'Author: Z\u2013A',
+    pubold: 'Published: Old to New', pubnew: 'Published: New to Old',
+    'new': 'Added: New to Old', old: 'Added: Old to New'
+  };
+
+  // Hide the currently active sort option on load
+  function updateActiveOption() {
+    sortPopover.querySelectorAll('.sort-option').forEach(function(btn) {
+      btn.style.display = btn.dataset.sort === currentSort ? 'none' : '';
+    });
+  }
+  updateActiveOption();
+
+  // Build sort URL from the current next-url or page URL
+  function buildSortUrl(sortParam) {
+    var nextUrl = grid.dataset.nextUrl;
+    if (nextUrl) {
+      // next-url format: /pageType/sortParam/bookId/pageNum
+      var parts = nextUrl.split('/').filter(Boolean);
+      // parts[0]=pageType, parts[1]=sortParam, parts[2]=bookId, parts[3]=pageNum
+      parts[1] = sortParam;
+      parts[3] = '1'; // reset to page 1
+      return '/' + parts.join('/');
+    }
+    // Fallback: use current page URL
+    var path = window.location.pathname.split('/').filter(Boolean);
+    if (path.length >= 2) {
+      path[1] = sortParam;
+      if (path.length >= 4) path[3] = '1';
+      return '/' + path.join('/');
+    }
+    return window.location.pathname;
+  }
+
+  sortPopover.addEventListener('click', function(e) {
+    var btn = e.target.closest('.sort-option');
+    if (!btn) return;
+
+    var newSort = btn.dataset.sort;
+    if (newSort === currentSort) return;
+
+    // Close the dropdown
+    sortDropdown.removeAttribute('open');
+
+    // Update button label
+    sortDropdown.querySelector('.sort-button').textContent = sortLabels[newSort] || 'Sort';
+
+    // Show loading
+    if (spinner) spinner.style.display = 'flex';
+
+    // Fetch sorted page via AJAX
+    var url = buildSortUrl(newSort);
+    fetch(url)
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var newGrid = doc.querySelector('.books-grid');
+        if (!newGrid) return;
+
+        // Fade out current content
+        grid.style.transition = 'opacity 0.15s ease';
+        grid.style.opacity = '0';
+
+        setTimeout(function() {
+          // Replace grid content
+          grid.innerHTML = newGrid.innerHTML;
+
+          // Update next-url for infinite scroll
+          var newNext = newGrid.dataset.nextUrl;
+          if (newNext) {
+            grid.dataset.nextUrl = newNext;
+          } else {
+            delete grid.dataset.nextUrl;
+          }
+
+          // Apply saved cover size
+          var saved = localStorage.getItem('coverSize');
+          if (saved) {
+            grid.style.setProperty('--cover-size', saved + 'px');
+          }
+
+          // Fade in new content
+          grid.style.opacity = '1';
+          setTimeout(function() { grid.style.transition = ''; }, 150);
+
+          if (spinner) spinner.style.display = 'none';
+        }, 150);
+      })
+      .catch(function() {
+        grid.style.opacity = '1';
+        grid.style.transition = '';
+        if (spinner) spinner.style.display = 'none';
+      });
+
+    // Update state
+    currentSort = newSort;
+    sortDropdown.dataset.currentSort = newSort;
+    updateActiveOption();
+  });
+})();
 
 
 
