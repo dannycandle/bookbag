@@ -9,7 +9,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     {% block header %}{% endblock %}
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" media="screen">
-    <link href="{{ url_for('static', filename='css/upload.css') }}" rel="stylesheet" media="screen">
   </head>
 
 
@@ -20,7 +19,7 @@
     <div id="navbar">
       <div id="navbar-menus-wrapper">        
         <div class="navigation-items">
-            <button id="nav-books" class="nav-button" onclick="window.location.href='{{url_for('web.books_list', data='newest', book_id=1, sort_param='stored')}}'">
+            <button id="nav-books" class="nav-button" onclick="navigateToBooks()" data-books-url="{{url_for('web.books')}}">
               <div class="nav-button-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M231.65,194.55,198.46,36.75a16,16,0,0,0-19-12.39L132.65,34.42a16.08,16.08,0,0,0-12.3,19l33.19,157.8A16,16,0,0,0,169.16,224a16.25,16.25,0,0,0,3.38-.36l46.81-10.06A16.09,16.09,0,0,0,231.65,194.55ZM136,50.15c0-.06,0-.09,0-.09l46.8-10,3.33,15.87L139.33,66Zm6.62,31.47,46.82-10.05,3.34,15.9L146,97.53Zm6.64,31.57,46.82-10.06,13.3,63.24-46.82,10.06ZM216,197.94l-46.8,10-3.33-15.87L212.67,182,216,197.85C216,197.91,216,197.94,216,197.94ZM104,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V48A16,16,0,0,0,104,32ZM56,48h48V64H56Zm0,32h48v96H56Zm48,128H56V192h48v16Z"></path></svg>
               </div>
@@ -60,13 +59,26 @@
             </summary>
             <div class="user-popover-menu">
               <div class="user-popover-arrow"></div>
-              <h3>User Settings</h2>
-              <button class="user-popup-button"  onclick="window.location.href='{{url_for('web.profile')}}'">
+              <h3>User Settings</h3>
+              {% if current_user.is_anonymous %}
+              <button class="user-popup-button" onclick="window.location.href='{{url_for('web.login')}}'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M141.66,133.66l-40,40a8,8,0,0,1-11.32-11.32L116.69,136H24a8,8,0,0,1,0-16h92.69L90.34,93.66a8,8,0,0,1,11.32-11.32l40,40A8,8,0,0,1,141.66,133.66ZM192,32H136a8,8,0,0,0,0,16h56V208H136a8,8,0,0,0,0,16h56a16,16,0,0,0,16-16V48A16,16,0,0,0,192,32Z"></path></svg>
+                Sign In
+              </button>
+              {% if config.config_public_reg %}
+              <button class="user-popup-button" onclick="window.location.href='{{url_for('web.register')}}'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M256,136a8,8,0,0,1-8,8H232v16a8,8,0,0,1-16,0V144H200a8,8,0,0,1,0-16h16V112a8,8,0,0,1,16,0v16h16A8,8,0,0,1,256,136Zm-57.87,58.85a8,8,0,0,1-12.26,10.3C165.75,181.19,138.09,168,108,168s-57.75,13.19-77.87,37.15a8,8,0,0,1-12.25-10.3A109.21,109.21,0,0,1,56,161.06a68,68,0,1,1,104,0A109.21,109.21,0,0,1,198.13,194.85ZM108,152a52,52,0,1,0-52-52A52.06,52.06,0,0,0,108,152Z"></path></svg>
+                Sign Up
+              </button>
+              {% endif %}
+              {% else %}
+              <button class="user-popup-button" data-profile-url="{{url_for('web.profile')}}" onclick="navigateToProfile()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path></svg>
                 Edit Profile
               </button>
+              {% endif %}
             {% if current_user.role_admin() %}
-            <button class="user-popup-button" onclick="window.location.href='{{url_for('admin.admin')}}'">
+            <button class="user-popup-button" data-admin-url="{{url_for('admin.admin')}}" onclick="navigateToAdmin()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M128,80a48,48,0,1,0,48,48A48.06,48.06,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm95.68-93.85L135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17h0a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,224,40,175.82V80.18L128,32l88,48.17v95.64Z"></path></svg>
                 Server Administration
             </button>
@@ -87,7 +99,7 @@
       </div>
 
 
-{% if request.endpoint == 'web.index' or request.endpoint == 'web.books_list'  or request.endpoint == 'admin.admin' %}
+{% if request.endpoint == 'web.index' or request.endpoint == 'web.books' or request.endpoint == 'web.books_list'  or request.endpoint == 'admin.admin' %}
 
 <aside class="sidebar">
 
@@ -121,7 +133,7 @@
 
 {% endif %}
 
-{% if request.endpoint == 'web.index' or request.endpoint == 'web.books_list' %}
+{% if request.endpoint == 'web.index' or request.endpoint == 'web.books' or request.endpoint == 'web.books_list' %}
 
   
   <div class="side-head">
@@ -273,7 +285,7 @@
         <script>
       function goToLastBook() {
         var last = localStorage.getItem('lastBookUrl');
-        window.location.href = last || '{{ url_for('web.books_list', data='newest', book_id=1, sort_param='stored') }}';
+        window.location.href = last || '{{ url_for('web.books') }}';
       }
     </script>
 
@@ -304,33 +316,37 @@
           return closeFn;
         }
 
-        // Details-based popovers (user settings, sort menu)
-        var useScrim = { 'user-popover': true };
-        document.querySelectorAll('details.user-popover, details.sort-dropdown').forEach(function(d) {
-          var hasScrim = d.classList.contains('user-popover');
-          var close = register(function() {
-            d.removeAttribute('open');
-            if (hasScrim) hideOverlay();
+        function unregister(closeFn) {
+          var idx = closers.indexOf(closeFn);
+          if (idx !== -1) closers.splice(idx, 1);
+        }
+
+        // Register details-based popovers (user settings, sort menu)
+        function registerDetailsPopovers() {
+          document.querySelectorAll('details.user-popover, details.sort-dropdown').forEach(function(d) {
+            if (d.dataset.popoverRegistered) return;
+            d.dataset.popoverRegistered = 'true';
+            var close = register(function() {
+              d.removeAttribute('open');
+            });
+            d.querySelector('summary').addEventListener('click', function() {
+              if (!d.open) {
+                closeAll(close);
+              }
+            });
           });
-          d.querySelector('summary').addEventListener('click', function() {
-            if (!d.open) {
-              closeAll(close);
-              if (hasScrim) showOverlay();
-            } else {
-              if (hasScrim) hideOverlay();
-            }
-          });
-        });
+        }
+        registerDetailsPopovers();
 
         // Overlay click closes everything
         overlay.addEventListener('click', function() {
           closeAll();
         });
 
-        // Click outside closes details popovers (for non-scrim popovers like sort)
+        // Click outside closes details popovers
         document.addEventListener('click', function(e) {
           if (e.target.closest('summary')) return;
-          document.querySelectorAll('details.sort-dropdown[open]').forEach(function(d) {
+          document.querySelectorAll('details.sort-dropdown[open], details.user-popover[open]').forEach(function(d) {
             if (!d.contains(e.target)) d.removeAttribute('open');
           });
         });
@@ -340,16 +356,273 @@
           if (e.key === 'Escape') closeAll();
         });
 
-        return { closeAll: closeAll, register: register, showOverlay: showOverlay, hideOverlay: hideOverlay };
+        return { closeAll: closeAll, register: register, unregister: unregister,
+                 registerDetailsPopovers: registerDetailsPopovers,
+                 showOverlay: showOverlay, hideOverlay: hideOverlay };
       })();
     </script>
 
-    {% block js %}{% endblock %}
+    <script>
+    // --- SPA-like AJAX navigation ---
+    function initFilterShowMore() {
+      document.querySelectorAll('.filter-show-more').forEach(function(btn) {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = 'true';
+        var container = btn.closest('.filter-options');
+        var overflow = container.querySelectorAll('.filter-overflow');
+        var expanded = false;
+        var count = overflow.length;
+        btn.addEventListener('click', function() {
+          expanded = !expanded;
+          overflow.forEach(function(el) { el.style.display = expanded ? '' : 'none'; });
+          btn.textContent = expanded ? 'Show less' : 'Show ' + count + ' more';
+        });
+      });
+    }
+
+    // Execute script tags inside a container (innerHTML doesn't run scripts)
+    function executePageScripts(container, callback) {
+      var scripts = Array.from(container.querySelectorAll('script'));
+      var i = 0;
+
+      function next() {
+        if (i >= scripts.length) {
+          if (callback) callback();
+          return;
+        }
+        var oldScript = scripts[i++];
+
+        // Skip template blocks (e.g. underscore.js templates)
+        if (oldScript.type && oldScript.type !== 'text/javascript' && oldScript.type !== '') {
+          next();
+          return;
+        }
+
+        var newScript = document.createElement('script');
+        if (oldScript.src) {
+          newScript.src = oldScript.src;
+          newScript.onload = next;
+          newScript.onerror = next;
+        } else {
+          newScript.textContent = oldScript.textContent;
+        }
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+        if (!oldScript.src) next(); // inline scripts execute synchronously
+      }
+
+      next();
+    }
+
+    // General AJAX page navigation
+    window.navigateAjax = function(url) {
+      // Close any open popovers immediately
+      window.Popovers.closeAll();
+
+      // Tear down current page's JS
+      if (window.__booksPageDestroy) {
+        window.__booksPageDestroy();
+        window.__booksPageDestroy = null;
+      }
+
+      fetch(url)
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+
+          // 1. Update body class
+          document.body.className = doc.body.className;
+
+          // 2. Handle sidebar
+          var newSidebar = doc.querySelector('aside.sidebar');
+          var currentSidebar = document.querySelector('aside.sidebar');
+          var popoverOverlay = document.getElementById('popover-overlay');
+
+          if (newSidebar) {
+            if (currentSidebar) {
+              currentSidebar.innerHTML = newSidebar.innerHTML;
+            } else {
+              popoverOverlay.parentNode.insertBefore(newSidebar, popoverOverlay);
+            }
+            initFilterShowMore();
+          } else if (currentSidebar) {
+            currentSidebar.remove();
+          }
+
+          // 3. Replace action bar
+          var newActionBar = doc.querySelector('.action-bar');
+          var currentActionBar = document.querySelector('.action-bar');
+          if (newActionBar && currentActionBar) {
+            currentActionBar.innerHTML = newActionBar.innerHTML;
+          }
+
+          // 4. Replace main content
+          var newMainContent = doc.querySelector('.main-content-wrapper');
+          var currentMainContent = document.querySelector('.main-content-wrapper');
+          if (newMainContent && currentMainContent) {
+            currentMainContent.innerHTML = newMainContent.innerHTML;
+          }
+
+          // 5. Execute inline scripts in the new main content
+          executePageScripts(currentMainContent, function() {
+            // 6. Replace and execute page-specific scripts (block js)
+            var newPageScripts = doc.getElementById('page-scripts');
+            var currentPageScripts = document.getElementById('page-scripts');
+            if (newPageScripts && currentPageScripts) {
+              currentPageScripts.innerHTML = newPageScripts.innerHTML;
+              executePageScripts(currentPageScripts);
+            }
+          });
+
+          // 7. Update browser URL
+          history.pushState({ ajaxNav: true }, '', url);
+
+          // 8. Update document title
+          var newTitle = doc.querySelector('title');
+          if (newTitle) document.title = newTitle.textContent;
+
+          // 9. Register new details-based popovers (sort dropdown, etc.)
+          window.Popovers.registerDetailsPopovers();
+        })
+        .catch(function(err) {
+          console.error('AJAX nav failed, falling back:', err);
+          window.location.href = url;
+        });
+    };
+
+    // --- Books button ---
+    function navigateToBooks() {
+      var booksUrl = document.getElementById('nav-books').dataset.booksUrl;
+      var mainContent = document.querySelector('.main-content');
+      var grid = document.querySelector('.books-grid');
+
+      // Already on books page?
+      if (mainContent && grid) {
+        if (mainContent.scrollTop > 5) {
+          mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        // Already at top — fade-refresh the grid
+        refreshBooksGrid(booksUrl, grid);
+        return;
+      }
+
+      window.navigateAjax(booksUrl);
+    }
+
+    function refreshBooksGrid(booksUrl, grid) {
+      grid.style.transition = 'opacity 0.15s ease';
+      grid.style.opacity = '0';
+
+      fetch(booksUrl)
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var newGrid = doc.querySelector('.books-grid');
+          if (!newGrid) return;
+
+          setTimeout(function() {
+            grid.innerHTML = newGrid.innerHTML;
+
+            var newNext = newGrid.dataset.nextUrl;
+            if (newNext) {
+              grid.dataset.nextUrl = newNext;
+            } else {
+              delete grid.dataset.nextUrl;
+            }
+
+            var saved = localStorage.getItem('coverSize');
+            if (saved) grid.style.setProperty('--cover-size', saved + 'px');
+
+            grid.style.opacity = '1';
+            setTimeout(function() { grid.style.transition = ''; }, 150);
+          }, 150);
+        })
+        .catch(function() {
+          grid.style.opacity = '1';
+          grid.style.transition = '';
+        });
+    }
+
+    // --- Admin button ---
+    function navigateToAdmin() {
+      window.Popovers.closeAll();
+      var btn = document.querySelector('[data-admin-url]');
+      if (!btn) return;
+      var adminUrl = btn.dataset.adminUrl;
+      var wrapper = document.querySelector('.admin-page-wrapper');
+
+      if (wrapper) {
+        if (wrapper.scrollTop > 5) {
+          wrapper.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        refreshPageContent(adminUrl, '.admin-page-wrapper');
+        return;
+      }
+
+      window.navigateAjax(adminUrl);
+    }
+
+    // --- Profile button ---
+    function navigateToProfile() {
+      window.Popovers.closeAll();
+      var btn = document.querySelector('[data-profile-url]');
+      if (!btn) return;
+      var profileUrl = btn.dataset.profileUrl;
+      var wrapper = document.getElementById('user-edit-form');
+
+      if (wrapper) {
+        var scrollable = wrapper.closest('.admin-page-wrapper') || document.querySelector('.main-content-wrapper');
+        if (scrollable && scrollable.scrollTop > 5) {
+          scrollable.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        refreshPageContent(profileUrl, '.admin-page-wrapper', '.main-content-wrapper');
+        return;
+      }
+
+      window.navigateAjax(profileUrl);
+    }
+
+    // Fade-refresh any page's content area
+    function refreshPageContent(url, selector, fallbackSelector) {
+      var el = document.querySelector(selector) || (fallbackSelector && document.querySelector(fallbackSelector));
+      if (!el) return;
+
+      el.style.transition = 'opacity 0.15s ease';
+      el.style.opacity = '0';
+
+      fetch(url)
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var newEl = doc.querySelector(selector) || (fallbackSelector && doc.querySelector(fallbackSelector));
+          if (!newEl) return;
+
+          setTimeout(function() {
+            el.innerHTML = newEl.innerHTML;
+            executePageScripts(el);
+            el.style.opacity = '1';
+            setTimeout(function() { el.style.transition = ''; }, 150);
+          }, 150);
+        })
+        .catch(function() {
+          el.style.opacity = '1';
+          el.style.transition = '';
+        });
+    }
+
+    // Handle browser back/forward
+    window.addEventListener('popstate', function(e) {
+      if (e.state && e.state.ajaxNav) {
+        window.location.reload();
+      }
+    });
+    </script>
+
+    <div id="page-scripts">{% block js %}{% endblock %}</div>
 
 <!--END MAIN APP-->
-
-
-
 
 </body>
 </html>
