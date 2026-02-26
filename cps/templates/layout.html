@@ -551,10 +551,11 @@
       var btn = document.querySelector('[data-admin-url]');
       if (!btn) return;
       var adminUrl = btn.dataset.adminUrl;
-      var wrapper = document.querySelector('.admin-page-wrapper');
+      var onAdminPage = window.location.pathname === new URL(adminUrl, window.location.origin).pathname;
 
-      if (wrapper) {
-        if (wrapper.scrollTop > 5) {
+      if (onAdminPage) {
+        var wrapper = document.querySelector('.admin-page-wrapper');
+        if (wrapper && wrapper.scrollTop > 5) {
           wrapper.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
@@ -571,10 +572,11 @@
       var btn = document.querySelector('[data-profile-url]');
       if (!btn) return;
       var profileUrl = btn.dataset.profileUrl;
-      var wrapper = document.getElementById('user-edit-form');
+      var onProfilePage = window.location.pathname === new URL(profileUrl, window.location.origin).pathname;
 
-      if (wrapper) {
-        var scrollable = wrapper.closest('.admin-page-wrapper') || document.querySelector('.main-content-wrapper');
+      if (onProfilePage) {
+        var wrapper = document.getElementById('user-edit-form');
+        var scrollable = wrapper && (wrapper.closest('.admin-page-wrapper') || document.querySelector('.main-content-wrapper'));
         if (scrollable && scrollable.scrollTop > 5) {
           scrollable.scrollTo({ top: 0, behavior: 'smooth' });
           return;

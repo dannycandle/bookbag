@@ -199,7 +199,7 @@ def update_thumbnails():
     return ""
 
 
-@admi.route("/admin/view")
+@admi.route("/settings")
 @user_login_required
 @admin_required
 def admin():

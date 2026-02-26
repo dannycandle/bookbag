@@ -495,6 +495,66 @@ details[open] .user-popover-menu {
     display: none;
 }
 
+/* SAVE STATUS PILL */
+
+.save-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #581C1C;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.save-status--visible {
+    opacity: 1;
+}
+
+.save-status--fading {
+    opacity: 0;
+}
+
+.save-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #80C900;
+    transition: background 0.2s ease;
+}
+
+.save-status--saving .save-status-dot {
+    background: #e8bf5e;
+    animation: pulse-dot 0.8s ease-in-out infinite;
+}
+
+.save-status--pending .save-status-dot {
+    background: #e8bf5e;
+}
+
+.save-status--saved .save-status-dot {
+    background: #80C900;
+}
+
+.save-status--error .save-status-dot {
+    background: #F94C4C;
+}
+
+.save-status--error {
+    color: #c0392b;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
 .sort-button {
     background-color: rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(255,255,255 0.9);

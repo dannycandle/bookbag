@@ -3,7 +3,10 @@
   {% if setting_value %}<span class="admin-bool-yes">✓</span>{% else %}<span class="admin-bool-no">✗</span>{% endif %}
 {%- endmacro %}
 {% block action_bar %}
-    <div></div> <!-- EMPTY CONTAINER TO ALIGN SEARCHBOX RIGHT -->
+    <div id="save-status" class="save-status">
+        <span class="save-status-dot"></span>
+        <span class="save-status-text"></span>
+    </div>
     <form class="search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
         <input type="text" class="search-input" name="query" placeholder="Search..." value="{{searchterm}}">
@@ -14,6 +17,19 @@
 {% endblock %}
 
 {% block body %}
+
+<!-- Email Disable Confirmation Popover -->
+<div id="email-disable-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 50;">
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 10px; padding: 28px; box-shadow: -1px 2px 10px #00000033; z-index: 100; color: #581C1C;">
+        <button id="email-disable-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; color: rgba(88,28,28,0.4); cursor: pointer; padding: 2px 6px; border-radius: 4px;">X</button>
+        <p style="margin: 0 0 14px 0; font-size: 0.9rem;"><strong>Disable email?</strong></p>
+        <p style="font-size: 0.85rem; margin: 0 0 18px 0; line-height: 1.6;">Turning off this setting will erase your email server configuration. You will need to re-enter your settings if you wish to re-enable this feature.</p>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn" id="email-disable-cancel" style="padding: 6px 16px;">Cancel</button>
+            <button type="button" class="btn btn-primary" id="email-disable-confirm" style="padding: 6px 16px; background: #F94C4C; border-color: #F94C4C;">Disable</button>
+        </div>
+    </div>
+</div>
 
 <!-- Google Drive Setup Popover -->
 <div id="gdrive-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 50;">
@@ -324,7 +340,7 @@
                         <div><p class="toggle-desc">Disables the upload of ebooks altogether.</p></div>
                     </div>
                 </div>
-                <div class="setting-path-row">
+                <div class="setting-path-row" id="upload-formats-row" {% if not config.config_uploading %}style="display:none"{% endif %}>
                     <span class="setting-path-label">Allowed Upload Fileformats</span>
                     <input class="setting-input config-field" type="text" name="config_upload_formats" value="{% if config.config_upload_formats != None %}{{ config.config_upload_formats }}{% endif %}" placeholder="epub,pdf,mobi,azw,azw3,cbr,cbz,cb7,cbt,djvu,docx,fb2,html,htmlz,lit,lrf,odt,pdb,prc,rtf,txt">
                 </div>
@@ -371,22 +387,6 @@
             <h2 class="admin-section-title">Integrations</h2>
         </div>
         <div class="admin-section-body">
-
-            <!-- Automatic Metadata Fetching -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Automatic Metadata Fetching (Coming Soon)</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_hardcover_fetch" checked disabled>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Fetch book and author data from hardcover.app</h3></div>
-                        <div><p class="toggle-desc">Provides additional meta data including author bio and book ratings from Hardcover.app.</p></div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Email Integration -->
             <div class="admin-subsection-wrapper">
@@ -501,7 +501,7 @@
                         <div><p class="toggle-desc">GoodReads has ramped down their API service, a legacy API Key is required.</p></div>
                     </div>
                 </div>
-                <div class="setting-path-row">
+                <div class="setting-path-row" id="goodreads-api-key-row" {% if not config.config_use_goodreads %}style="display:none"{% endif %}>
                     <span class="setting-path-label">Goodreads API Key</span>
                     <input class="setting-input config-field" type="text" name="config_goodreads_api_key" value="{% if config.config_goodreads_api_key != None %}{{ config.config_goodreads_api_key }}{% endif %}">
                 </div>
@@ -546,7 +546,7 @@
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" disabled>
+                        <input class="toggle-boolean" type="checkbox" id="config_custom_limiter" {% if config.config_limiter_uri %}checked{% endif %}>
                         <span class="toggle-span"></span>
                     </div>
                     <div class="toggle-info-wrapper">
@@ -554,13 +554,15 @@
                         <div><p class="toggle-desc">Useful for multi-instance deployments.</p></div>
                     </div>
                 </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Login Attempt Storage</span>
-                    <input class="setting-input config-field" type="text" name="config_limiter_uri" value="{% if config.config_limiter_uri != None %}{{ config.config_limiter_uri }}{% endif %}" placeholder="i.e. redis://localhost:6379">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Options for Limiter Backend</span>
-                    <input class="setting-input config-field" type="text" name="config_limiter_options" placeholder="mail.example.com">
+                <div id="limiter-fields" {% if not config.config_limiter_uri %}style="display:none"{% endif %}>
+                    <div class="setting-path-row">
+                        <span class="setting-path-label">Login Attempt Storage</span>
+                        <input class="setting-input config-field" type="text" name="config_limiter_uri" value="{% if config.config_limiter_uri != None %}{{ config.config_limiter_uri }}{% endif %}" placeholder="i.e. redis://localhost:6379">
+                    </div>
+                    <div class="setting-path-row">
+                        <span class="setting-path-label">Options for Limiter Backend</span>
+                        <input class="setting-input config-field" type="text" name="config_limiter_options" placeholder="mail.example.com">
+                    </div>
                 </div>
             </div>
         <div class="admin-subsection-wrapper">
@@ -1005,6 +1007,78 @@
     <!-- ============================================ -->
 
     <script>
+        var _saveFadeTimer = null;
+        var _savingStart = 0;
+        var _deferredState = null;
+        var _deferredMessage = null;
+        var _minSavingMs = 500;
+
+        function showToast(message, category) {
+            var container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + (category || 'error');
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(function() {
+                toast.classList.add('toast-hiding');
+                toast.addEventListener('animationend', function() { toast.remove(); });
+            }, 3000);
+        }
+
+        function _applyStatus(state, message) {
+            var el = document.getElementById('save-status');
+            if (!el) return;
+            clearTimeout(_saveFadeTimer);
+            _deferredState = null;
+            _deferredMessage = null;
+            el.className = 'save-status save-status--' + state + ' save-status--visible';
+            el.querySelector('.save-status-text').textContent =
+                state === 'pending' ? 'Unsaved' :
+                state === 'saving'  ? 'Saving…' :
+                state === 'error'   ? 'Error'   : 'Saved';
+            if (state === 'saved') {
+                _saveFadeTimer = setTimeout(function() {
+                    el.classList.remove('save-status--visible');
+                    el.classList.add('save-status--fading');
+                }, 2000);
+            }
+            if (state === 'error') {
+                showToast(message || 'Failed to save settings', 'error');
+            }
+        }
+
+        function setSaveStatus(state, message) {
+            if (state === 'pending' || state === 'saving') {
+                if (state === 'saving') _savingStart = Date.now();
+                _applyStatus(state);
+                return;
+            }
+            var elapsed = Date.now() - _savingStart;
+            if (elapsed < _minSavingMs) {
+                _deferredState = state;
+                _deferredMessage = message;
+                setTimeout(function() {
+                    if (_deferredState) _applyStatus(_deferredState, _deferredMessage);
+                }, _minSavingMs - elapsed);
+            } else {
+                _applyStatus(state, message);
+            }
+        }
+
+        function debounce(fn, delay) {
+            var timer = null;
+            return function() {
+                clearTimeout(timer);
+                setSaveStatus('pending');
+                timer = setTimeout(fn, delay);
+            };
+        }
+
         function saveRoles() {
             var formData = new FormData();
             formData.append('csrf_token', '{{ csrf_token() }}');
@@ -1017,10 +1091,17 @@
                     formData.append(toggle.name, 'on');
                 }
             });
+            setSaveStatus('saving');
             fetch('{{ url_for("admin.update_view_configuration") }}', {
                 method: 'POST',
                 headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
                 body: formData
+            })
+            .then(function(resp) {
+                setSaveStatus(resp.ok ? 'saved' : 'error');
+            })
+            .catch(function() {
+                setSaveStatus('error');
             });
         }
         // Library Owner hides default permissions — owner has all permissions
@@ -1048,11 +1129,12 @@
         })();
 
         // saveRoles listeners — admin_role registered after handleRoleChange above
+        var debouncedSaveRoles = debounce(saveRoles, 1500);
         document.querySelectorAll('input[name="admin_role"]').forEach(function(radio) {
-            radio.addEventListener('change', saveRoles);
+            radio.addEventListener('change', debouncedSaveRoles);
         });
         document.querySelectorAll('.role-toggle').forEach(function(toggle) {
-            toggle.addEventListener('change', saveRoles);
+            toggle.addEventListener('change', debouncedSaveRoles);
         });
 
         function saveConfig() {
@@ -1083,6 +1165,7 @@
                 formData.append('config_use_google_drive', 'on');
             }
 
+            setSaveStatus('saving');
             fetch('{{ url_for("admin.ajax_config") }}', {
                 method: 'POST',
                 headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
@@ -1091,7 +1174,7 @@
             .then(function(resp) { return resp.json(); })
             .then(function(data) {
                 if (data.result && data.result[0] && data.result[0].type === 'danger') {
-                    console.log('saveConfig error:', data.result[0].message);
+                    setSaveStatus('error', data.result[0].message);
                     if (data.result[0].message.indexOf('client_secrets') !== -1) {
                         // Show gdrive setup popover and revert radio
                         document.getElementById('gdrive-overlay').style.display = '';
@@ -1104,20 +1187,24 @@
                             pathRow.style.display = '';
                         }
                     }
+                } else {
+                    setSaveStatus('saved');
                 }
             })
             .catch(function(err) {
+                setSaveStatus('error');
                 console.error('saveConfig fetch error:', err);
             });
         }
+        var debouncedSaveConfig = debounce(saveConfig, 1500);
         document.querySelectorAll('.config-toggle').forEach(function(toggle) {
-            toggle.addEventListener('change', saveConfig);
+            toggle.addEventListener('change', debouncedSaveConfig);
         });
         document.querySelectorAll('.config-field').forEach(function(field) {
-            field.addEventListener('change', saveConfig);
+            field.addEventListener('change', debouncedSaveConfig);
         });
         document.querySelectorAll('input[name="config_session"]').forEach(function(radio) {
-            radio.addEventListener('change', saveConfig);
+            radio.addEventListener('change', debouncedSaveConfig);
         });
 
         // Server action buttons
@@ -1190,20 +1277,20 @@
                     radios.style.display = '';
                     pathRow.style.display = localRadio.checked ? '' : 'none';
                     if (!localRadio.checked) {
-                        saveConfig();
+                        debouncedSaveConfig();
                     }
                 } else {
                     radios.style.display = 'none';
                     pathRow.style.display = 'none';
                     pathField.value = '/books';
-                    saveConfig();
+                    debouncedSaveConfig();
                 }
             }
 
             function onRadioChange() {
                 pathRow.style.display = localRadio.checked ? '' : 'none';
                 if (!localRadio.checked) {
-                    saveConfig();
+                    debouncedSaveConfig();
                 }
             }
 
@@ -1248,7 +1335,7 @@
                 } else {
                     portRow.style.display = 'none';
                     portField.value = defaultPort;
-                    saveConfig();
+                    debouncedSaveConfig();
                 }
             }
 
@@ -1263,8 +1350,12 @@
 
         // "Disable uploads" toggle — inverted, handled by saveConfig via data-inverted
         var uploadToggle = document.getElementById('config_uploading');
+        var uploadFormatsRow = document.getElementById('upload-formats-row');
         if (uploadToggle) {
-            uploadToggle.addEventListener('change', saveConfig);
+            uploadToggle.addEventListener('change', function() {
+                if (uploadFormatsRow) uploadFormatsRow.style.display = this.checked ? 'none' : '';
+                debouncedSaveConfig();
+            });
         }
 
         // Password policy toggle — show/hide and reset child settings
@@ -1274,29 +1365,81 @@
             var minLength = fields.querySelector('input[name="config_password_min_length"]');
             var childToggles = fields.querySelectorAll('.config-toggle');
 
-            function update() {
+            function update(save) {
                 if (toggle.checked) {
                     fields.style.display = '';
                 } else {
                     fields.style.display = 'none';
                     minLength.value = '1';
                     childToggles.forEach(function(t) { t.checked = false; });
-                    saveConfig();
+                    if (save) debouncedSaveConfig();
                 }
             }
 
-            update();
-            toggle.addEventListener('change', update);
+            update(false);
+            toggle.addEventListener('change', function() { update(true); });
         })();
 
-        // Email Integration — show/hide fields
-        var emailToggle = document.getElementById('config_email_enabled');
-        var emailFields = document.getElementById('email-settings-fields');
-        if (emailToggle && emailFields) {
-            emailToggle.addEventListener('change', function() {
-                emailFields.style.display = this.checked ? '' : 'none';
+        // Goodreads — show/hide API key field
+        var grToggle = document.querySelector('input[name="config_use_goodreads"]');
+        var grKeyRow = document.getElementById('goodreads-api-key-row');
+        if (grToggle && grKeyRow) {
+            grToggle.addEventListener('change', function() {
+                grKeyRow.style.display = this.checked ? '' : 'none';
             });
         }
+
+        // Limiter storage — show/hide fields
+        var limiterToggle = document.getElementById('config_custom_limiter');
+        var limiterFields = document.getElementById('limiter-fields');
+        if (limiterToggle && limiterFields) {
+            limiterToggle.addEventListener('change', function() {
+                limiterFields.style.display = this.checked ? '' : 'none';
+            });
+        }
+
+        // Email Integration — show/hide fields with confirmation on disable
+        (function() {
+            var emailToggle = document.getElementById('config_email_enabled');
+            var emailFields = document.getElementById('email-settings-fields');
+            var overlay = document.getElementById('email-disable-overlay');
+            if (!emailToggle || !emailFields) return;
+
+            emailToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    emailFields.style.display = '';
+                } else {
+                    // Revert toggle and show confirmation
+                    this.checked = true;
+                    overlay.style.display = '';
+                }
+            });
+
+            function closeOverlay() { overlay.style.display = 'none'; }
+
+            document.getElementById('email-disable-cancel').addEventListener('click', closeOverlay);
+            document.getElementById('email-disable-close').addEventListener('click', closeOverlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeOverlay();
+            });
+
+            document.getElementById('email-disable-confirm').addEventListener('click', function() {
+                closeOverlay();
+                emailToggle.checked = false;
+                emailFields.style.display = 'none';
+                // Clear all email fields and save
+                document.querySelectorAll('.email-field').forEach(function(field) {
+                    if (field.tagName === 'SELECT') {
+                        field.selectedIndex = 0;
+                    } else {
+                        field.value = '';
+                    }
+                });
+                var smtpRadio = document.querySelector('input[name="mail_server_type"][value="0"]');
+                if (smtpRadio) smtpRadio.checked = true;
+                saveEmailSettings(false);
+            });
+        })();
 
         // Email Integration — save and test
         function collectEmailFormData(includeTest) {
@@ -1315,17 +1458,31 @@
 
         function saveEmailSettings(includeTest) {
             var formData = collectEmailFormData(includeTest);
+            setSaveStatus('saving');
             fetch('{{ url_for("admin.update_mailsettings") }}', {
                 method: 'POST',
                 headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
                 body: formData
-            }).then(function(response) {
-                if (response.ok) {
-                    window.location.reload();
+            })
+            .then(function(resp) { return resp.text(); })
+            .then(function(html) {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var errToast = doc.querySelector('#toast-container .toast-error');
+                if (errToast) {
+                    setSaveStatus('error', errToast.textContent.trim());
+                } else {
+                    setSaveStatus('saved');
                 }
+            })
+            .catch(function() {
+                setSaveStatus('error');
             });
         }
 
+        var debouncedSaveEmail = debounce(function() { saveEmailSettings(false); }, 1500);
+        document.querySelectorAll('.email-field').forEach(function(field) {
+            field.addEventListener('change', debouncedSaveEmail);
+        });
         var btnSaveEmail = document.getElementById('btn-save-email');
         if (btnSaveEmail) {
             btnSaveEmail.addEventListener('click', function() { saveEmailSettings(false); });
@@ -1365,7 +1522,8 @@
                     })
                     .then(function(resp) { return resp.text(); })
                     .then(function(html) {
-                        if (html.indexOf('toast-error') !== -1) {
+                        var doc = new DOMParser().parseFromString(html, 'text/html');
+                        if (doc.querySelector('#toast-container .toast-error')) {
                             // Gmail not available (missing deps or missing gmail.json) — show overlay and revert
                             document.getElementById('gdrive-overlay').style.display = '';
                             if (smtpRadio) smtpRadio.checked = true;
