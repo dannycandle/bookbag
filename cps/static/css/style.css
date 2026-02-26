@@ -2061,7 +2061,18 @@ details[open] .detail-icon-popover {
 }
 
 .setting-input:focus {
+    border-color: #4A90D9;
+}
+
+.setting-input.is-invalid {
     border-color: #F94C4C;
+}
+
+.field-error {
+    font-size: 0.78rem;
+    color: #F94C4C;
+    margin-top: 2px;
+    padding-left: 12px;
 }
 
 .setting-input::placeholder {

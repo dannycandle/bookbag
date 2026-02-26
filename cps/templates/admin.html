@@ -230,7 +230,339 @@
                 </div>
             </div>
         </div>
-        <!-- BEGIN SUBSECTION USER AUTHENTICATION -->
+
+
+    </section>
+
+    <!-- ============================================ -->
+    <!-- FILES AND METADATA SECTION                   -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="data">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M128,24C74.17,24,32,48.6,32,80v96c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm80,104c0,9.62-7.88,19.43-21.61,26.92C170.93,163.35,150.19,168,128,168s-42.93-4.65-58.39-13.08C55.88,147.43,48,137.62,48,128V111.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64ZM69.61,53.08C85.07,44.65,105.81,40,128,40s42.93,4.65,58.39,13.08C200.12,60.57,208,70.38,208,80s-7.88,19.43-21.61,26.92C170.93,115.35,150.19,120,128,120s-42.93-4.65-58.39-13.08C55.88,99.43,48,89.62,48,80S55.88,60.57,69.61,53.08ZM186.39,202.92C170.93,211.35,150.19,216,128,216s-42.93-4.65-58.39-13.08C55.88,195.43,48,185.62,48,176V159.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64V176C208,185.62,200.12,195.43,186.39,202.92Z"></path></svg>
+            <h2 class="admin-section-title">Files &amp; Metadata</h2>
+        </div>
+        <div class="admin-section-body">
+
+            <!-- Book Files Location -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Book Files Location</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_custom_book_location">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Customize the Location Books are Stored</h3></div>
+                        <div><p class="toggle-desc">Turn off if you want to store books on a separate volume that is larger but slower while keeping your metadata database on the faster default volume.</p></div>
+                    </div>
+                </div>
+                <div class="radio-group-row" id="book-storage-radios">
+                    <label class="radio-card-block">
+                        <input type="radio" name="book_storage_type" value="local" checked>
+                        <span class="radio-card-dot"></span>
+                        Other Location
+                    </label>
+                    <label class="radio-card-block">
+                        <input type="radio" name="book_storage_type" value="gdrive">
+                        <span class="radio-card-dot"></span>
+                        <!-- Warning icon -->
+                        <svg class="radio-card-warning" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg>
+                        Google Drive
+                    </label>
+                </div>
+                <div class="setting-path-row" id="book-path-row">
+                    <span class="setting-path-label">Server path to book files</span>
+                    <input class="setting-input config-field" type="text" name="config_calibre_dir" data-validate="required path" value="{% if config.config_calibre_dir != None %}{{ config.config_calibre_dir }}{% endif %}" placeholder="/books">
+                </div>
+            </div>
+
+            <!-- Metadata Database Location -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Metadata Database Location</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_custom_metadata_location" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Customize the location of the metadata database</h3></div>
+                        <div><p class="toggle-desc">When enabled, you can move the metadata database to a different location than the book files.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Path to metadata database:</span>
+                    <span class="setting-path-value">/books.metadata.db</span>
+                </div>
+                <div class="radio-group-row">
+                    <label class="radio-card-block">
+                        <input type="radio" name="metadata_storage_type" value="gdrive">
+                        <span class="radio-card-dot"></span>
+                        Google Drive
+                    </label>
+                    <label class="radio-card-block">
+                        <input type="radio" name="metadata_storage_type" value="local" checked>
+                        <span class="radio-card-dot"></span>
+                        Other Location
+                    </label>
+                </div>
+            </div>
+
+            <!-- Book Uploads -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Book Uploads</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_uploading" id="config_uploading" data-inverted="true" {% if not config.config_uploading %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Disable uploads</h3></div>
+                        <div><p class="toggle-desc">Disables the upload of ebooks altogether.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Allowed Upload Fileformats</span>
+                    <input class="setting-input config-field" type="text" name="config_upload_formats" value="{% if config.config_upload_formats != None %}{{ config.config_upload_formats }}{% endif %}" placeholder="epub,pdf,mobi,azw,azw3,cbr,cbz,cb7,cbt,djvu,docx,fb2,html,htmlz,lit,lrf,odt,pdb,prc,rtf,txt">
+                </div>
+            </div>
+
+
+            <!-- Automated File Handling -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">File Handling</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_unicode_filename">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Remove accents and special characters from filenames</h3></div>
+                        <div><p class="toggle-desc">Useful if you intend to place your books on legacy devices and network shares to prevent filesystem errors.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_embed_metadata" {% if config.config_embed_metadata %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Embed metadata into downloaded/emailed books</h3></div>
+                        <div><p class="toggle-desc">Requires Calibre or Kepubify binaries to be configured.</p></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- INTEGRATIONS SECTION                         -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="integrations">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M237.66,18.34a8,8,0,0,0-11.32,0l-52.4,52.41-5.37-5.38a32.05,32.05,0,0,0-45.26,0L100,88.69l-6.34-6.35A8,8,0,0,0,82.34,93.66L88.69,100,65.37,123.31a32,32,0,0,0,0,45.26l5.38,5.37-52.41,52.4a8,8,0,0,0,11.32,11.32l52.4-52.41,5.37,5.38a32,32,0,0,0,45.26,0L156,167.31l6.34,6.35a8,8,0,0,0,11.32-11.32L167.31,156l23.32-23.31a32,32,0,0,0,0-45.26l-5.38-5.37,52.41-52.4A8,8,0,0,0,237.66,18.34Zm-116.29,161a16,16,0,0,1-22.62,0L76.69,157.25a16,16,0,0,1,0-22.62L100,111.31,144.69,156Zm57.94-57.94L156,144.69,111.31,100l23.32-23.31a16,16,0,0,1,22.62,0l22.06,22A16,16,0,0,1,179.31,121.37ZM88.57,35A8,8,0,0,1,103.43,29l8,20A8,8,0,0,1,96.57,55ZM24.57,93A8,8,0,0,1,35,88.57l20,8A8,8,0,0,1,49,111.43l-20-8A8,8,0,0,1,24.57,93ZM231.43,163a8,8,0,0,1-10.4,4.46l-20-8A8,8,0,1,1,207,144.57l20,8A8,8,0,0,1,231.43,163Zm-64,58.06A8,8,0,0,1,152.57,227l-8-20A8,8,0,0,1,159.43,201Z"></path></svg>
+            <h2 class="admin-section-title">Integrations</h2>
+        </div>
+        <div class="admin-section-body">
+
+            <!-- Automatic Metadata Fetching -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Automatic Metadata Fetching (Coming Soon)</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" name="config_hardcover_fetch" checked disabled>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Fetch book and author data from hardcover.app</h3></div>
+                        <div><p class="toggle-desc">Provides additional meta data including author bio and book ratings from Hardcover.app.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Integration -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Email Integration</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" id="config_email_enabled" {% if config.get_mail_server_configured() %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Allow Bookbag to send email</h3></div>
+                        <div><p class="toggle-desc">When enabled, Bookbag will be able to send Password Reset emails, Magic Link login becomes available, and eMail.</p></div>
+                    </div>
+                </div>
+                <div id="email-settings-fields" {% if not config.get_mail_server_configured() %}style="display:none"{% endif %}>
+                    <div class="radio-group-row">
+                        <label class="radio-card-block">
+                            <input type="radio" name="mail_server_type" value="0" {% if config.mail_server_type == 0 %}checked{% endif %}>
+                            <span class="radio-card-dot"></span>
+                            Standard (SMTP)
+                        </label>
+                        <label class="radio-card-block">
+                            <input type="radio" name="mail_server_type" value="1" {% if config.mail_server_type == 1 %}checked{% endif %}>
+                            <span class="radio-card-dot"></span>
+                            Gmail
+                        </label>
+                    </div>
+                    <div id="smtp-fields">
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Mail Server URL</span>
+                            <input class="setting-input email-field" type="text" name="mail_server" data-validate="required hostname" placeholder="mail.example.com" value="{{ config.mail_server }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Port</span>
+                            <input class="setting-input email-field" type="number" name="mail_port" data-validate="required" placeholder="25" min="1" max="65535" value="{{ config.mail_port }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Encryption Type</span>
+                            <select class="setting-input email-field" name="mail_use_ssl">
+                                <option value="0" {% if config.mail_use_ssl == 0 %}selected{% endif %}>None</option>
+                                <option value="1" {% if config.mail_use_ssl == 1 %}selected{% endif %}>STARTTLS</option>
+                                <option value="2" {% if config.mail_use_ssl == 2 %}selected{% endif %}>SSL/TLS</option>
+                            </select>
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Username</span>
+                            <input class="setting-input email-field" type="text" name="mail_login" data-validate="required" placeholder="user@example.com" value="{{ config.mail_login }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Password</span>
+                            <input class="setting-input email-field" type="password" name="mail_password_e" placeholder="{% if config.mail_password_e %}(unchanged){% endif %}" value="">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">"From" Address</span>
+                            <input class="setting-input email-field" type="text" name="mail_from" data-validate="required email" placeholder="Bookbag <mail@example.com>" value="{{ config.mail_from }}">
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label">Attachment File Size Limit (MB)</span>
+                            <input class="setting-input email-field" type="number" name="mail_size" data-validate="required" placeholder="25" min="1" max="600" value="{{ config.mail_size // 1048576 }}">
+                        </div>
+                    </div>
+                    <div style="padding: 8px 10px;">
+                        <button type="button" class="btn btn-primary" id="btn-save-email">Save</button>
+                        <button type="button" class="btn btn-primary" id="btn-test-email">Save and Send Test Email</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kobo Sync -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Kobo Sync</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_kobo_sync" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Allow Book Sync with Kobo Ereaders</h3></div>
+                        <div><p class="toggle-desc">Experimental. Users must edit the configuration text files on their Kobo device to change the API Endpoint.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">External Port for Kobo Syncing</span>
+                    <input class="setting-input config-field" type="number" name="config_external_port" data-validate="required" min="1" max="65535" placeholder="25">
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_kobo_proxy" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Pass unrecognized Kobo requests to Kobo Store</h3></div>
+                        <div><p class="toggle-desc">Requests received from a Kobo device that are not supported or understood by Bookbag will relay the request to Kobo's book store.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Good Reads -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Good Reads</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_use_goodreads">
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Fetch Author Data from GoodReads (Legacy)</h3></div>
+                        <div><p class="toggle-desc">GoodReads has ramped down their API service, a legacy API Key is required.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Goodreads API Key</span>
+                    <input class="setting-input config-field" type="text" name="config_goodreads_api_key" value="{% if config.config_goodreads_api_key != None %}{{ config.config_goodreads_api_key }}{% endif %}">
+                </div>
+            </div>
+
+            <!-- Google Books -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Google Books</h3>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Google Books API Key</span>
+                    <input class="setting-input config-field" type="text" name="config_googlebooks_api_key" value="{% if config.config_googlebooks_api_key != '' %}{{ config.config_googlebooks_api_key }}{% endif %}">
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECURITY SECTION                             -->
+    <!-- ============================================ -->
+    <section class="admin-section" id="security">
+        <div class="admin-section-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"></path></svg>
+            <h2 class="admin-section-title">Security</h2>
+        </div>
+        <div class="admin-section-body">
+
+            <!-- Brute Force Protection -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Brute Force Protection</h3>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_ratelimiter" checked>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Limit failed login attempts</h3></div>
+                        <div><p class="toggle-desc">Temporarily locks out users after repeated failed login attempts to prevent brute force attacks.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean" type="checkbox" disabled>
+                        <span class="toggle-span"></span>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Customize Storage Location of Login Attempts</h3></div>
+                        <div><p class="toggle-desc">Useful for multi-instance deployments.</p></div>
+                    </div>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Login Attempt Storage</span>
+                    <input class="setting-input config-field" type="text" name="config_limiter_uri" value="{% if config.config_limiter_uri != None %}{{ config.config_limiter_uri }}{% endif %}" placeholder="i.e. redis://localhost:6379">
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Options for Limiter Backend</span>
+                    <input class="setting-input config-field" type="text" name="config_limiter_options" placeholder="mail.example.com">
+                </div>
+            </div>
         <div class="admin-subsection-wrapper">
             <h3 class="admin-subsection-title">
                 User Authentication
@@ -380,329 +712,9 @@
             <p class="toggle-desc">No OAuth providers are available. Install the Flask-Dance library to enable OAuth authentication.</p>
             {% endif %}
         </div>
-
-    </section>
-
-    <!-- ============================================ -->
-    <!-- FILES AND METADATA SECTION                   -->
-    <!-- ============================================ -->
-    <section class="admin-section" id="data">
-        <div class="admin-section-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M128,24C74.17,24,32,48.6,32,80v96c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm80,104c0,9.62-7.88,19.43-21.61,26.92C170.93,163.35,150.19,168,128,168s-42.93-4.65-58.39-13.08C55.88,147.43,48,137.62,48,128V111.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64ZM69.61,53.08C85.07,44.65,105.81,40,128,40s42.93,4.65,58.39,13.08C200.12,60.57,208,70.38,208,80s-7.88,19.43-21.61,26.92C170.93,115.35,150.19,120,128,120s-42.93-4.65-58.39-13.08C55.88,99.43,48,89.62,48,80S55.88,60.57,69.61,53.08ZM186.39,202.92C170.93,211.35,150.19,216,128,216s-42.93-4.65-58.39-13.08C55.88,195.43,48,185.62,48,176V159.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64V176C208,185.62,200.12,195.43,186.39,202.92Z"></path></svg>
-            <h2 class="admin-section-title">Files &amp; Metadata</h2>
-        </div>
-        <div class="admin-section-body">
-
-            <!-- Book Files Location -->
+            <!-- Passwords -->
             <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Book Files Location</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_custom_book_location">
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Customize the Location Books are Stored</h3></div>
-                        <div><p class="toggle-desc">Turn off if you want to store books on a separate volume that is larger but slower while keeping your metadata database on the faster default volume.</p></div>
-                    </div>
-                </div>
-                <div class="radio-group-row" id="book-storage-radios">
-                    <label class="radio-card-block">
-                        <input type="radio" name="book_storage_type" value="local" checked>
-                        <span class="radio-card-dot"></span>
-                        Other Location
-                    </label>
-                    <label class="radio-card-block">
-                        <input type="radio" name="book_storage_type" value="gdrive">
-                        <span class="radio-card-dot"></span>
-                        <!-- Warning icon -->
-                        <svg class="radio-card-warning" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg>
-                        Google Drive
-                    </label>
-                </div>
-                <div class="setting-path-row" id="book-path-row">
-                    <span class="setting-path-label">Server path to book files</span>
-                    <input class="setting-input config-field" type="text" name="config_calibre_dir" value="{% if config.config_calibre_dir != None %}{{ config.config_calibre_dir }}{% endif %}" placeholder="/books">
-                </div>
-            </div>
-
-            <!-- Metadata Database Location -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Metadata Database Location</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_custom_metadata_location" checked>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Customize the location of the metadata database</h3></div>
-                        <div><p class="toggle-desc">When enabled, you can move the metadata database to a different location than the book files.</p></div>
-                    </div>
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Path to metadata database:</span>
-                    <span class="setting-path-value">/books.metadata.db</span>
-                </div>
-                <div class="radio-group-row">
-                    <label class="radio-card-block">
-                        <input type="radio" name="metadata_storage_type" value="gdrive">
-                        <span class="radio-card-dot"></span>
-                        Google Drive
-                    </label>
-                    <label class="radio-card-block">
-                        <input type="radio" name="metadata_storage_type" value="local" checked>
-                        <span class="radio-card-dot"></span>
-                        Other Location
-                    </label>
-                </div>
-            </div>
-
-            <!-- Book Uploads -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Book Uploads</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_uploading" id="config_uploading" data-inverted="true" {% if not config.config_uploading %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Disable uploads</h3></div>
-                        <div><p class="toggle-desc">Disables the upload of ebooks altogether.</p></div>
-                    </div>
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Allowed Upload Fileformats</span>
-                    <input class="setting-input config-field" type="text" name="config_upload_formats" value="{% if config.config_upload_formats != None %}{{ config.config_upload_formats }}{% endif %}" placeholder="epub,pdf,mobi,azw,azw3,cbr,cbz,cb7,cbt,djvu,docx,fb2,html,htmlz,lit,lrf,odt,pdb,prc,rtf,txt">
-                </div>
-            </div>
-
-
-            <!-- Automated File Handling -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Automated File Handling (Coming Soon)</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_auto_ingest" disabled>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Automatic File Ingestion</h3></div>
-                        <div><p class="toggle-desc">Automatically add books added to a folder on your server into Bookbag.</p></div>
-                    </div>
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_unicode_filename">
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Remove accents and special characters from filenames</h3></div>
-                        <div><p class="toggle-desc">Useful if you intend to place your books on legacy devices and network shares to prevent filesystem errors.</p></div>
-                    </div>
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_embed_metadata" {% if config.config_embed_metadata %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Embed metadata into downloaded/emailed books</h3></div>
-                        <div><p class="toggle-desc">Requires Calibre or Kepubify binaries to be configured.</p></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ============================================ -->
-    <!-- INTEGRATIONS SECTION                         -->
-    <!-- ============================================ -->
-    <section class="admin-section" id="integrations">
-        <div class="admin-section-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M237.66,18.34a8,8,0,0,0-11.32,0l-52.4,52.41-5.37-5.38a32.05,32.05,0,0,0-45.26,0L100,88.69l-6.34-6.35A8,8,0,0,0,82.34,93.66L88.69,100,65.37,123.31a32,32,0,0,0,0,45.26l5.38,5.37-52.41,52.4a8,8,0,0,0,11.32,11.32l52.4-52.41,5.37,5.38a32,32,0,0,0,45.26,0L156,167.31l6.34,6.35a8,8,0,0,0,11.32-11.32L167.31,156l23.32-23.31a32,32,0,0,0,0-45.26l-5.38-5.37,52.41-52.4A8,8,0,0,0,237.66,18.34Zm-116.29,161a16,16,0,0,1-22.62,0L76.69,157.25a16,16,0,0,1,0-22.62L100,111.31,144.69,156Zm57.94-57.94L156,144.69,111.31,100l23.32-23.31a16,16,0,0,1,22.62,0l22.06,22A16,16,0,0,1,179.31,121.37ZM88.57,35A8,8,0,0,1,103.43,29l8,20A8,8,0,0,1,96.57,55ZM24.57,93A8,8,0,0,1,35,88.57l20,8A8,8,0,0,1,49,111.43l-20-8A8,8,0,0,1,24.57,93ZM231.43,163a8,8,0,0,1-10.4,4.46l-20-8A8,8,0,1,1,207,144.57l20,8A8,8,0,0,1,231.43,163Zm-64,58.06A8,8,0,0,1,152.57,227l-8-20A8,8,0,0,1,159.43,201Z"></path></svg>
-            <h2 class="admin-section-title">Integrations</h2>
-        </div>
-        <div class="admin-section-body">
-
-            <!-- Automatic Metadata Fetching -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Automatic Metadata Fetching (Coming Soon)</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_hardcover_fetch" checked disabled>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Fetch book and author data from hardcover.app</h3></div>
-                        <div><p class="toggle-desc">Provides additional meta data including author bio and book ratings from Hardcover.app.</p></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Email Integration -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Email Integration</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" id="config_email_enabled" {% if config.get_mail_server_configured() %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Allow Bookbag to send email</h3></div>
-                        <div><p class="toggle-desc">When enabled, Bookbag will be able to send Password Reset emails, Magic Link login becomes available, and eMail.</p></div>
-                    </div>
-                </div>
-                <div id="email-settings-fields" {% if not config.get_mail_server_configured() %}style="display:none"{% endif %}>
-                    <div class="radio-group-row">
-                        <label class="radio-card-block">
-                            <input type="radio" name="mail_server_type" value="0" {% if config.mail_server_type == 0 %}checked{% endif %}>
-                            <span class="radio-card-dot"></span>
-                            Standard (SMTP)
-                        </label>
-                        <label class="radio-card-block">
-                            <input type="radio" name="mail_server_type" value="1" {% if config.mail_server_type == 1 %}checked{% endif %}>
-                            <span class="radio-card-dot"></span>
-                            Gmail
-                        </label>
-                    </div>
-                    <div id="smtp-fields">
-                        <div class="setting-path-row">
-                            <span class="setting-path-label">Mail Server URL</span>
-                            <input class="setting-input email-field" type="text" name="mail_server" placeholder="mail.example.com" value="{{ config.mail_server }}">
-                        </div>
-                        <div class="setting-path-row">
-                            <span class="setting-path-label">Port</span>
-                            <input class="setting-input email-field" type="number" name="mail_port" placeholder="25" min="1" max="65535" value="{{ config.mail_port }}">
-                        </div>
-                        <div class="setting-path-row">
-                            <span class="setting-path-label">Encryption Type</span>
-                            <select class="setting-input email-field" name="mail_use_ssl">
-                                <option value="0" {% if config.mail_use_ssl == 0 %}selected{% endif %}>None</option>
-                                <option value="1" {% if config.mail_use_ssl == 1 %}selected{% endif %}>STARTTLS</option>
-                                <option value="2" {% if config.mail_use_ssl == 2 %}selected{% endif %}>SSL/TLS</option>
-                            </select>
-                        </div>
-                        <div class="setting-path-row">
-                            <span class="setting-path-label">Username</span>
-                            <input class="setting-input email-field" type="text" name="mail_login" placeholder="user@example.com" value="{{ config.mail_login }}">
-                        </div>
-                        <div class="setting-path-row">
-                            <span class="setting-path-label">Password</span>
-                            <input class="setting-input email-field" type="password" name="mail_password_e" placeholder="{% if config.mail_password_e %}(unchanged){% endif %}" value="">
-                        </div>
-                        <div class="setting-path-row">
-                            <span class="setting-path-label">"From" Address</span>
-                            <input class="setting-input email-field" type="text" name="mail_from" placeholder="Bookbag <mail@example.com>" value="{{ config.mail_from }}">
-                        </div>
-                        <div class="setting-path-row">
-                            <span class="setting-path-label">Attachment File Size Limit (MB)</span>
-                            <input class="setting-input email-field" type="number" name="mail_size" placeholder="25" value="{{ config.mail_size // 1048576 }}">
-                        </div>
-                    </div>
-                    <div style="padding: 8px 10px;">
-                        <button type="button" class="btn btn-primary" id="btn-save-email">Save</button>
-                        <button type="button" class="btn btn-primary" id="btn-test-email">Save and Send Test Email</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Kobo Sync -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Kobo Sync</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_kobo_sync" checked>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Allow Book Sync with Kobo Ereaders</h3></div>
-                        <div><p class="toggle-desc">Experimental. Users must edit the configuration text files on their Kobo device to change the API Endpoint.</p></div>
-                    </div>
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">External Port for Kobo Syncing</span>
-                    <input class="setting-input config-field" type="text" name="config_external_port" placeholder="25">
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_kobo_proxy" checked>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Pass unrecognized Kobo requests to Kobo Store</h3></div>
-                        <div><p class="toggle-desc">Requests received from a Kobo device that are not supported or understood by Bookbag will relay the request to Kobo's book store.</p></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Good Reads -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Good Reads</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_use_goodreads">
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Fetch Author Data from GoodReads (Legacy)</h3></div>
-                        <div><p class="toggle-desc">GoodReads has ramped down their API service, a legacy API Key is required.</p></div>
-                    </div>
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Goodreads API Key</span>
-                    <input class="setting-input config-field" type="text" name="config_goodreads_api_key" value="{% if config.config_goodreads_api_key != None %}{{ config.config_goodreads_api_key }}{% endif %}">
-                </div>
-            </div>
-
-            <!-- Google Books -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Google Books</h3>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Google Books API Key</span>
-                    <input class="setting-input config-field" type="text" name="config_googlebooks_api_key" value="{% if config.config_googlebooks_api_key != '' %}{{ config.config_googlebooks_api_key }}{% endif %}">
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ============================================ -->
-    <!-- SECURITY SECTION                             -->
-    <!-- ============================================ -->
-    <section class="admin-section" id="security">
-        <div class="admin-section-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"></path></svg>
-            <h2 class="admin-section-title">Security</h2>
-        </div>
-        <div class="admin-section-body">
-
-            <!-- Brute Force Protection -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Brute Force Protection</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_ratelimiter" checked>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Limit failed login attempts</h3></div>
-                        <div><p class="toggle-desc">Temporarily locks out users after repeated failed login attempts to prevent brute force attacks.</p></div>
-                    </div>
-                </div>
+                <h3 class="admin-subsection-title">Passwords</h3>
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
@@ -711,92 +723,75 @@
                         </label>
                     </div>
                     <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Disable complex password requirement</h3></div>
+                        <div><h3 class="toggle-name">Require complex passwords</h3></div>
                         <div><p class="toggle-desc">Enforce minimum password complexity requirements for all user accounts.</p></div>
                     </div>
                 </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Minimum Password Length</span>
-                    <input class="setting-input config-field" type="number" name="config_password_min_length" min="1" max="40" value="{{ config.config_password_min_length }}">
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_number" {% if config.config_password_number %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                        </label>
+                <div id="password-policy-fields">
+                    <div class="setting-path-row">
+                        <span class="setting-path-label">Minimum Password Length</span>
+                        <input class="setting-input config-field" type="number" name="config_password_min_length" data-validate="required" min="1" max="40" value="{{ config.config_password_min_length }}">
                     </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Require a number</h3></div>
-                        <div><p class="toggle-desc">Passwords must contain at least one digit (0-9).</p></div>
+                    <div class="toggle-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">
+                            <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_number" {% if config.config_password_number %}checked{% endif %}>
+                            <span class="toggle-span"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-info-wrapper">
+                            <div><h3 class="toggle-name">Require a number</h3></div>
+                            <div><p class="toggle-desc">Passwords must contain at least one digit (0-9).</p></div>
+                        </div>
                     </div>
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_lower" {% if config.config_password_lower %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                        </label>
+                    <div class="toggle-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">
+                            <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_lower" {% if config.config_password_lower %}checked{% endif %}>
+                            <span class="toggle-span"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-info-wrapper">
+                            <div><h3 class="toggle-name">Require a lowercase letter</h3></div>
+                            <div><p class="toggle-desc">Passwords must contain at least one lowercase letter (a-z).</p></div>
+                        </div>
                     </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Require a lowercase letter</h3></div>
-                        <div><p class="toggle-desc">Passwords must contain at least one lowercase letter (a-z).</p></div>
+                    <div class="toggle-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">
+                            <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_upper" {% if config.config_password_upper %}checked{% endif %}>
+                            <span class="toggle-span"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-info-wrapper">
+                            <div><h3 class="toggle-name">Require an uppercase letter</h3></div>
+                            <div><p class="toggle-desc">Passwords must contain at least one uppercase letter (A-Z).</p></div>
+                        </div>
                     </div>
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_upper" {% if config.config_password_upper %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                        </label>
+                    <div class="toggle-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">
+                            <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_character" {% if config.config_password_character %}checked{% endif %}>
+                            <span class="toggle-span"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-info-wrapper">
+                            <div><h3 class="toggle-name">Require a letter</h3></div>
+                            <div><p class="toggle-desc">Passwords must contain at least one letter of any case.</p></div>
+                        </div>
                     </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Require an uppercase letter</h3></div>
-                        <div><p class="toggle-desc">Passwords must contain at least one uppercase letter (A-Z).</p></div>
+                    <div class="toggle-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">
+                            <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_special" {% if config.config_password_special %}checked{% endif %}>
+                            <span class="toggle-span"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-info-wrapper">
+                            <div><h3 class="toggle-name">Require a special character</h3></div>
+                            <div><p class="toggle-desc">Passwords must contain at least one special character (!@#$%^&amp;* etc.).</p></div>
+                        </div>
                     </div>
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_character" {% if config.config_password_character %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Require a letter</h3></div>
-                        <div><p class="toggle-desc">Passwords must contain at least one letter of any case.</p></div>
-                    </div>
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_password_special" {% if config.config_password_special %}checked{% endif %}>
-                        <span class="toggle-span"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Require a special character</h3></div>
-                        <div><p class="toggle-desc">Passwords must contain at least one special character (!@#$%^&amp;* etc.).</p></div>
-                    </div>
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" disabled>
-                        <span class="toggle-span"></span>
-                    </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Customize Storage Location of Login Attempts</h3></div>
-                        <div><p class="toggle-desc">Useful for multi-instance deployments.</p></div>
-                    </div>
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Login Attempt Storage</span>
-                    <input class="setting-input config-field" type="text" name="config_limiter_uri" value="{% if config.config_limiter_uri != None %}{{ config.config_limiter_uri }}{% endif %}" placeholder="i.e. redis://localhost:6379">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Options for Limiter Backend</span>
-                    <input class="setting-input config-field" type="text" name="config_limiter_options" placeholder="mail.example.com">
                 </div>
             </div>
 
@@ -888,7 +883,7 @@
                 </div>
                 <div class="setting-path-row">
                     <span class="setting-path-label">Server Port Number</span>
-                    <input class="setting-input config-field" type="text" name="config_port" value="{% if config.config_port != None %}{{ config.config_port }}{% endif %}" placeholder="8084">
+                    <input class="setting-input config-field" type="number" name="config_port" data-validate="required" min="1" max="65535" value="{% if config.config_port != None %}{{ config.config_port }}{% endif %}" placeholder="8084">
                 </div>
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
@@ -903,11 +898,11 @@
                 </div>
                 <div class="setting-path-row">
                     <span class="setting-path-label">SSL Certfile Path</span>
-                    <input class="setting-input config-field" type="text" name="config_certfile" placeholder="/path/to/SSL/certfile">
+                    <input class="setting-input config-field" type="text" name="config_certfile" data-validate="path" placeholder="/path/to/SSL/certfile">
                 </div>
                 <div class="setting-path-row">
                     <span class="setting-path-label">SSL Keyfile Path</span>
-                    <input class="setting-input config-field" type="text" name="config_keyfile" placeholder="/path/to/SSL/keyfile">
+                    <input class="setting-input config-field" type="text" name="config_keyfile" data-validate="path" placeholder="/path/to/SSL/keyfile">
                 </div>
                 <div class="setting-path-row">
                     <span class="setting-path-label">Trusted Hosts (Comma Separated)</span>
@@ -951,6 +946,19 @@
             <!-- Server Logs -->
             <div class="admin-subsection-wrapper">
                 <h3 class="admin-subsection-title">Server Logs</h3>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Log Level</span>
+                    <select class="setting-input config-field" name="config_log_level">
+                        <option value="10" {% if config.config_log_level == 10 %}selected{% endif %}>DEBUG</option>
+                        <option value="20" {% if config.config_log_level == 20 %}selected{% endif %}>INFO</option>
+                        <option value="30" {% if config.config_log_level == 30 %}selected{% endif %}>WARNING</option>
+                        <option value="40" {% if config.config_log_level == 40 %}selected{% endif %}>ERROR</option>
+                    </select>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Log File Location</span>
+                    <input class="setting-input config-field" type="text" name="config_logfile" placeholder="/path/to/logfile">
+                </div>
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
@@ -962,14 +970,6 @@
                         <div><h3 class="toggle-name">Enable Access Logging</h3></div>
                         <div><p class="toggle-desc">Log all HTTP requests to a separate access log file.</p></div>
                     </div>
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Log Level</span>
-                    <input class="setting-input config-field" type="text" name="config_log_level" placeholder="INFO">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Log File Location</span>
-                    <input class="setting-input config-field" type="text" name="config_logfile" placeholder="/path/to/logfile">
                 </div>
                 <div class="setting-path-row">
                     <span class="setting-path-label">Access Log File Location</span>
@@ -1072,6 +1072,11 @@
                     formData.append(toggle.name, 'on');
                 }
             });
+            // Include session protection radio value
+            var sessionRadio = document.querySelector('input[name="config_session"]:checked');
+            if (sessionRadio) {
+                formData.append('config_session', sessionRadio.value);
+            }
             // Include Google Drive flag if gdrive radio is selected
             var gdriveRadio = document.querySelector('input[name="book_storage_type"][value="gdrive"]');
             if (gdriveRadio && gdriveRadio.checked) {
@@ -1113,6 +1118,32 @@
         });
         document.querySelectorAll('input[name="config_session"]').forEach(function(radio) {
             radio.addEventListener('change', saveConfig);
+        });
+
+        // Server action buttons
+        document.getElementById('btn-restart').addEventListener('click', function() {
+            if (!confirm('Are you sure you want to restart the server?')) return;
+            fetch('{{ url_for("admin.shutdown") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+                body: JSON.stringify({ parameter: 0 })
+            }).then(function() {
+                setTimeout(function() { window.location.reload(); }, 3000);
+            });
+        });
+        document.getElementById('btn-shutdown').addEventListener('click', function() {
+            if (!confirm('Are you sure you want to shut down the server?')) return;
+            fetch('{{ url_for("admin.shutdown") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+                body: JSON.stringify({ parameter: 1 })
+            });
+        });
+        document.getElementById('btn-viewlogs').addEventListener('click', function() {
+            window.location.href = '{{ url_for("admin.view_logfile") }}';
+        });
+        document.getElementById('btn-viewtasks').addEventListener('click', function() {
+            window.location.href = '{{ url_for("admin.edit_scheduledtasks") }}';
         });
 
         // Reverse proxy toggle — show/hide header name field
@@ -1236,6 +1267,28 @@
             uploadToggle.addEventListener('change', saveConfig);
         }
 
+        // Password policy toggle — show/hide and reset child settings
+        (function() {
+            var toggle = document.querySelector('input[name="config_password_policy"]');
+            var fields = document.getElementById('password-policy-fields');
+            var minLength = fields.querySelector('input[name="config_password_min_length"]');
+            var childToggles = fields.querySelectorAll('.config-toggle');
+
+            function update() {
+                if (toggle.checked) {
+                    fields.style.display = '';
+                } else {
+                    fields.style.display = 'none';
+                    minLength.value = '1';
+                    childToggles.forEach(function(t) { t.checked = false; });
+                    saveConfig();
+                }
+            }
+
+            update();
+            toggle.addEventListener('change', update);
+        })();
+
         // Email Integration — show/hide fields
         var emailToggle = document.getElementById('config_email_enabled');
         var emailFields = document.getElementById('email-settings-fields');
@@ -1281,6 +1334,139 @@
         if (btnTestEmail) {
             btnTestEmail.addEventListener('click', function() { saveEmailSettings(true); });
         }
+
+        // Email Integration — mail server type toggle (Standard vs Gmail)
+        (function() {
+            var smtpFields = document.getElementById('smtp-fields');
+            var btnSave = document.getElementById('btn-save-email');
+            var btnRow = btnSave ? btnSave.parentNode : null;
+            var smtpRadio = document.querySelector('input[name="mail_server_type"][value="0"]');
+            var gmailRadio = document.querySelector('input[name="mail_server_type"][value="1"]');
+
+            function updateMailView() {
+                var isGmail = gmailRadio && gmailRadio.checked;
+                if (smtpFields) smtpFields.style.display = isGmail ? 'none' : '';
+                if (btnRow) btnRow.style.display = isGmail ? 'none' : '';
+            }
+
+            // Set initial state on page load
+            updateMailView();
+
+            // When Gmail is selected, hide SMTP fields and trigger gmail_server setup
+            if (gmailRadio) {
+                gmailRadio.addEventListener('change', function() {
+                    updateMailView();
+                    var formData = collectEmailFormData(false);
+                    formData.append('gmail', 'submit');
+                    fetch('{{ url_for("admin.update_mailsettings") }}', {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+                        body: formData
+                    })
+                    .then(function(resp) { return resp.text(); })
+                    .then(function(html) {
+                        if (html.indexOf('toast-error') !== -1) {
+                            // Gmail not available (missing deps or missing gmail.json) — show overlay and revert
+                            document.getElementById('gdrive-overlay').style.display = '';
+                            if (smtpRadio) smtpRadio.checked = true;
+                            updateMailView();
+                        } else {
+                            window.location.reload();
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('Gmail setup error:', err);
+                        if (smtpRadio) smtpRadio.checked = true;
+                        updateMailView();
+                    });
+                });
+            }
+
+            // When Standard is selected, show SMTP fields
+            if (smtpRadio) {
+                smtpRadio.addEventListener('change', updateMailView);
+            }
+        })();
+
+        // Inline field validation on blur (all [data-validate] fields)
+        (function() {
+            var btnSave = document.getElementById('btn-save-email');
+            var btnTest = document.getElementById('btn-test-email');
+            var hostnameRe = /^[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?$/;
+            var emailRe = /\S+@\S+\.\S+/;
+            var pathRe = /^\/\S+/;
+
+            function validateField(field) {
+                var rules = (field.getAttribute('data-validate') || '').split(/\s+/);
+                var val = field.value.trim();
+
+                if (rules.indexOf('required') !== -1 && val === '') {
+                    return 'This field is required';
+                }
+                if (val === '') return '';
+
+                if (field.type === 'number') {
+                    var n = Number(field.value);
+                    var min = field.hasAttribute('min') ? Number(field.min) : null;
+                    var max = field.hasAttribute('max') ? Number(field.max) : null;
+                    if (isNaN(n) || n !== Math.floor(n)) return 'Must be a whole number';
+                    if (min !== null && max !== null && (n < min || n > max)) {
+                        return 'Must be between ' + min + ' and ' + max;
+                    }
+                }
+                if (rules.indexOf('hostname') !== -1 && !hostnameRe.test(val)) {
+                    return 'Enter a valid hostname';
+                }
+                if (rules.indexOf('email') !== -1 && !emailRe.test(val)) {
+                    return 'Enter a valid email address';
+                }
+                if (rules.indexOf('path') !== -1 && !pathRe.test(val)) {
+                    return 'Enter a valid absolute path';
+                }
+                return '';
+            }
+
+            function showError(field, msg) {
+                field.classList.toggle('is-invalid', msg !== '');
+                var existing = field.parentNode.querySelector('.field-error');
+                if (msg) {
+                    if (!existing) {
+                        existing = document.createElement('div');
+                        existing.className = 'field-error';
+                        field.parentNode.appendChild(existing);
+                    }
+                    existing.textContent = msg;
+                } else if (existing) {
+                    existing.remove();
+                }
+            }
+
+            function validateEmailFields() {
+                var valid = true;
+                document.querySelectorAll('#smtp-fields input[data-validate]').forEach(function(field) {
+                    if (validateField(field) !== '') valid = false;
+                });
+                if (btnSave) btnSave.disabled = !valid;
+                if (btnTest) btnTest.disabled = !valid;
+            }
+
+            // Attach blur/input listeners to all [data-validate] fields on the page
+            document.querySelectorAll('input[data-validate]').forEach(function(field) {
+                field.addEventListener('blur', function() {
+                    showError(field, validateField(field));
+                    validateEmailFields();
+                });
+                field.addEventListener('input', function() {
+                    if (field.classList.contains('is-invalid')) {
+                        showError(field, validateField(field));
+                        validateEmailFields();
+                    }
+                });
+            });
+
+            // Set initial email button state
+            validateEmailFields();
+        })();
     </script>
 
 
