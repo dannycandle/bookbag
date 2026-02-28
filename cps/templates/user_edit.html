@@ -239,7 +239,9 @@
 
                 <!-- Actions -->
                 <div class="admin-actions-row">
+                    {% if new_user %}
                     <button type="button" class="btn btn-primary" onclick="saveUserForm()">{{_('Save')}}</button>
+                    {% endif %}
                     {% if current_user and current_user.role_admin() and not profile and not new_user and not content.role_anonymous() %}
                     <button type="button" class="btn btn-danger" id="btn-delete-user">{{_('Delete User')}}</button>
                     <script>

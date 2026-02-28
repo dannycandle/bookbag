@@ -671,17 +671,14 @@ def do_edit_book(book_id, upload_formats=None):
             if not current_user.role_upload():
                 edit_error = True
                 flash(_("User has no rights to upload cover"), category="error")
-            if to_save["cover_url"].endswith('/static/generic_cover.jpg'):
-                book.has_cover = 0
+            result, error = helper.save_cover_from_url(to_save["cover_url"].strip(), book.path)
+            if result is True:
+                book.has_cover = 1
+                modify_date = True
+                helper.replace_cover_thumbnail_cache(book.id)
             else:
-                result, error = helper.save_cover_from_url(to_save["cover_url"].strip(), book.path)
-                if result is True:
-                    book.has_cover = 1
-                    modify_date = True
-                    helper.replace_cover_thumbnail_cache(book.id)
-                else:
-                    edit_error = True
-                    flash(error, category="error")
+                edit_error = True
+                flash(error, category="error")
 
         # Add default series_index to book
         modify_date |= edit_book_series_index(to_save.get("series_index"), book)
@@ -973,16 +970,14 @@ def file_handling_on_upload(requested_file):
 
 def move_coverfile(meta, db_book):
     # move cover to final directory, including book id
-    if meta.cover:
-        cover_file = meta.cover
-    else:
-        cover_file = os.path.join(constants.STATIC_DIR, 'generic_cover.jpg')
+    if not meta.cover:
+        return
+    cover_file = meta.cover
     new_cover_path = os.path.join(config.get_book_path(), db_book.path)
     try:
         os.makedirs(new_cover_path, exist_ok=True)
         copyfile(cover_file, os.path.join(new_cover_path, "cover.jpg"))
-        if meta.cover:
-            os.unlink(meta.cover)
+        os.unlink(meta.cover)
     except OSError as e:
         log.error("Failed to move cover file %s: %s", new_cover_path, e)
         flash(_("Failed to Move Cover File %(file)s: %(error)s", file=new_cover_path,

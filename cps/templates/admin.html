@@ -308,21 +308,22 @@
                         <div><p class="toggle-desc">When enabled, you can move the metadata database to a different location than the book files.</p></div>
                     </div>
                 </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">Path to metadata database:</span>
-                    <span class="setting-path-value">/books.metadata.db</span>
-                </div>
-                <div class="radio-group-row">
-                    <label class="radio-card-block">
-                        <input type="radio" name="metadata_storage_type" value="gdrive">
-                        <span class="radio-card-dot"></span>
-                        Google Drive
-                    </label>
+                <div class="radio-group-row" id="metadata-storage-radios">
                     <label class="radio-card-block">
                         <input type="radio" name="metadata_storage_type" value="local" checked>
                         <span class="radio-card-dot"></span>
                         Other Location
                     </label>
+                    <label class="radio-card-block">
+                        <input type="radio" name="metadata_storage_type" value="gdrive">
+                        <span class="radio-card-dot"></span>
+                        <svg class="radio-card-warning" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg>
+                        Google Drive
+                    </label>
+                </div>
+                <div class="setting-path-row" id="metadata-path-row">
+                    <span class="setting-path-label">Path to metadata database:</span>
+                    <input class="setting-input config-field" type="text" name="config_calibre_split_dir" data-validate="required path" value="{% if config.config_calibre_split_dir != None %}{{ config.config_calibre_split_dir }}{% endif %}" placeholder="/books">
                 </div>
             </div>
 
@@ -470,19 +471,21 @@
                         <div><p class="toggle-desc">Experimental. Users must edit the configuration text files on their Kobo device to change the API Endpoint.</p></div>
                     </div>
                 </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">External Port for Kobo Syncing</span>
-                    <input class="setting-input config-field" type="number" name="config_external_port" data-validate="required" min="1" max="65535" placeholder="25">
-                </div>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean config-toggle" type="checkbox" name="config_kobo_proxy" checked>
-                        <span class="toggle-span"></span>
+                <div id="kobo-sync-options" style="display:none;">
+                    <div class="toggle-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">
+                            <input class="toggle-boolean config-toggle" type="checkbox" name="config_kobo_proxy" checked>
+                            <span class="toggle-span"></span>
+                        </div>
+                        <div class="toggle-info-wrapper">
+                            <div><h3 class="toggle-name">Pass unrecognized Kobo requests to Kobo Store</h3></div>
+                            <div><p class="toggle-desc">Requests received from a Kobo device that are not supported or understood by Bookbag will relay the request to Kobo's book store.</p></div>
+                        </div>
                     </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Pass unrecognized Kobo requests to Kobo Store</h3></div>
-                        <div><p class="toggle-desc">Requests received from a Kobo device that are not supported or understood by Bookbag will relay the request to Kobo's book store.</p></div>
+                    <div class="setting-path-row">
+                        <span class="setting-path-label">External Port for Kobo Syncing</span>
+                        <input class="setting-input config-field" type="number" name="config_external_port" data-validate="required" min="1" max="65535" placeholder="25">
                     </div>
                 </div>
             </div>
@@ -1309,6 +1312,59 @@
             document.querySelectorAll('input[name="book_storage_type"]').forEach(function(radio) {
                 radio.addEventListener('change', onRadioChange);
             });
+        })();
+
+        // Metadata database location — toggle controls radios, radio controls path field
+        (function() {
+            var toggle = document.querySelector('input[name="config_custom_metadata_location"]');
+            var radios = document.getElementById('metadata-storage-radios');
+            var pathRow = document.getElementById('metadata-path-row');
+            var pathField = document.querySelector('input[name="config_calibre_split_dir"]');
+            var localRadio = document.querySelector('input[name="metadata_storage_type"][value="local"]');
+            var gdriveRadio = document.querySelector('input[name="metadata_storage_type"][value="gdrive"]');
+
+            function updateMetadataView() {
+                if (toggle.checked) {
+                    radios.style.display = '';
+                    pathRow.style.display = localRadio.checked ? '' : 'none';
+                } else {
+                    radios.style.display = 'none';
+                    pathRow.style.display = 'none';
+                }
+            }
+
+            function onRadioChange() {
+                if (gdriveRadio.checked) {
+                    // Show gdrive setup overlay and revert to local
+                    document.getElementById('gdrive-overlay').style.display = '';
+                    localRadio.checked = true;
+                    pathRow.style.display = '';
+                    return;
+                }
+                pathRow.style.display = localRadio.checked ? '' : 'none';
+            }
+
+            // Derive initial state from saved value
+            if (!pathField.value || pathField.value === '/books') {
+                toggle.checked = false;
+            }
+            updateMetadataView();
+
+            toggle.addEventListener('change', updateMetadataView);
+            document.querySelectorAll('input[name="metadata_storage_type"]').forEach(function(radio) {
+                radio.addEventListener('change', onRadioChange);
+            });
+        })();
+
+        // Kobo sync — toggle controls visibility of sub-options
+        (function() {
+            var toggle = document.querySelector('input[name="config_kobo_sync"]');
+            var options = document.getElementById('kobo-sync-options');
+            function update() {
+                options.style.display = toggle.checked ? '' : 'none';
+            }
+            update();
+            toggle.addEventListener('change', update);
         })();
 
         // Google Drive popover — close handler

@@ -150,14 +150,14 @@ body {
 }
 
 .nav-button-icon svg {
-    fill: #581C1C;
+    fill: black;
 }
 
 .nav-button-text {
     font-family: 'Comfortaa', sans-serif;
     font-size: small;
     font-weight: 500;
-    color: #581C1C;
+    color: black;
 }
 
 .navigation-items {

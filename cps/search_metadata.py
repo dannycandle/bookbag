@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-from flask import Blueprint, request, url_for, make_response, jsonify
+from flask import Blueprint, request, make_response, jsonify
 from .cw_login import current_user
 from flask_babel import get_locale
 from sqlalchemy.exc import InvalidRequestError, OperationalError
@@ -126,11 +126,10 @@ def metadata_search():
     active = current_user.view_settings.get("metadata", {})
     locale = get_locale()
     if query:
-        static_cover = url_for("static", filename="generic_cover.jpg")
         # ret = cl[0].search(query, static_cover, locale)
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             meta = {
-                executor.submit(c.search, query, static_cover, locale): c
+                executor.submit(c.search, query, "", locale): c
                 for c in cl
                 if active.get(c.__id__, True)
             }

@@ -17,11 +17,8 @@
 #  along with this program. If not, see <http://www.gnu.org/licenses/>.
 import abc
 import dataclasses
-import os
 import re
 from typing import Dict, Generator, List, Optional, Union
-
-from cps import constants
 
 
 @dataclasses.dataclass
@@ -38,7 +35,7 @@ class MetaRecord:
     authors: List[str]
     url: str
     source: MetaSourceInfo
-    cover: str = os.path.join(constants.STATIC_DIR, 'generic_cover.jpg')
+    cover: str = ""
     description: Optional[str] = ""
     series: Optional[str] = None
     series_index: Optional[Union[int, float]] = 0
