@@ -1820,6 +1820,185 @@ details[open] .detail-icon-popover {
 }
 
 
+/* BOOK EDIT PAGE */
+
+.book-edit-group {
+    margin-bottom: 16px;
+}
+
+.book-edit-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8A5353;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.book-edit-field {
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #581C1C;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1.5px solid rgba(88, 28, 28, 0.15);
+    border-radius: 10px;
+    padding: 8px 14px;
+    height: 40px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.book-edit-field:focus {
+    border-color: #F94C4C;
+    box-shadow: 0 0 0 3px rgba(249, 76, 76, 0.1);
+}
+
+.book-edit-field::placeholder {
+    color: #aaa;
+    font-weight: 400;
+}
+
+textarea.book-edit-field {
+    height: auto;
+    min-height: 120px;
+    resize: vertical;
+}
+
+select.book-edit-field {
+    appearance: auto;
+    cursor: pointer;
+}
+
+.book-edit-title-input {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #581C1C;
+    height: auto;
+    padding: 6px 14px;
+    border-color: transparent;
+    background: transparent;
+}
+
+.book-edit-title-input:focus {
+    border-color: rgba(88, 28, 28, 0.15);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.book-edit-author-input {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #8A5353;
+    height: auto;
+    padding: 4px 14px;
+    border-color: transparent;
+    background: transparent;
+}
+
+.book-edit-author-input:focus {
+    border-color: rgba(88, 28, 28, 0.15);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.book-edit-inline {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.book-edit-inline .book-edit-group {
+    flex: 1;
+}
+
+.book-edit-inline .book-edit-group-narrow {
+    flex: 0 0 100px;
+}
+
+.book-edit-identifiers table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+}
+
+.book-edit-identifiers td {
+    padding: 0 4px 0 0;
+}
+
+.book-edit-identifiers td:last-child {
+    padding-right: 0;
+    width: 80px;
+}
+
+.book-edit-identifiers input {
+    width: 100%;
+}
+
+/* On the edit page, allow the cover column to scroll so sidebar sections are accessible */
+.book-detail-layout:has(#book_edit_frm) .book-detail-cover-col {
+    height: auto;
+    max-height: 100%;
+    overflow-y: auto;
+    flex: 0 0 280px;
+}
+
+.book-detail-layout:has(#book_edit_frm) .book-detail-cover-img {
+    height: auto;
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.book-edit-sidebar-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(88, 28, 28, 0.1);
+}
+
+.book-edit-sidebar-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #8A5353;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+}
+
+.book-edit-sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.book-edit-cover-manage {
+    margin-top: 16px;
+}
+
+.book-edit-cover-manage .book-edit-group {
+    margin-bottom: 10px;
+}
+
+.book-edit-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #581C1C;
+    margin-bottom: 16px;
+}
+
+.book-edit-checkbox input[type="checkbox"] {
+    accent-color: #F94C4C;
+}
+
+.book-edit-xchange {
+    display: flex;
+    justify-content: center;
+    margin: -8px 0 8px 0;
+}
+
+
 /* ADMIN PAGES */
 
 .admin-section-link {

@@ -83,7 +83,7 @@
 <form id="upload-form" action="{{ url_for('edit-book.upload') }}" method="POST" enctype="multipart/form-data" style="display:none;">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <input type="hidden" name="book_id" value="-1">
-  <input type="file" id="upload-file-input" name="btn-upload-format" multiple>
+  <input type="file" id="upload-file-input" name="btn-upload" multiple>
 </form>
 
 <button class="fab-button" onclick="document.getElementById('upload-file-input').click()">

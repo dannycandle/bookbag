@@ -579,7 +579,23 @@ window.initBooksPage = function() {
   if (uploadInput) {
     uploadInput.addEventListener('change', function() {
       if (this.files.length > 0) {
-        document.getElementById('upload-form').submit();
+        var form = document.getElementById('upload-form');
+        var formData = new FormData(form);
+        var fab = document.querySelector('.fab-button');
+        if (fab) { fab.disabled = true; fab.style.opacity = '0.5'; }
+
+        fetch(form.action, { method: 'POST', body: formData })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.location) {
+              window.location.href = data.location;
+            } else {
+              window.location.reload();
+            }
+          })
+          .catch(function() {
+            window.location.reload();
+          });
       }
     });
   }
