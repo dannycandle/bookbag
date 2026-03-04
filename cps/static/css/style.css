@@ -998,11 +998,9 @@ or design guidelines. I am in the process of updating them. */
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    background-color: transparent;
     min-height: 85vh;
     padding: 40px 20px;
     background-color: rgba(255, 255, 255, 0.99);
-
 }
 
 #search-form-wrapper {
@@ -1014,12 +1012,143 @@ or design guidelines. I am in the process of updating them. */
     max-width: 680px;
 }
 
-#search-form-wrapper select[multiple] {
-    border-bottom: none !important;
-    border: 1.5px solid rgba(88, 28, 28, 0.2) !important;
-    border-radius: 10px !important;
-    padding: 6px !important;
+.search-heading {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #581C1C;
+    margin-bottom: 28px;
+}
+
+#search-form-wrapper select[multiple].book-edit-field {
     height: auto;
+    min-height: 120px;
+    padding: 6px;
+}
+
+.search-picker {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.search-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1.5px dashed rgba(88, 28, 28, 0.2);
+    background: transparent;
+    color: #8A5353;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+
+.search-add-btn:hover {
+    border-color: #F94C4C;
+    color: #F94C4C;
+    background-color: rgba(249, 76, 76, 0.04);
+}
+
+.search-add-btn svg {
+    flex-shrink: 0;
+}
+
+.search-field-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 6px;
+    min-width: 220px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.search-field-menu-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.search-field-menu-item {
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #581C1C;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.search-field-menu-item:hover {
+    background-color: rgba(249, 76, 76, 0.06);
+}
+
+.search-field-row {
+    position: relative;
+    padding: 12px 40px 12px 16px;
+    margin-bottom: 12px;
+    border: 1.5px solid rgba(88, 28, 28, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.search-field-row-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.search-field-row .book-edit-group {
+    margin-bottom: 0;
+}
+
+.search-remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #8A5353;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-remove-btn:hover {
+    background-color: rgba(249, 76, 76, 0.1);
+    color: #F94C4C;
+}
+
+.search-hint {
+    display: block;
+    font-size: 11px;
+    color: #8A5353;
+    margin-top: 4px;
+}
+
+.search-submit {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(88, 28, 28, 0.08);
 }
 
 

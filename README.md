@@ -4,17 +4,15 @@
 
 **A modern UI redesign of [Calibre-Web](https://github.com/janeczku/calibre-web).**
 
-> ⚠️ Book Bag is in early development and is not stable. It is offered as-is. Please do not open issues requesting troubleshooting help.
+> ⚠️ Book Bag is in early development and is not stable. It is offered as-is. 
 
 ---
 
-## Why
+## About
 
-Calibre-Web is a remarkable piece of software. It breathes new life into personal ebook libraries and offers a real alternative to the corporate platforms — Amazon, Google, Kobo — that want to lock your reading life inside their ecosystem. Finding it genuinely felt like a revelation.
+Most of us self-hosters can agree that Calibre-Web is great and offers us an alternative to the greedy corporate overloads of the ebook realm.
 
-But the interface hasn't kept pace with what users have come to expect from modern software. Eight unlabeled sort buttons. Book titles displayed twice per book, right next to the cover that already has the title on it. Two search bars. Two admin buttons. Rounded corners mixed with sharp ones. The design makes it hard to fall in love with what you're actually there for: your books.
-
-Book Bag is an attempt to answer the question: *what would Calibre-Web look like with a clear, consistent, and opinionated design language — one that gets out of the way and puts the books front and center?*
+However, we shouldn't have to choose between escaping from those tech conglomerates and having a beautiful apps that offer a great user experience.
 
 ## Design Philosophy
 
@@ -22,37 +20,51 @@ Book Bag is an attempt to answer the question: *what would Calibre-Web look like
 
 **Navigation on the left.** On desktop, the left side of the screen carries the most visual weight. The most important button in a book library app should be the one that takes you to your books — not a logo.
 
-**No redundancy.** One search. Sort controls that are clearly labeled. Information shown once, where it matters.
+**Removing UI redundancy.** One search. Sort controls that are clearly labeled. Information shown once, where it matters.
 
-**Out of the way.** The app should serve the user's relationship with their books, not demand attention for itself.
+**Out of the way.** The app should serve the user's relationship with their books and should therefore be simple and easy to use
+
+**Still Powerful.** We also shouldn't have to choose between something beauitul and something powerful. By keeping the base of Calibre and Calibre-Web, Bookbag aims to retain the power of the originals, taking care to include as many features from Calibre-Web as possible.
 
 ## What's Changed from Calibre-Web
 
-- Vanilla CSS replacing Bootstrap
-- New left-side sticky navigation bar
-- Redesigned book grid — cover art only, no duplicate metadata
-- Action bar with labeled sort dropdown and integrated search
-- Filter sidebar (in progress)
-- Many upstream GUI features may be temporarily inaccessible while the UI is rebuilt
-
-All backend functionality — user management, OPDS, metadata editing, eBook conversion, Kobo sync, etc. — is inherited from Calibre-Web and remains intact.
+- Fresh, modern and unique design
+- Single Page Application Feel
+- Resizeable book grid 
+- Instant search and filters
+- Redesigned Admin Settings page with instant save
+- Simpler advanced search UI without losing it's power
+- All backend functionality — user management, OPDS, metadata editing, eBook conversion, Kobo sync, etc. — is inherited from Calibre-Web and remains intact.
 
 ## Quick Start
+Bookbag is early in development, do not install it as your production server.
+- Download and unpack files to your server/container
+- Create venv and install dependencies in requirements.txt and optionally optional-requirements.txt
+- run cps.py
+- create a penis
 
-Book Bag runs identically to Calibre-Web. Refer to the [Calibre-Web documentation](https://github.com/janeczku/calibre-web/wiki) for setup instructions.
+**Docker Image Coming Soon**
+I will be making a docker image in the coming days.
+
 
 Default admin credentials:
 - **Username:** `admin`
 - **Password:** `admin123`
 
-Change these immediately after first login.
+Recommended to set up email config in settings for easy password resets.
 
 ## Requirements
 
-- Python 3.7 or newer
+- Python 3.13
 - A Calibre library (`metadata.db`)
-- Optionally: Calibre desktop app (for conversion), Kepubify (for Kobo support), ImageMagick (for cover extraction from EPUBs)
+- Optionally: Calibre Cli Tools, Kepubify (for Kobo support), ImageMagick (for cover extraction from EPUBs)
 
 ## License
 
 Book Bag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) and is licensed under the [GPL v3 License](LICENSE).
+
+- [Calibre-Web](https://github.com/janeczku/calibre-web) — [GPL v3](LICENSE)
+- [Inter](https://github.com/rsms/inter) — [SIL Open Font License 1.1](cps/static/fonts/Inter/OFL.txt)
+- [Comfortaa](https://github.com/alexeiva/comfortaa) — [SIL Open Font License 1.1](cps/static/fonts/Comfortaa/OFL.txt)
+- [Phosphor Icons](https://phosphoricons.com/) — [MIT License](LICENSE-PHOSPHOR-ICONS.txt)
+

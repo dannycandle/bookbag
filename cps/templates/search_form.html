@@ -2,151 +2,317 @@
 {% block body %}
 <div id="search-wrapper">
 <div id="search-form-wrapper">
-  <h2>{{title}}</h2>
+  <h2 class="search-heading">{{title}}</h2>
   <form role="form" id="search" action="{{ url_for('search.advanced_search_form') }}" method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    <div class="form-group">
-      <label for="title">{{_('Book Title')}}</label>
-      <input type="text" class="form-control" name="title" id="title" value="">
-    </div>
+    <div id="search-fields"></div>
 
-    <div class="form-group">
-      <label for="authors">{{_('Author')}}</label>
-      <input type="text" class="form-control" name="authors" id="authors" value="">
-    </div>
-
-    <div class="form-group">
-      <label for="publisher">{{_('Publisher')}}</label>
-      <input type="text" class="form-control" name="publisher" id="publisher" value="">
-    </div>
-
-    <div class="row">
-      <div class="form-group col-sm-6">
-        <label for="publishstart">{{_('Published Date From')}}</label>
-        <input type="date" class="form-control" name="publishstart" id="publishstart">
+    <div class="search-picker">
+      <button type="button" id="add-field-btn" class="search-add-btn" title="{{_('Add filter')}}">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span>{{_('Add filter')}}</span>
+      </button>
+      <div id="field-menu" class="search-field-menu">
+        <div class="search-field-menu-item" data-field="title">{{_('Book Title')}}</div>
+        <div class="search-field-menu-item" data-field="authors">{{_('Author')}}</div>
+        <div class="search-field-menu-item" data-field="publisher">{{_('Publisher')}}</div>
+        <div class="search-field-menu-item" data-field="comments">{{_('Description')}}</div>
+        <div class="search-field-menu-item" data-field="publishstart">{{_('Published Date From')}}</div>
+        <div class="search-field-menu-item" data-field="publishend">{{_('Published Date To')}}</div>
+        <div class="search-field-menu-item" data-field="read_status">{{_('Read Status')}}</div>
+        <div class="search-field-menu-item" data-field="include_tag">{{_('Include Tags')}}</div>
+        <div class="search-field-menu-item" data-field="exclude_tag">{{_('Exclude Tags')}}</div>
+        <div class="search-field-menu-item" data-field="include_serie">{{_('Include Series')}}</div>
+        <div class="search-field-menu-item" data-field="exclude_serie">{{_('Exclude Series')}}</div>
+        <div class="search-field-menu-item" data-field="ratinghigh">{{_('Rating Above')}}</div>
+        <div class="search-field-menu-item" data-field="ratinglow">{{_('Rating Below')}}</div>
+        {% for c in cc %}
+        <div class="search-field-menu-item" data-field="custom_column_{{ c.id }}">{{ c.name }}</div>
+        {% endfor %}
       </div>
-      <div class="form-group col-sm-6">
-        <label for="publishend">{{_('Published Date To')}}</label>
-        <input type="date" class="form-control" name="publishend" id="publishend">
-      </div>
     </div>
 
-    <div class="form-group">
-      <label for="read_status">{{_('Read Status')}}</label>
-      <select name="read_status" id="read_status" class="form-control">
+    <div class="search-submit">
+      <button type="submit" id="adv_submit" class="detail-action-btn detail-action-btn-primary">{{_('Search')}}</button>
+    </div>
+  </form>
+</div>
+</div>
+
+<template id="tpl-title">
+  <div class="search-field-row" data-field="title">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Book Title')}}</label>
+      <input type="text" class="book-edit-field" name="title" value="">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-authors">
+  <div class="search-field-row" data-field="authors">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Author')}}</label>
+      <input type="text" class="book-edit-field" name="authors" value="">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-publisher">
+  <div class="search-field-row" data-field="publisher">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Publisher')}}</label>
+      <input type="text" class="book-edit-field" name="publisher" value="">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-comments">
+  <div class="search-field-row" data-field="comments">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Description')}}</label>
+      <input type="text" class="book-edit-field" name="comments" value="">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-publishstart">
+  <div class="search-field-row" data-field="publishstart">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Published Date From')}}</label>
+      <input type="date" class="book-edit-field" name="publishstart">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-publishend">
+  <div class="search-field-row" data-field="publishend">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Published Date To')}}</label>
+      <input type="date" class="book-edit-field" name="publishend">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-read_status">
+  <div class="search-field-row" data-field="read_status">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Read Status')}}</label>
+      <select name="read_status" class="book-edit-field">
         <option value="Any" selected>{{_('Any')}}</option>
         <option value="">{{_('Empty')}}</option>
         <option value="True">{{_('Yes')}}</option>
         <option value="False">{{_('No')}}</option>
       </select>
     </div>
+  </div>
+</template>
 
-    <div class="row">
-      <div class="form-group col-sm-6">
-        <label for="include_tag">{{_('Include Tags')}} (Hold Ctrl/Cmd to select multiple)</label>
-        <select class="form-control" name="include_tag" id="include_tag" multiple size="5">
-          {% for tag in tags %}
-          <option value="{{tag.id}}">{{tag.name}}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="form-group col-sm-6">
-        <label for="exclude_tag">{{_('Exclude Tags')}}</label>
-        <select class="form-control" name="exclude_tag" id="exclude_tag" multiple size="5">
-          {% for tag in tags %}
-          <option value="{{tag.id}}">{{tag.name}}</option>
-          {% endfor %}
-        </select>
-      </div>
+<template id="tpl-include_tag">
+  <div class="search-field-row" data-field="include_tag">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Include Tags')}}</label>
+      <select class="book-edit-field" name="include_tag" multiple size="5">
+        {% for tag in tags %}
+        <option value="{{tag.id}}">{{tag.name}}</option>
+        {% endfor %}
+      </select>
+      <span class="search-hint">Hold Ctrl/Cmd to select multiple</span>
     </div>
+  </div>
+</template>
 
-    <div class="row">
-      <div class="form-group col-sm-6">
-        <label for="include_serie">{{_('Include Series')}}</label>
-        <select class="form-control" name="include_serie" id="include_serie" multiple size="5">
-          {% for serie in series %}
-          <option value="{{serie.id}}">{{serie.name}}</option>
-          {% endfor %}
+<template id="tpl-exclude_tag">
+  <div class="search-field-row" data-field="exclude_tag">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Exclude Tags')}}</label>
+      <select class="book-edit-field" name="exclude_tag" multiple size="5">
+        {% for tag in tags %}
+        <option value="{{tag.id}}">{{tag.name}}</option>
+        {% endfor %}
+      </select>
+      <span class="search-hint">Hold Ctrl/Cmd to select multiple</span>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-include_serie">
+  <div class="search-field-row" data-field="include_serie">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Include Series')}}</label>
+      <select class="book-edit-field" name="include_serie" multiple size="5">
+        {% for serie in series %}
+        <option value="{{serie.id}}">{{serie.name}}</option>
+        {% endfor %}
+      </select>
+      <span class="search-hint">Hold Ctrl/Cmd to select multiple</span>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-exclude_serie">
+  <div class="search-field-row" data-field="exclude_serie">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Exclude Series')}}</label>
+      <select class="book-edit-field" name="exclude_serie" multiple size="5">
+        {% for serie in series %}
+        <option value="{{serie.id}}">{{serie.name}}</option>
+        {% endfor %}
+      </select>
+      <span class="search-hint">Hold Ctrl/Cmd to select multiple</span>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-ratinghigh">
+  <div class="search-field-row" data-field="ratinghigh">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Rating Above')}}</label>
+      <input type="number" min="0" max="5" step="0.5" name="ratinghigh" class="book-edit-field">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-ratinglow">
+  <div class="search-field-row" data-field="ratinglow">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{_('Rating Below')}}</label>
+      <input type="number" min="0" max="5" step="0.5" name="ratinglow" class="book-edit-field">
+    </div>
+  </div>
+</template>
+
+{% for c in cc %}
+<template id="tpl-custom_column_{{ c.id }}">
+  <div class="search-field-row" data-field="custom_column_{{ c.id }}">
+    <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
+    <div class="book-edit-group">
+      <label class="book-edit-label">{{ c.name }}</label>
+      {% if c.datatype == 'bool' %}
+        <select name="custom_column_{{ c.id }}" class="book-edit-field">
+          <option value="Any" selected>{{_('Any')}}</option>
+          <option value="">{{_('Empty')}}</option>
+          <option value="True">{{_('Yes')}}</option>
+          <option value="False">{{_('No')}}</option>
         </select>
-      </div>
-      <div class="form-group col-sm-6">
-        <label for="exclude_serie">{{_('Exclude Series')}}</label>
-        <select class="form-control" name="exclude_serie" id="exclude_serie" multiple size="5">
-          {% for serie in series %}
-          <option value="{{serie.id}}">{{serie.name}}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="form-group col-sm-6">
-        <label for="ratinghigh">{{_('Rating Above')}}</label>
-        <input type="number" min="0" max="5" step="0.5" name="ratinghigh" id="ratinghigh" class="form-control">
-      </div>
-      <div class="form-group col-sm-6">
-        <label for="ratinglow">{{_('Rating Below')}}</label>
-        <input type="number" min="0" max="5" step="0.5" name="ratinglow" id="ratinglow" class="form-control">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="comments">{{_('Description')}}</label>
-      <input type="text" class="form-control" name="comments" id="comments" value="">
-    </div>
-
-    {% if cc|length > 0 %}
-      {% for c in cc %}
-      <div class="form-group">
-        <label for="{{ 'custom_column_' ~ c.id }}">{{ c.name }}</label>
-        
-        {% if c.datatype == 'bool' %}
-          <select name="{{ 'custom_column_' ~ c.id }}" id="{{ 'custom_column_' ~ c.id }}" class="form-control">
-            <option value="Any" selected>{{_('Any')}}</option>
-            <option value="">{{_('Empty')}}</option>
-            <option value="True">{{_('Yes')}}</option>
-            <option value="False">{{_('No')}}</option>
-          </select>
-        {% elif c.datatype in ['int', 'float'] %}
-          <div class="row">
-            <div class="col-sm-6">
-              <input type="number" step="{{ '0.01' if c.datatype == 'float' else '1' }}" class="form-control" name="{{ 'custom_column_' ~ c.id }}_low" placeholder="From">
-            </div>
-            <div class="col-sm-6">
-              <input type="number" step="{{ '0.01' if c.datatype == 'float' else '1' }}" class="form-control" name="{{ 'custom_column_' ~ c.id }}_high" placeholder="To">
-            </div>
+      {% elif c.datatype in ['int', 'float'] %}
+        <div class="book-edit-inline">
+          <div class="book-edit-group">
+            <input type="number" step="{{ '0.01' if c.datatype == 'float' else '1' }}" class="book-edit-field" name="custom_column_{{ c.id }}_low" placeholder="From">
           </div>
-        {% elif c.datatype == 'datetime' %}
-          <div class="row">
-            <div class="col-sm-6">
-              <input type="date" class="form-control" name="{{ 'custom_column_' ~ c.id }}_start">
-            </div>
-            <div class="col-sm-6">
-              <input type="date" class="form-control" name="{{ 'custom_column_' ~ c.id }}_end">
-            </div>
+          <div class="book-edit-group">
+            <input type="number" step="{{ '0.01' if c.datatype == 'float' else '1' }}" class="book-edit-field" name="custom_column_{{ c.id }}_high" placeholder="To">
           </div>
-        {% elif c.datatype == 'enumeration' %}
-          <select class="form-control" name="{{ 'custom_column_' ~ c.id }}" id="{{ 'custom_column_' ~ c.id }}">
-            <option value=""></option>
-            {% for opt in c.get_display_dict().enum_values %}
-            <option value="{{ opt }}">{{ opt }}</option>
-            {% endfor %}
-          </select>
-        {% else %}
-          <input type="text" class="form-control" name="{{ 'custom_column_' ~ c.id }}" id="{{ 'custom_column_' ~ c.id }}">
-        {% endif %}
-      </div>
-      {% endfor %}
-    {% endif %}
-
-    <div style="margin-top: 20px;">
-      <button type="submit" id="adv_submit" class="btn btn-primary">{{_('Search')}}</button>
+        </div>
+      {% elif c.datatype == 'datetime' %}
+        <div class="book-edit-inline">
+          <div class="book-edit-group">
+            <input type="date" class="book-edit-field" name="custom_column_{{ c.id }}_start">
+          </div>
+          <div class="book-edit-group">
+            <input type="date" class="book-edit-field" name="custom_column_{{ c.id }}_end">
+          </div>
+        </div>
+      {% elif c.datatype == 'enumeration' %}
+        <select class="book-edit-field" name="custom_column_{{ c.id }}">
+          <option value=""></option>
+          {% for opt in c.get_display_dict().enum_values %}
+          <option value="{{ opt }}">{{ opt }}</option>
+          {% endfor %}
+        </select>
+      {% else %}
+        <input type="text" class="book-edit-field" name="custom_column_{{ c.id }}">
+      {% endif %}
     </div>
-  </form>
-</div>
-</div>
+  </div>
+</template>
+{% endfor %}
+
 {% endblock %}
 
-{% block js %}{% endblock %}
+{% block js %}
+<script>
+(function() {
+  var addBtn = document.getElementById('add-field-btn');
+  var menu = document.getElementById('field-menu');
+  var container = document.getElementById('search-fields');
+
+  function addField(fieldKey) {
+    var tpl = document.getElementById('tpl-' + fieldKey);
+    if (!tpl) return;
+
+    var clone = tpl.content.cloneNode(true);
+    var row = clone.querySelector('.search-field-row');
+
+    // Hide the menu item
+    var item = menu.querySelector('[data-field="' + fieldKey + '"]');
+    if (item) item.style.display = 'none';
+
+    // Close menu
+    menu.classList.remove('search-field-menu-open');
+
+    // Add to form
+    container.appendChild(clone);
+
+    // Trigger animation
+    requestAnimationFrame(function() {
+      row.classList.add('search-field-row-visible');
+    });
+
+    // Focus the first input/select in the new field
+    var input = row.querySelector('input, select');
+    if (input) input.focus();
+  }
+
+  // Toggle menu on button click
+  addBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    menu.classList.toggle('search-field-menu-open');
+  });
+
+  // Handle menu item clicks
+  menu.addEventListener('click', function(e) {
+    var item = e.target.closest('.search-field-menu-item');
+    if (!item) return;
+    addField(item.dataset.field);
+  });
+
+  // Handle remove buttons via delegation
+  container.addEventListener('click', function(e) {
+    var btn = e.target.closest('.search-remove-btn');
+    if (!btn) return;
+
+    var row = btn.closest('.search-field-row');
+    var fieldKey = row.dataset.field;
+
+    // Show the menu item again
+    var item = menu.querySelector('[data-field="' + fieldKey + '"]');
+    if (item) item.style.display = '';
+
+    // Remove the field row
+    row.remove();
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!addBtn.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.remove('search-field-menu-open');
+    }
+  });
+})();
+</script>
+{% endblock %}
 {% block header %}{% endblock %}
