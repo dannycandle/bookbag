@@ -57,7 +57,9 @@ Recommended to set up email config in settings for easy password resets.
 
 - Python 3.13
 - A Calibre library (`metadata.db`)
-- Optionally: Calibre Cli Tools, Kepubify (for Kobo support), ImageMagick (for cover extraction from EPUBs)
+- [Calibre CLI Tools](https://calibre-ebook.com) — for ebook conversion
+- [Kepubify](https://github.com/pgaskin/kepubify) — for Kobo support
+- [ImageMagick](https://imagemagick.org) — for cover extraction from EPUBs
 
 ## License
 
