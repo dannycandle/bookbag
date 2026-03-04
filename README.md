@@ -10,33 +10,32 @@
 
 ## About
 
-Most of us self-hosters can agree that Calibre-Web is great and offers us an alternative to the greedy corporate overloads of the ebook realm.
-
-However, we shouldn't have to choose between escaping from those tech conglomerates and having a beautiful apps that offer a great user experience.
+Bookbag is a fork of calibre-web that incorporates a complete redesign of the user interface. The goal is to make a foss alternatives to the popular proprietary ebook management apps that provides a user experience is just as good, if not better, than what they provide. We shouldn't have to choose between having beautiful, fucntional apps and supporting FOSS.
 
 ## Design Philosophy
 
-**Books first.** Cover art is large, prominent, and uncluttered. Additional metadata is available on interaction, not plastered everywhere by default.
+**Books first.** Cover art is large, prominent, and uncluttered. Additional metadata is available on interaction.
 
-**Navigation on the left.** On desktop, the left side of the screen carries the most visual weight. The most important button in a book library app should be the one that takes you to your books — not a logo.
+**User-centric navigation.** Logo-less app design. The most important button in a book library app is the one that takes you to your books — not a logo.
 
-**Removing UI redundancy.** One search. Sort controls that are clearly labeled. Information shown once, where it matters.
+**Removing UI redundancy.** A single source of truth to find what you need. Sort controls that are clearly labeled. Information shown once, where it matters.
 
-**Out of the way.** The app should serve the user's relationship with their books and should therefore be simple and easy to use
+**Second to your library.** Serves user's books and not itself.Simple, easy to use, and 
 
-**Still Powerful.** We also shouldn't have to choose between something beauitul and something powerful. By keeping the base of Calibre and Calibre-Web, Bookbag aims to retain the power of the originals, taking care to include as many features from Calibre-Web as possible.
+**Still Powerful.** Bookbag is based on Calibre and Calibre-Web and includes as many features from Calibre-Web as possible.
 
 ## What's Changed from Calibre-Web
 
 - Fresh, modern and unique design
 - Single Page Application Feel
-- Resizeable book grid 
+- Resizeable book grid
 - Instant search and filters
 - Redesigned Admin Settings page with instant save
 - Simpler advanced search UI without losing it's power
 - All backend functionality — user management, OPDS, metadata editing, eBook conversion, Kobo sync, etc. — is inherited from Calibre-Web and remains intact.
 
 ## Quick Start
+  
 Bookbag is early in development, do not install it as your production server.
 - Download and unpack files to your server/container
 - Create venv and install dependencies in requirements.txt and optionally optional-requirements.txt
@@ -55,7 +54,7 @@ Recommended to set up email config in settings for easy password resets.
 
 ## Requirements
 
-- Python 3.13
+- Python 3.8 or newer (3.12+ recommended)
 - A Calibre library (`metadata.db`)
 - [Calibre CLI Tools](https://calibre-ebook.com) — for ebook conversion
 - [Kepubify](https://github.com/pgaskin/kepubify) — for Kobo support

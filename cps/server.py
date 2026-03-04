@@ -218,9 +218,9 @@ class WebServer(object):
             log.info('Starting Gevent server on %s', output)
             # Also print to stdout so interactive terminals show a clear success message
             try:
-                print(f"Calibre-Web: server started on {output}")
+                print(f"Bookbag: server started on {output}")
             except Exception:
-                print(f"Calibre-Web: error {output}")
+                print(f"Bookbag: error {output}")
                 pass
             self.wsgiserver = WSGIServer(sock, self.app, log=self.access_logger, handler_class=MyWSGIHandler,
                                          error_log=log,
@@ -274,9 +274,9 @@ class WebServer(object):
             log.info('Starting Tornado server on %s', output)
             # Also print to stdout so interactive terminals show a clear success message
             try:
-                print(f"Calibre-Web: server started on {output}")
+                print(f"Bookbag: server started on {output}")
             except Exception:
-                print(f"Calibre-Web: error {output}")
+                print(f"Bookbag: error {output}")
                 pass
 
             self.wsgiserver = IOLoop.current()
