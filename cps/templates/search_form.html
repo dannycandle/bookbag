@@ -1,45 +1,42 @@
 {% extends "layout.html" %}
 {% block body %}
-<div id="search-wrapper">
-<div id="search-form-wrapper">
-  <h2 class="search-heading">{{title}}</h2>
-  <form role="form" id="search" action="{{ url_for('search.advanced_search_form') }}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    <div id="search-fields"></div>
+<div class="main-content">
+  <div class="books-grid" id="search-results-grid"></div>
+  <div id="search-empty-state" class="search-empty-state">
+    <p>Add filters and click Search to find books</p>
+  </div>
+  <div id="search-no-results" class="search-empty-state" style="display:none;">
+    <h2>{{_('No Results Found')}}</h2>
+    <p>Try adjusting your filters</p>
+  </div>
+  <div id="search-result-count" class="search-result-count" style="display:none;"></div>
+</div>
 
-    <div class="search-picker">
-      <button type="button" id="add-field-btn" class="search-add-btn" title="{{_('Add filter')}}">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-        <span>{{_('Add filter')}}</span>
-      </button>
-      <div id="field-menu" class="search-field-menu">
-        <div class="search-field-menu-item" data-field="title">{{_('Book Title')}}</div>
-        <div class="search-field-menu-item" data-field="authors">{{_('Author')}}</div>
-        <div class="search-field-menu-item" data-field="publisher">{{_('Publisher')}}</div>
-        <div class="search-field-menu-item" data-field="comments">{{_('Description')}}</div>
-        <div class="search-field-menu-item" data-field="publishstart">{{_('Published Date From')}}</div>
-        <div class="search-field-menu-item" data-field="publishend">{{_('Published Date To')}}</div>
-        <div class="search-field-menu-item" data-field="read_status">{{_('Read Status')}}</div>
-        <div class="search-field-menu-item" data-field="include_tag">{{_('Include Tags')}}</div>
-        <div class="search-field-menu-item" data-field="exclude_tag">{{_('Exclude Tags')}}</div>
-        <div class="search-field-menu-item" data-field="include_serie">{{_('Include Series')}}</div>
-        <div class="search-field-menu-item" data-field="exclude_serie">{{_('Exclude Series')}}</div>
-        <div class="search-field-menu-item" data-field="ratinghigh">{{_('Rating Above')}}</div>
-        <div class="search-field-menu-item" data-field="ratinglow">{{_('Rating Below')}}</div>
-        {% for c in cc %}
-        <div class="search-field-menu-item" data-field="custom_column_{{ c.id }}">{{ c.name }}</div>
-        {% endfor %}
+<div id="book-popover">
+  <div id="book-popover-arrow"></div>
+  <button id="popover-close" type="button" aria-label="Close">&times;</button>
+  <h3 id="popover-title"></h3>
+  <h4 id="popover-author"></h4>
+  <p id="popover-rating"></p>
+  <p id="popover-description"></p>
+  <div id="popover-actions">
+    <button id="popover-read-btn" href="#">
+      <div id="read-btn-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M232,48H160a40,40,0,0,0-32,16A40,40,0,0,0,96,48H24a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h72a8,8,0,0,0,8-8V56A8,8,0,0,0,232,48ZM96,192H32V64H96a24,24,0,0,1,24,24V200A39.81,39.81,0,0,0,96,192Zm128,0H160a39.81,39.81,0,0,0-24,8V88a24,24,0,0,1,24-24h64Z"></path></svg>
       </div>
-    </div>
-
-    <div class="search-submit">
-      <button type="submit" id="adv_submit" class="detail-action-btn detail-action-btn-primary">{{_('Search')}}</button>
-    </div>
-  </form>
+      Read Now
+    </button>
+    <button id="popover-details-btn" href="#">
+      Details
+      <div id="details-btn-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+      </div>
+    </button>
+  </div>
 </div>
-</div>
 
+<!-- Field templates for the sidebar form -->
 <template id="tpl-title">
   <div class="search-field-row" data-field="title">
     <button type="button" class="search-remove-btn" title="{{_('Remove')}}">&times;</button>
@@ -246,72 +243,262 @@
 {% block js %}
 <script>
 (function() {
+  // --- Sidebar form: add/remove fields ---
   var addBtn = document.getElementById('add-field-btn');
   var menu = document.getElementById('field-menu');
   var container = document.getElementById('search-fields');
+  var form = document.getElementById('adv-search-form');
 
   function addField(fieldKey) {
     var tpl = document.getElementById('tpl-' + fieldKey);
     if (!tpl) return;
-
     var clone = tpl.content.cloneNode(true);
     var row = clone.querySelector('.search-field-row');
-
-    // Hide the menu item
     var item = menu.querySelector('[data-field="' + fieldKey + '"]');
     if (item) item.style.display = 'none';
-
-    // Close menu
     menu.classList.remove('search-field-menu-open');
-
-    // Add to form
     container.appendChild(clone);
-
-    // Trigger animation
-    requestAnimationFrame(function() {
-      row.classList.add('search-field-row-visible');
-    });
-
-    // Focus the first input/select in the new field
+    requestAnimationFrame(function() { row.classList.add('search-field-row-visible'); });
     var input = row.querySelector('input, select');
     if (input) input.focus();
   }
 
-  // Toggle menu on button click
   addBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     menu.classList.toggle('search-field-menu-open');
   });
 
-  // Handle menu item clicks
   menu.addEventListener('click', function(e) {
     var item = e.target.closest('.search-field-menu-item');
     if (!item) return;
     addField(item.dataset.field);
   });
 
-  // Handle remove buttons via delegation
   container.addEventListener('click', function(e) {
     var btn = e.target.closest('.search-remove-btn');
     if (!btn) return;
-
     var row = btn.closest('.search-field-row');
     var fieldKey = row.dataset.field;
-
-    // Show the menu item again
     var item = menu.querySelector('[data-field="' + fieldKey + '"]');
     if (item) item.style.display = '';
-
-    // Remove the field row
     row.remove();
   });
 
-  // Close menu when clicking outside
   document.addEventListener('click', function(e) {
     if (!addBtn.contains(e.target) && !menu.contains(e.target)) {
       menu.classList.remove('search-field-menu-open');
     }
   });
+
+  // --- AJAX search ---
+  var grid = document.getElementById('search-results-grid');
+  var emptyState = document.getElementById('search-empty-state');
+  var noResults = document.getElementById('search-no-results');
+  var resultCount = document.getElementById('search-result-count');
+  var csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+  function collectFormData() {
+    var data = {};
+    var fields = container.querySelectorAll('.search-field-row');
+    fields.forEach(function(row) {
+      var inputs = row.querySelectorAll('input, select');
+      inputs.forEach(function(input) {
+        var name = input.name;
+        if (!name) return;
+        if (input.tagName === 'SELECT' && input.multiple) {
+          var selected = Array.from(input.selectedOptions).map(function(o) { return o.value; });
+          if (selected.length) data[name] = selected;
+        } else if (input.value) {
+          data[name] = input.value;
+        }
+      });
+    });
+    return data;
+  }
+
+  function stripTags(html) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return (tmp.textContent || tmp.innerText || '').substring(0, 200);
+  }
+
+  function renderResults(books) {
+    grid.innerHTML = '';
+    emptyState.style.display = 'none';
+    noResults.style.display = 'none';
+    resultCount.style.display = 'none';
+
+    if (!books.length) {
+      noResults.style.display = '';
+      return;
+    }
+
+    resultCount.textContent = books.length + ' result' + (books.length !== 1 ? 's' : '');
+    resultCount.style.display = '';
+
+    books.forEach(function(book) {
+      var div = document.createElement('div');
+      div.className = 'book-cover';
+      div.dataset.bookId = book.id;
+      div.dataset.title = book.title;
+      div.dataset.sortTitle = book.sort || '';
+      div.dataset.author = book.authors;
+      div.dataset.authorSort = book.author_sort || '';
+      div.dataset.rating = book.rating || '';
+      div.dataset.description = stripTags(book.description);
+      div.dataset.format = book.format;
+      div.dataset.readUrl = book.read_url;
+      div.dataset.detailUrl = book.detail_url;
+      div.dataset.tags = (book.tags || []).join('||');
+      div.dataset.languages = (book.languages || []).join('||');
+      div.dataset.series = (book.series || []).join('||');
+      div.dataset.publishers = (book.publishers || []).join('||');
+      div.dataset.pubdate = book.pubdate || '';
+      div.dataset.timestamp = book.timestamp || '';
+
+      var img = document.createElement('img');
+      img.src = book.cover_url;
+      img.alt = book.title;
+      img.loading = 'lazy';
+      img.onerror = function() {
+        this.style.display = 'none';
+        this.nextElementSibling.style.display = 'flex';
+      };
+      div.appendChild(img);
+
+      var fallback = document.createElement('div');
+      fallback.className = 'book-cover-fallback';
+      fallback.style.display = 'none';
+      var titleSpan = document.createElement('span');
+      titleSpan.className = 'book-cover-fallback-title';
+      titleSpan.textContent = book.title;
+      var authorSpan = document.createElement('span');
+      authorSpan.className = 'book-cover-fallback-author';
+      authorSpan.textContent = book.authors;
+      fallback.appendChild(titleSpan);
+      fallback.appendChild(authorSpan);
+      div.appendChild(fallback);
+
+      grid.appendChild(div);
+    });
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var data = collectFormData();
+    var submitBtn = document.getElementById('adv_submit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Searching...';
+
+    fetch('{{ url_for("search.ajax_advanced_search") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify(data)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      renderResults(result.books);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Search';
+    })
+    .catch(function(err) {
+      console.error('Search failed:', err);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Search';
+    });
+  });
+
+  // --- Popover ---
+  var popover = document.getElementById('book-popover');
+  var overlay = document.getElementById('popover-overlay');
+  var activeCard = null;
+
+  function showPopover(cover) {
+    document.querySelector('.main-content-wrapper').style.overflowY = 'hidden';
+    document.getElementById('popover-title').textContent = cover.dataset.title || '';
+    document.getElementById('popover-author').textContent = cover.dataset.author || '';
+    var rating = cover.dataset.rating;
+    document.getElementById('popover-rating').textContent = rating ? '\u2605 ' + parseFloat(rating).toFixed(1) + ' / 5' : '';
+    document.getElementById('popover-description').textContent = cover.dataset.description || '';
+
+    var readBtn = document.getElementById('popover-read-btn');
+    var detailsBtn = document.getElementById('popover-details-btn');
+    var readUrl = cover.dataset.readUrl;
+    if (readUrl) {
+      readBtn.style.display = '';
+      readBtn.onclick = function() { window.location.href = readUrl; };
+    } else {
+      readBtn.style.display = 'none';
+    }
+    detailsBtn.onclick = function() {
+      var detailUrl = cover.dataset.detailUrl;
+      if (detailUrl) window.location.href = detailUrl;
+    };
+
+    popover.classList.remove('arrow-right');
+    popover.style.visibility = 'hidden';
+    popover.style.display = 'block';
+
+    var pw = popover.offsetWidth;
+    var ph = popover.offsetHeight;
+    var rect = cover.getBoundingClientRect();
+    var gap = 12;
+    var left = rect.right + gap;
+    if (left + pw > window.innerWidth - 8) {
+      left = rect.left - gap - pw;
+      popover.classList.add('arrow-right');
+    }
+    var top = rect.top + rect.height / 2 - ph / 2;
+    top = Math.max(8, Math.min(top, window.innerHeight - ph - 8));
+
+    popover.style.top = top + 'px';
+    popover.style.left = left + 'px';
+    popover.style.visibility = '';
+    popover.classList.remove('animating');
+    void popover.offsetWidth;
+    popover.classList.add('animating');
+
+    activeCard = cover;
+    overlay.style.display = 'block';
+    activeCard.style.position = 'relative';
+    activeCard.style.zIndex = '51';
+  }
+
+  function hidePopover() {
+    document.querySelector('.main-content-wrapper').style.overflowY = '';
+    popover.style.display = 'none';
+    overlay.style.display = 'none';
+    if (activeCard) {
+      activeCard.style.position = '';
+      activeCard.style.zIndex = '';
+    }
+    activeCard = null;
+  }
+
+  grid.addEventListener('click', function(e) {
+    var cover = e.target.closest('.book-cover');
+    if (cover) {
+      if (activeCard === cover) { hidePopover(); }
+      else { showPopover(cover); }
+      e.stopPropagation();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (activeCard && !popover.contains(e.target)) hidePopover();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') hidePopover();
+  });
+
+  var closeBtn = document.getElementById('popover-close');
+  if (closeBtn) closeBtn.addEventListener('click', hidePopover);
+
+  popover.addEventListener('click', function(e) { e.stopPropagation(); });
 })();
 </script>
 {% endblock %}

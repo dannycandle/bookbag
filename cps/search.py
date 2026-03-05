@@ -17,7 +17,7 @@
 import json
 from datetime import datetime
 
-from flask import Blueprint, request, redirect, url_for, flash
+from flask import Blueprint, request, redirect, url_for, flash, jsonify
 from flask import session as flask_session
 from .cw_login import current_user
 from flask_babel import format_date
@@ -61,6 +61,121 @@ def advanced_search():
         values[param] = list(request.form.getlist(param))
     flask_session['query'] = json.dumps(values)
     return redirect(url_for('web.books_list', data="advsearch", sort_param='stored', query=""))
+
+
+@search.route("/ajax/advsearch", methods=['POST'])
+@login_required_if_no_ano
+def ajax_advanced_search():
+    term = request.get_json() or {}
+    # Normalize multi-select fields to lists
+    params = ['include_tag', 'exclude_tag', 'include_serie', 'exclude_serie', 'include_shelf', 'exclude_shelf',
+              'include_language', 'exclude_language', 'include_extension', 'exclude_extension']
+    for param in params:
+        if param not in term:
+            term[param] = []
+        elif not isinstance(term[param], list):
+            term[param] = [term[param]]
+
+    results = _build_adv_search_query(term)
+    books = []
+    for entry in results:
+        book = entry.Books
+        books.append({
+            'id': book.id,
+            'title': book.title,
+            'sort': book.sort,
+            'authors': ', '.join(a.name for a in book.authors) if book.authors else '',
+            'author_sort': book.author_sort or '',
+            'rating': (book.ratings[0].rating / 2) if book.ratings else None,
+            'description': book.comments[0].text if book.comments else '',
+            'format': book.data[0].format if book.data else '',
+            'tags': [t.name for t in book.tags] if book.tags else [],
+            'series': [s.name for s in book.series] if book.series else [],
+            'publishers': [p.name for p in book.publishers] if book.publishers else [],
+            'languages': [l.lang_code for l in book.languages] if book.languages else [],
+            'pubdate': str(book.pubdate) if book.pubdate else '',
+            'timestamp': str(book.timestamp) if book.timestamp else '',
+            'cover_url': url_for('web.get_cover', book_id=book.id, resolution='og'),
+            'read_url': url_for('web.read_book', book_id=book.id, book_format=book.data[0].format) if book.data else '',
+            'detail_url': url_for('web.show_book', book_id=book.id),
+        })
+    return jsonify({'books': books, 'count': len(books)})
+
+
+def _build_adv_search_query(term):
+    """Build and execute advanced search query, returning list of result rows."""
+    cc = calibre_db.get_cc_columns(config, filter_config_custom_read=True)
+    calibre_db.create_functions()
+    query = calibre_db.generate_linked_query(config.config_read_column, db.Books)
+    q = query.outerjoin(db.books_series_link, db.Books.id == db.books_series_link.c.book)\
+        .outerjoin(db.Series)\
+        .filter(calibre_db.common_filters(True))
+
+    tags = dict()
+    elements = ['tag', 'serie', 'shelf', 'language', 'extension']
+    for element in elements:
+        tags['include_' + element] = term.get('include_' + element)
+        tags['exclude_' + element] = term.get('exclude_' + element)
+
+    author_name = term.get("authors")
+    book_title = term.get("title")
+    publisher = term.get("publisher")
+    pub_start = term.get("publishstart")
+    pub_end = term.get("publishend")
+    rating_low = term.get("ratinghigh")
+    rating_high = term.get("ratinglow")
+    description = term.get("comments")
+    read_status = term.get("read_status", "Any")
+    if author_name:
+        author_name = strip_whitespaces(author_name).lower().replace(',', '|')
+    if book_title:
+        book_title = strip_whitespaces(book_title).lower()
+    if publisher:
+        publisher = strip_whitespaces(publisher).lower()
+
+    cc_present = False
+    for c in cc:
+        if c.datatype == "datetime":
+            if term.get('custom_column_' + str(c.id) + '_start') or term.get('custom_column_' + str(c.id) + '_end'):
+                cc_present = True
+        elif c.datatype in ["int", "float"]:
+            if term.get('custom_column_' + str(c.id) + '_low') or term.get('custom_column_' + str(c.id) + '_high'):
+                cc_present = True
+        elif c.datatype == "bool":
+            if term.get('custom_column_' + str(c.id)) != "Any":
+                cc_present = True
+        elif term.get('custom_column_' + str(c.id)):
+            cc_present = True
+
+    if any(tags.values()) or author_name or book_title or publisher or pub_start or pub_end or rating_low \
+       or rating_high or description or cc_present or read_status != "Any":
+        if author_name:
+            q = q.filter(db.Books.authors.any(func.lower(db.Authors.name).ilike("%" + author_name + "%")))
+        if book_title:
+            q = q.filter(func.lower(db.Books.title).ilike("%" + book_title + "%"))
+        if pub_start:
+            q = q.filter(func.datetime(db.Books.pubdate) > func.datetime(pub_start))
+        if pub_end:
+            q = q.filter(func.datetime(db.Books.pubdate) < func.datetime(pub_end))
+        if read_status != "Any":
+            q = q.filter(adv_search_read_status(read_status))
+        if publisher:
+            q = q.filter(db.Books.publishers.any(func.lower(db.Publishers.name).ilike("%" + publisher + "%")))
+        q = adv_search_tag(q, tags['include_tag'], tags['exclude_tag'])
+        q = adv_search_serie(q, tags['include_serie'], tags['exclude_serie'])
+        q = adv_search_shelf(q, tags['include_shelf'], tags['exclude_shelf'])
+        q = adv_search_extension(q, tags['include_extension'], tags['exclude_extension'])
+        q = adv_search_language(q, tags['include_language'], tags['exclude_language'])
+        q = adv_search_ratings(q, rating_high, rating_low)
+        if description:
+            q = q.filter(db.Books.comments.any(func.lower(db.Comments.text).ilike("%" + description + "%")))
+        try:
+            q = adv_search_custom_columns(cc, term, q)
+        except AttributeError as ex:
+            log.debug_or_exception(ex)
+
+    q = q.order_by(db.Books.sort).all()
+    return calibre_db.order_authors(q, list_return=True, combined=True)
 
 
 @search.route("/advsearch", methods=['GET'])
@@ -208,7 +323,12 @@ def extend_search_term(searchterm,
                        rating_low,
                        read_status,
                        ):
-    searchterm.extend((author_name.replace('|', ','), book_title, publisher))
+    if author_name:
+        searchterm.append("Author: " + author_name.replace('|', ','))
+    if book_title:
+        searchterm.append("Title: " + book_title)
+    if publisher:
+        searchterm.append("Publisher: " + publisher)
     if pub_start:
         try:
             searchterm.extend([_("Published after ") +
@@ -279,7 +399,7 @@ def render_adv_search_results(term, offset=None, order=None, limit=None):
     rating_low = term.get("ratinghigh")
     rating_high = term.get("ratinglow")
     description = term.get("comments")
-    read_status = term.get("read_status")
+    read_status = term.get("read_status", "Any")
     if author_name:
         author_name = strip_whitespaces(author_name).lower().replace(',', '|')
     if book_title:

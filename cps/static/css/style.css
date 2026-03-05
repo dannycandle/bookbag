@@ -344,6 +344,16 @@ details[open] .user-popover-menu {
     max-height: calc(100vh - 140px);
 }
 
+.advsearch .sidebar {
+    width: 400px;
+}
+
+.advsearch .side-wrapper {
+    flex: 1;
+    max-height: none;
+    min-height: 0;
+}
+
 
 .set-cat {font-size:15px}
 
@@ -1073,35 +1083,40 @@ or design guidelines. I am in the process of updating them. */
 
 /* Advanced Search Page */
 
-#search-wrapper {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    min-height: 85vh;
-    padding: 40px 20px;
-    background-color: rgba(255, 255, 255, 0.99);
-}
-
-#search-form-wrapper {
-    padding: 40px;
-    border-radius: 20px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
-    width: 100%;
-    max-width: 680px;
-}
-
-.search-heading {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #581C1C;
-    margin-bottom: 28px;
-}
-
-#search-form-wrapper select[multiple].book-edit-field {
+.admin-section-body select[multiple].book-edit-field,
+#search-sidebar select[multiple].book-edit-field {
     height: auto;
     min-height: 120px;
     padding: 6px;
+}
+
+.search-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    color: #8A5353;
+    text-align: center;
+}
+
+.search-empty-state h2 {
+    margin: 0 0 8px 0;
+    color: #581C1C;
+}
+
+.search-empty-state p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.search-result-count {
+    padding: 15px 20px;
+    font-size: 0.85rem;
+    color: #8A5353;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .search-picker {
