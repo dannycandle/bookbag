@@ -17,6 +17,13 @@ var reader;
         reader.rendition.themes.register(theme, themes[theme].css_path);
     });
 
+    // Re-apply reader style overrides on each new page load
+    reader.rendition.hooks.content.register(function (contents) {
+        if (contents.document && window._injectReaderCSS) {
+            window._injectReaderCSS(contents.document);
+        }
+    });
+
     if (calibre.useBookmarks) {
         reader.on("reader:bookmarked", updateBookmark.bind(reader, "add"));
         reader.on("reader:unbookmarked", updateBookmark.bind(reader, "remove"));
@@ -24,97 +31,48 @@ var reader;
         $("#bookmark, #show-Bookmarks").remove();
     }
 
-    // Enable swipe support
-    // I have no idea why swiperRight/swiperLeft from plugins is not working, events just don't get fired
+    // Swipe support
     var touchStart = 0;
-    var touchEnd = 0;
-
     reader.rendition.on('touchstart', function(event) {
         touchStart = event.changedTouches[0].screenX;
     });
     reader.rendition.on('touchend', function(event) {
-      touchEnd = event.changedTouches[0].screenX;
+        var touchEnd = event.changedTouches[0].screenX;
+        var rtl = reader.book.package.metadata.direction === "rtl";
         if (touchStart < touchEnd) {
-            if(reader.book.package.metadata.direction === "rtl") {
-    			reader.rendition.next();
-    		} else {
-    			reader.rendition.prev();
-    		}
-            // Swiped Right
-        }
-        if (touchStart > touchEnd) {
-            if(reader.book.package.metadata.direction === "rtl") {
-    			reader.rendition.prev();
-    		} else {
-                reader.rendition.next();
-    		}
-            // Swiped Left
+            rtl ? reader.rendition.next() : reader.rendition.prev();
+        } else if (touchStart > touchEnd) {
+            rtl ? reader.rendition.prev() : reader.rendition.next();
         }
     });
 
-    // Update progress percentage
-    let progressDiv = document.getElementById("progress");
-    // Pages counter (virtual pages via EPUB locations)
-    let pagesDiv = document.getElementById("pages-count");
-    // Honor saved visibility preference for pages counter
-    (function () {
-        try {
-            var pref = localStorage.getItem("calibre.reader.showPages");
-            var show = pref === null ? true : pref === "true";
-            if (pagesDiv)
-                pagesDiv.style.visibility = show ? "visible" : "hidden";
-        } catch (e) {}
-    })();
+    var progressDiv = document.getElementById("progress");
+    var pagesDiv = document.getElementById("pages-count");
 
     reader.book.ready.then(() => {
-        let locations_key = reader.book.key() + "-locations";
-        // Key to persist last-read position for this book in localStorage
-        let position_key = "calibre.reader.position." + reader.book.key();
-        let stored_locations = localStorage.getItem(locations_key);
-        let make_locations, save_locations;
-        if (stored_locations) {
-            make_locations = Promise.resolve(
-                reader.book.locations.load(stored_locations)
-            );
-            // No-op because locations are already saved
-            save_locations = () => {};
-        } else {
-            make_locations = reader.book.locations.generate();
-            save_locations = () => {
-                localStorage.setItem(
-                    locations_key,
-                    reader.book.locations.save()
-                );
-            };
-        }
+        var locations_key = reader.book.key() + "-locations";
+        var position_key = "calibre.reader.position." + reader.book.key();
+        var stored = localStorage.getItem(locations_key);
+        var make_locations = stored
+            ? Promise.resolve(reader.book.locations.load(stored))
+            : reader.book.locations.generate();
+        var save_locations = stored ? () => {} : () => {
+            localStorage.setItem(locations_key, reader.book.locations.save());
+        };
+
         make_locations
             .then(() => {
-                // Try to restore last position (CFI) from localStorage if present
+                // Restore last reading position
                 try {
-                    var _savedPos = localStorage.getItem(position_key);
-                    if (_savedPos) {
-                        try {
-                            var _posObj = JSON.parse(_savedPos);
-                            if (_posObj && _posObj.cfi) {
-                                // Display the saved CFI location
-                                try {
-                                    reader.rendition.display(_posObj.cfi);
-                                } catch (e) {}
-                            }
-                        } catch (e) {}
-                    }
+                    var pos = JSON.parse(localStorage.getItem(position_key));
+                    if (pos && pos.cfi) reader.rendition.display(pos.cfi);
                 } catch (e) {}
 
                 reader.rendition.on("relocated", (location) => {
-                    let percentage = Math.round(location.end.percentage * 100);
-                    progressDiv.textContent = percentage + "%";
+                    progressDiv.textContent = Math.round(location.end.percentage * 100) + "%";
 
-                    // Pages based on generated EPUB locations (CFI positions)
-                    const cfi = location.start.cfi;
-                    const current =
-                        reader.book.locations.locationFromCfi(cfi) || 0; // 1-based index typically
-                    const total = reader.book.locations.length() || 0;
-
+                    var current = reader.book.locations.locationFromCfi(location.start.cfi) || 0;
+                    var total = reader.book.locations.length() || 0;
                     if (total > 0) {
                         pagesDiv.textContent = current + "/" + total;
                         pagesDiv.style.visibility = "visible";
@@ -123,16 +81,11 @@ var reader;
                         pagesDiv.style.visibility = "hidden";
                     }
 
-                    // Persist last position (CFI + percentage) to localStorage so reader can restore on next open
                     try {
-                        var posObj = {
+                        localStorage.setItem(position_key, JSON.stringify({
                             cfi: location.start.cfi,
                             percentage: location.start.percentage,
-                        };
-                        localStorage.setItem(
-                            position_key,
-                            JSON.stringify(posObj)
-                        );
+                        }));
                     } catch (e) {}
                 });
                 reader.rendition.reportLocation();
@@ -141,27 +94,13 @@ var reader;
             .then(save_locations);
     });
 
-    /**
-     * @param {string} action - Add or remove bookmark
-     * @param {string|int} location - Location or zero
-     */
     function updateBookmark(action, location) {
-        // Remove other bookmarks (there can only be one)
         if (action === "add") {
-            this.settings.bookmarks
-                .filter(function (bookmark) {
-                    return bookmark && bookmark !== location;
-                })
-                .map(
-                    function (bookmark) {
-                        this.removeBookmark(bookmark);
-                    }.bind(this)
-                );
+            this.settings.bookmarks.forEach(function (bookmark) {
+                if (bookmark && bookmark !== location) this.removeBookmark(bookmark);
+            }.bind(this));
         }
-
         var csrftoken = $("input[name='csrf_token']").val();
-
-        // Save to database
         $.ajax(calibre.bookmarkUrl, {
             method: "post",
             data: { bookmark: location || "" },
@@ -171,20 +110,22 @@ var reader;
         });
     }
 
-    // Default settings load
-    const theme = localStorage.getItem("calibre.reader.theme") ?? "lightTheme";
+    // Restore settings
+    var theme = localStorage.getItem("calibre.reader.theme") ?? "lightTheme";
     selectTheme(theme);
 
-    // Restore saved font and font size after reader is ready
     reader.book.ready.then(() => {
-        const savedFontSize = localStorage.getItem("calibre.reader.fontSize");
-        if (savedFontSize) {
-            reader.rendition.themes.fontSize(`${savedFontSize}%`);
-        }
-
-        const savedFont = localStorage.getItem("calibre.reader.font");
-        if (savedFont && window.selectFont) {
-            window.selectFont(savedFont);
-        }
+        var s;
+        if (s = localStorage.getItem("calibre.reader.fontSize"))
+            reader.rendition.themes.fontSize(s + "%");
+        if (s = localStorage.getItem("calibre.reader.fontWeight"))
+            window._readerFontWeight = s;
+        if (s = localStorage.getItem("calibre.reader.textAlign"))
+            window._readerTextAlign = s;
+        s = localStorage.getItem("calibre.reader.font");
+        if (s === "default") s = "Inter";
+        if (s && window.selectFont) window.selectFont(s);
+        if (s = localStorage.getItem("calibre.reader.lineSpacing"))
+            reader.rendition.themes.override("line-height", s, true);
     });
 })();

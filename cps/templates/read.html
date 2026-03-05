@@ -1,146 +1,132 @@
 <!DOCTYPE html>
 <html class="no-js">
-
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{{_('epub Reader')}} | {{title}}</title>
-    <meta name="description" content="">
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     {% if g.google_site_verification|length > 0 %}
     <meta name="google-site-verification" content="{{g.google_site_verification}}">
     {% endif %}
     <link rel="apple-touch-icon" sizes="140x140" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=Inter:300,400,500,700|Literata:300,400,400i,700,700i|Merriweather:300,400,400i,700,700i|Lora:300,400,400i,700,700i|Source+Sans+3:300,400,400i,700,700i|Zilla+Slab:300,400,400i,700,700i&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reader.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/epub_themes.css') }}">
 </head>
-
 <body>
     <script>localStorage.setItem('lastBookUrl', window.location.pathname);</script>
     <div id="sidebar">
         <div id="panels">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <!--input id="searchBox" placeholder="search" type="search"-->
-
-            <!--a id="show-Search" class="show_view icon-search" data-view="Search">Search</a-->
-            <a id="show-Toc" class="show_view icon-list-1 active" data-view="Toc">TOC</a>
-            <a id="show-Bookmarks" class="show_view icon-bookmark" data-view="Bookmarks">Bookmarks</a>
-            <a id="back-button" data-view="Back to Books" href="{{ url_for('web.index') }}">Books</a>            
-            <!--a id="show-Notes" class="show_view icon-edit" data-view="Notes">Notes</a-->
-
+            <div class="panel-tabs">
+              <a id="show-Toc" class="show_view active" data-view="Toc"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M88,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H96A8,8,0,0,1,88,64Zm128,56H96a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H96a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM56,56H40a8,8,0,0,0,0,16H56a8,8,0,0,0,0-16Zm0,64H40a8,8,0,0,0,0,16H56a8,8,0,0,0,0-16Zm0,64H40a8,8,0,0,0,0,16H56a8,8,0,0,0,0-16Z"></path></svg>Contents</a>
+              <a id="show-Bookmarks" class="show_view" data-view="Bookmarks"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M192,24H96A16,16,0,0,0,80,40V56H64A16,16,0,0,0,48,72V224a8,8,0,0,0,12.65,6.51L112,193.83l51.36,36.68A8,8,0,0,0,176,224V184.69l19.35,13.82A8,8,0,0,0,208,192V40A16,16,0,0,0,192,24ZM160,208.46l-43.36-31a8,8,0,0,0-9.3,0L64,208.45V72h96Zm32-32L176,165V72a16,16,0,0,0-16-16H96V40h96Z"></path></svg>Bookmarks</a>
+            </div>
         </div>
-        <div id="tocView" class="view">
-        </div>
-        <!--div id="searchView" class="view">
-          <ul id="searchResults"></ul>
-        </div-->
+        <div id="tocView" class="view active"></div>
         <div id="bookmarksView" class="view">
             <ul id="bookmarks"></ul>
+            <div id="bookmarks-empty" class="blank-state">No bookmarks</div>
         </div>
-        <!--div id="notesView" class="view">
-          <div id="new-note">
-            <textarea id="note-text"></textarea>
-            <button id="note-anchor">Anchor</button>
-          </div>
-          <ol id="notes"></ol>
-        </div-->
     </div>
     <div id="main">
         <div id="titlebar">
             <div id="opener">
-                <a id="slider" class="icon-menu">Menu</a>
+                <a id="back-btn" href="{{ url_for('web.index') }}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path></svg></a>
             </div>
             <div id="metainfo">
-	            <span id="book-title"></span>
-	            <span id="title-seperator">&nbsp;&nbsp;–&nbsp;&nbsp;</span>
-	            <span id="chapter-title"></span>
-	        </div>
-	        <div id="title-controls">
-	            <a id="bookmark" class="icon-bookmark-empty">Bookmark</a>
-	            <a id="setting" class="icon-cog">Settings</a>
-	            <a id="fullscreen" class="icon-resize-full">Fullscreen</a>            
-	        </div>
-	    </div>
-
-	    <div id="divider"></div>
-	    <div id="prev" class="arrow">‹</div>
-	    <div id="viewer"></div>
-	    <div id="next" class="arrow">›</div>
+                <span id="book-title"></span>
+                <span id="title-seperator">&nbsp;&nbsp;–&nbsp;&nbsp;</span>
+                <span id="chapter-title"></span>
+            </div>
+            <div id="title-controls">
+                <a id="bookmark" class="icon-bookmark-empty"><svg class="bookmark-outline" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"></path></svg><svg class="bookmark-filled" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Z"></path></svg></a>
+                <a id="setting" class="icon-cog"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M64,105V40a8,8,0,0,0-16,0v65a32,32,0,0,0,0,62v49a8,8,0,0,0,16,0V167a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,56,152Zm80-95V40a8,8,0,0,0-16,0V57a32,32,0,0,0,0,62v97a8,8,0,0,0,16,0V119a32,32,0,0,0,0-62Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,128,104Zm104,64a32.06,32.06,0,0,0-24-31V40a8,8,0,0,0-16,0v97a32,32,0,0,0,0,62v17a8,8,0,0,0,16,0V199A32.06,32.06,0,0,0,232,168Zm-32,16a16,16,0,1,1,16-16A16,16,0,0,1,200,184Z"></path></svg></a>
+                <a id="fullscreen" class="icon-resize-full"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V96a8,8,0,0,1-16,0V67.31l-50.34,50.35a8,8,0,0,1-11.32-11.32L188.69,56H160a8,8,0,0,1,0-16h48A8,8,0,0,1,216,48ZM106.34,138.34,56,188.69V160a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16H67.31l50.35-50.34a8,8,0,0,0-11.32-11.32Z"></path></svg></a>
+                <a id="slider" class="icon-menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128ZM128,72a12,12,0,1,0-12-12A12,12,0,0,0,128,72Zm0,112a12,12,0,1,0,12,12A12,12,0,0,0,128,184Z"></path></svg></a>
+            </div>
+        </div>
+        <div id="prev" class="arrow"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path></svg></div>
+        <div id="viewer"></div>
+        <div id="next" class="arrow"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path></svg></div>
         <div class="read-footer">
             <div id="pages-count"></div>
             <div id="progress">0%</div>
         </div>
-        <div id="loader">
-            <img src="{{ url_for('static', filename='img/loader.gif') }}">
-        </div>
+        <div id="loader"><img src="{{ url_for('static', filename='img/loader.gif') }}"></div>
     </div>
     <div class="modal md-effect-1" id="settings-modal">
         <div class="md-content">
-            <h3>{{_('Settings')}}</h3>
+            <h3>{{_('Customize')}}</h3>
             <div class="form-group themes" id="themes">
-                {{_('Choose a theme below:')}}<br />
-
-          <!-- Hardcoded a tick in the light theme button because it is the "default" theme. Need to find a way to do this dynamically on startup-->
-                <button type="button" id="lightTheme" class="lightTheme" onclick="selectTheme(this.id)"><span
-                        id="lightSelected">✓</span>{{_('Light')}}</button>
-                <button type="button" id="darkTheme" class="darkTheme" onclick="selectTheme(this.id)"><span
-                        id="darkSelected"> </span>{{_('Dark')}}</button>
-                <button type="button" id="sepiaTheme" class="sepiaTheme" onclick="selectTheme(this.id)"><span
-                        id="sepiaSelected"> </span>{{_('Sepia')}}</button>
-                <button type="button" id="amberTheme" class="amberTheme" onclick="selectTheme(this.id)"><span
-                        id="amberSelected"> </span>{{_('Amber')}}</button>
-                <button type="button" id="blackTheme" class="blackTheme" onclick="selectTheme(this.id)"><span
-                        id="blackSelected"> </span>{{_('Black')}}</button>
-
-          <!-- Custom theme: color input + pickr -->
-          <div id="customThemeWrapper" style="display: inline-flex; align-items: center;gap: 8px;margin: 5px 8px;">Custom:
-            <!-- Picker-only UI: swatch acts as the picker button, and a small span shows selection tick -->
-            <div id="customThemeSwatch" title="Pick color" style="width: 30px; height: 30px; border: 1px solid #ccc; border-radius: 3px;cursor: pointer;"></div>
-            <span id="customSelected"> </span>
-          </div>
-        </div>
-            <div class="form-group">
-                <p>
-                    <input type="checkbox" id="sidebarReflow"
-                        name="sidebarReflow">{{_('Reflow text when sidebars are open.')}}
-                </p>
+                <div class="theme-swatches">
+                <button type="button" id="lightTheme" class="theme-swatch lightTheme active" onclick="selectTheme(this.id)" title="Light"></button>
+                <button type="button" id="sepiaTheme" class="theme-swatch sepiaTheme" onclick="selectTheme(this.id)" title="Sepia"></button>
+                <button type="button" id="amberTheme" class="theme-swatch amberTheme" onclick="selectTheme(this.id)" title="Amber"></button>
+                <button type="button" id="darkTheme" class="theme-swatch darkTheme" onclick="selectTheme(this.id)" title="Dark"></button>
+                <button type="button" id="blackTheme" class="theme-swatch blackTheme" onclick="selectTheme(this.id)" title="Black"></button>
+                </div>
             </div>
-        <div class="form-group">
-          <p>
-            <input type="checkbox" id="showPagesCount" name="showPagesCount"/>{{_('Show pages count')}}
-          </p>
-        </div>
-        <div class="form-group fontSizeWrapper">
-          <label>{{ _('Font Size') }}</label>
-          <div class="font-size-controls" style="display: flex;align-items: center;gap: 10px;margin-top: 2px;">
-          <button type="button" id="fontSizeDecrease" style="padding: 8px 15px; font-size: 18px; cursor: pointer">−</button>
-            <span id="fontSizeDisplay" style="min-width: 60px;text-align: center;font-size: 14px;font-weight: bold;">100%</span>
-            <button type="button" id="fontSizeIncrease" style="padding: 8px 15px; font-size: 18px; cursor: pointer">+</button>
-          </div>
-        </div>
-              <div class="font" id="font">
-                <label class="item">{{_('Font')}}:</label>
-                <button type="button" id="default" onclick="selectFont(this.id)"><span>✓</span>{{_('Default')}}</button> 
-                <button type="button" id="Yahei" onclick="selectFont(this.id)"><span></span>{{_('Yahei')}}</button>
-                <button type="button" id="SimSun" onclick="selectFont(this.id)"><span></span>{{_('SimSun')}}</button>
-                <button type="button" id="KaiTi" onclick="selectFont(this.id)"><span></span>{{_('KaiTi')}}</button>
-                <button type="button" id="Arial" onclick="selectFont(this.id)"><span></span>{{_('Arial')}}</button>
+            <div class="form-group font-group">
+              <div class="font-size-controls">
+                <button type="button" id="fontSizeDecrease">−</button>
+                <input type="text" id="fontSizeDisplay" value="100%" />
+                <button type="button" id="fontSizeIncrease">+</button>
               </div>
-              <div class="layou" id="layout">
-                <label class="item">{{ _('Spread') }}:</label>
-                <button type="button" id="spread" onclick="spread(this.id)"><span>✓</span>{{_('Two columns')}}</button>
-                <button type="button" id="nonespread" onclick="spread(this.id)"><span></span>{{_('One column')}}</button>
-              </div>            
-            <div class="closer icon-cancel-circled"></div>
+              <select id="fontSelect" onchange="selectFont(this.value)">
+                <option value="Inter">Inter</option>
+                <option value="Literata">Literata</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Lora">Lora</option>
+                <option value="Source Sans 3">Source Sans</option>
+                <option value="Zilla Slab">Zilla Slab</option>
+              </select>
+              <div class="weight-group">
+                <button type="button" class="weight-btn" data-weight="300">Light</button>
+                <button type="button" class="weight-btn active" data-weight="400">Regular</button>
+                <button type="button" class="weight-btn" data-weight="700">Bold</button>
+              </div>
+            </div>
+            <div class="form-group spacing-align-group">
+              <div class="line-spacing-controls">
+                <button type="button" id="lineSpacingDecrease"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM122.34,101.66a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32L136,76.69V16a8,8,0,0,0-16,0V76.69L101.66,58.34A8,8,0,0,0,90.34,69.66Zm11.32,52.68a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L120,179.31V240a8,8,0,0,0,16,0V179.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z"></path></svg></button>
+                <span id="lineSpacingDisplay">1.5</span>
+                <button type="button" id="lineSpacingIncrease"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM101.66,53.66,120,35.31V96a8,8,0,0,0,16,0V35.31l18.34,18.35a8,8,0,0,0,11.32-11.32l-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32Zm52.68,148.68L136,220.69V160a8,8,0,0,0-16,0v60.69l-18.34-18.35a8,8,0,0,0-11.32,11.32l32,32a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Z"></path></svg></button>
+              </div>
+              <div class="justify-group">
+                <button type="button" class="justify-btn active" data-align="left" title="Left align"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M32,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H40A8,8,0,0,1,32,64Zm8,48H168a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16Zm176,24H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm-48,40H40a8,8,0,0,0,0,16H168a8,8,0,0,0,0-16Z"></path></svg></button>
+                <button type="button" class="justify-btn" data-align="center" title="Center"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M32,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H40A8,8,0,0,1,32,64ZM64,96a8,8,0,0,0,0,16H192a8,8,0,0,0,0-16Zm152,40H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm-24,40H64a8,8,0,0,0,0,16H192a8,8,0,0,0,0-16Z"></path></svg></button>
+                <button type="button" class="justify-btn" data-align="justify" title="Justify"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M32,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H40A8,8,0,0,1,32,64ZM216,96H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,40H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,40H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg></button>
+                <button type="button" class="justify-btn" data-align="right" title="Right align"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M32,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H40A8,8,0,0,1,32,64ZM216,96H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,40H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,40H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg></button>
+              </div>
+            </div>
+            <div class="form-group spread-group" id="layout">
+              <button type="button" id="spread" class="spread-icon active" onclick="spread(this.id)" title="Two columns"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M120,64a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16h72A8,8,0,0,1,120,64Zm-8,32H40a8,8,0,0,0,0,16h72a8,8,0,0,0,0-16Zm0,40H40a8,8,0,0,0,0,16h72a8,8,0,0,0,0-16Zm0,40H40a8,8,0,0,0,0,16h72a8,8,0,0,0,0-16ZM144,72h72a8,8,0,0,0,0-16H144a8,8,0,0,0,0,16Zm72,24H144a8,8,0,0,0,0,16h72a8,8,0,0,0,0-16Zm0,40H144a8,8,0,0,0,0,16h72a8,8,0,0,0,0-16Zm0,40H144a8,8,0,0,0,0,16h72a8,8,0,0,0,0-16Z"></path></svg></button>
+              <button type="button" id="nonespread" class="spread-icon" onclick="spread(this.id)" title="One column"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M32,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H40A8,8,0,0,1,32,64ZM216,96H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,40H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,40H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg></button>
+            </div>
+            <div class="form-group toggle-row">
+              <label class="toggle-label">
+                <input type="checkbox" id="showPagesCount" name="showPagesCount" class="toggle-boolean"/>
+                <span class="toggle-span"></span>
+              </label>
+              <span class="toggle-row-label">{{_('Page count')}}</span>
+            </div>
+            <div class="form-group toggle-row">
+              <label class="toggle-label">
+                <input type="checkbox" id="showProgress" name="showProgress" class="toggle-boolean"/>
+                <span class="toggle-span"></span>
+              </label>
+              <span class="toggle-row-label">{{_('Percent complete')}}</span>
+            </div>
         </div>
     </div>
     <div class="overlay"></div>
     <script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/compress/jszip_epub.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/libs/epub.min.js') }}"></script>
-    <script type="text/javascript">
+    <script>
         window.calibre = {
             filePath: "{{ url_for('static', filename='js/libs/') }}",
             cssPath: "{{ url_for('static', filename='css/') }}",
@@ -150,344 +136,215 @@
             useBookmarks: "{{ current_user.is_authenticated | tojson }}"
         };
 
-      // load custom theme color from localStorage (if any)
-      var _savedCustomThemeColor = null;
-      try {
-        _savedCustomThemeColor = localStorage.getItem(
-          "calibre.reader.customTheme"
-        );
-      } catch (e) {}
+        // Build themes from epub_themes.css classes
+        var _themeCssPath = "{{ url_for('static', filename='css/epub_themes.css') }}";
+        window.themes = {};
+        ["lightTheme", "darkTheme", "sepiaTheme", "amberTheme", "blackTheme"].forEach(function(id) {
+            window.themes[id] = { css_path: _themeCssPath };
+        });
 
-        window.themes = {
-            "darkTheme": {
-                "bgColor": "#202124",
-                "css_path": "{{ url_for('static', filename='css/epub_themes.css') }}",
-                "title-color": "#fff"
-            },
-            "lightTheme": {
-                "bgColor": "white",
-                "css_path": "{{ url_for('static', filename='css/epub_themes.css') }}",
-                "title-color": "#4f4f4f"
-            },
-            "sepiaTheme": {
-                "bgColor": "#ece1ca",
-                "css_path": "{{ url_for('static', filename='css/epub_themes.css') }}",
-                "title-color": "#4f4f4f"
-            },
-            "amberTheme": {
-                "bgColor": "#e8bf5e",
-                "css_path": "{{ url_for('static', filename='css/epub_themes.css') }}",
-                "title-color": "#2f2f2f"
-            },            
-            "blackTheme": {
-                "bgColor": "black",
-                "css_path": "{{ url_for('static', filename='css/epub_themes.css') }}",
-                "title-color": "#fff"
-            },
+        function getThemeColors(id) {
+            var probe = document.createElement("div");
+            probe.className = id;
+            probe.style.display = "none";
+            document.body.appendChild(probe);
+            var cs = getComputedStyle(probe);
+            var bg = cs.backgroundColor;
+            var tc = cs.color;
+            document.body.removeChild(probe);
+            return { bg: bg, tc: tc };
+        }
+
+        function isLightColor(rgb) {
+            var m = rgb.match(/\d+/g);
+            if (!m) return false;
+            return (parseInt(m[0]) * 299 + parseInt(m[1]) * 587 + parseInt(m[2]) * 114) / 1000 > 160;
+        }
+
+        function applyPageTheme(bg, tc) {
+            var subtleTc = isLightColor(bg) ? "rgba(88,28,28,0.25)" : "rgba(255,255,255,0.25)";
+            document.getElementById("main").style.backgroundColor = bg;
+            document.getElementById("titlebar").style.backgroundColor = bg;
+            document.getElementById("titlebar").style.color = tc;
+            document.querySelector(".read-footer").style.backgroundColor = bg;
+            document.getElementById("progress").style.color = tc;
+            document.getElementById("pages-count").style.color = tc;
+            document.getElementById("metainfo").style.color = tc;
+            document.querySelectorAll("#title-controls a").forEach(function(el) { el.style.color = tc; });
+            var backBtn = document.getElementById("back-btn");
+            if (backBtn) backBtn.style.color = tc;
+            document.querySelectorAll(".arrow").forEach(function(el) { el.style.color = subtleTc; });
+        }
+
+        function selectTheme(id) {
+            document.querySelectorAll("#themes .theme-swatch").forEach(function(btn) {
+                btn.classList.remove("active");
+            });
+            var el = document.getElementById(id);
+            if (el) el.classList.add("active");
+            localStorage.setItem("calibre.reader.theme", id);
+            try { reader.rendition.themes.select(id); } catch (e) {}
+            var colors = getThemeColors(id);
+            applyPageTheme(colors.bg, colors.tc);
+        }
+
+        // Font size
+        var currentFontSize = 100;
+        function updateFontSize(n) {
+            n = Math.max(50, Math.min(300, n));
+            currentFontSize = n;
+            document.getElementById("fontSizeDisplay").value = n + "%";
+            localStorage.setItem("calibre.reader.fontSize", n);
+            if (reader && reader.rendition) reader.rendition.themes.fontSize(n + "%");
+        }
+        var saved = localStorage.getItem("calibre.reader.fontSize");
+        if (saved) { currentFontSize = parseInt(saved); document.getElementById("fontSizeDisplay").value = saved + "%"; }
+        document.getElementById("fontSizeDecrease").addEventListener("click", function() { updateFontSize(currentFontSize - 5); });
+        document.getElementById("fontSizeIncrease").addEventListener("click", function() { updateFontSize(currentFontSize + 5); });
+        document.getElementById("fontSizeDisplay").addEventListener("change", function() {
+            var v = parseInt(this.value);
+            if (!isNaN(v)) updateFontSize(v); else this.value = currentFontSize + "%";
+        });
+
+        // Reader style injection (font, weight, text-align into epub iframe)
+        window._readerFont = null;
+        window._readerFontWeight = null;
+        window._readerTextAlign = null;
+
+        window._injectReaderCSS = function(doc) {
+            var linkId = 'reader-font-link';
+            if (!doc.getElementById(linkId)) {
+                var link = doc.createElement('link');
+                link.id = linkId;
+                link.rel = 'stylesheet';
+                link.href = 'https://fonts.bunny.net/css?family=Inter:300,400,500,700|Literata:300,400,400i,700,700i|Merriweather:300,400,400i,700,700i|Lora:300,400,400i,700,700i|Source+Sans+3:300,400,400i,700,700i|Zilla+Slab:300,400,400i,700,700i&display=swap';
+                doc.head.appendChild(link);
+            }
+            var rules = [];
+            if (window._readerFont) rules.push('font-family: "' + window._readerFont + '" !important');
+            if (window._readerFontWeight) rules.push('font-weight: ' + window._readerFontWeight + ' !important');
+            if (window._readerTextAlign) rules.push('text-align: ' + window._readerTextAlign + ' !important');
+            var existing = doc.getElementById('reader-font-override');
+            if (existing) existing.remove();
+            if (rules.length) {
+                var style = doc.createElement('style');
+                style.id = 'reader-font-override';
+                style.textContent = '* { ' + rules.join('; ') + '; }';
+                doc.head.appendChild(style);
+            }
         };
 
-        function selectTheme (id) {
-            let tickSpans = document.getElementById("themes").querySelectorAll("span");
-            tickSpans.forEach(function (tickSpan) {
-               try {
-                   tickSpan.textContent = "";
-               } catch (e) {}
-            });
-
-            // If the theme button exists, set its inner span to a tick. Otherwise set any span with the matching id.
-            let el = document.getElementById(id);
-            if (el) {
-                let sp = el.querySelector("span");
-                if (sp) sp.textContent = "✓";
-            } else {
-                let spById = document.getElementById(id + "Selected") || document.getElementById("customSelected");
-                if (spById) spById.textContent = "✓";
-            }
-
-            // Saving theme to local storage
-            localStorage.setItem("calibre.reader.theme", id);
-
-            // If selecting custom theme, ensure epubjs theme is registered with chosen bg color
-            if (id === "customTheme") {
-                let customColor = window.themes.customTheme.bgColor || "#ffffff";
-                try {
-                    if (reader && reader.rendition && reader.rendition.themes) {
-                        reader.rendition.themes.register("customTheme", {
-                            body: {
-                               background: customColor,
-                            },
-                        });
-                        reader.rendition.themes.select("customTheme");
-                    }
-                 } catch (e) {
-                     console.error("Failed to register/select customTheme", e);
-                 }
-             } else {
-                // Apply theme to epubjs iframe
-                try {
-                    reader.rendition.themes.select(id);
-                } catch (e) {}
-             }
-
-            // Apply theme to rest of the page.
-            document.getElementById("main").style.backgroundColor = themes[id]["bgColor"];
-            document.getElementById("titlebar").style.color = themes[id]["title-color"] || "#fff";
-            document.getElementById("progress").style.color = themes[id]["title-color"] || "#fff";
-        }
-
-        // font size settings logic
-        let currentFontSize = 100; // default 100%
-        const minFontSize = 50;
-        const maxFontSize = 300;
-        const stepSize = 5;
-
-        const fontSizeDisplay = document.getElementById("fontSizeDisplay");
-        const fontSizeDecrease = document.getElementById("fontSizeDecrease");
-        const fontSizeIncrease = document.getElementById("fontSizeIncrease");
-
-        function updateFontSize(newSize) {
-            if (newSize < minFontSize) newSize = minFontSize;
-            if (newSize > maxFontSize) newSize = maxFontSize;
-
-            currentFontSize = newSize;
-            fontSizeDisplay.textContent = newSize + "%";
-            localStorage.setItem("calibre.reader.fontSize", newSize);
-            if (reader && reader.rendition) {
-                reader.rendition.themes.fontSize(`${newSize}%`);
-            }
-        }
-
-        // Restore saved font size on load
-        const savedFontSize = localStorage.getItem("calibre.reader.fontSize");
-        if (savedFontSize) {
-            currentFontSize = parseInt(savedFontSize);
-            fontSizeDisplay.textContent = savedFontSize + "%";
-        }
-
-        fontSizeDecrease.addEventListener("click", function () {
-            updateFontSize(currentFontSize - stepSize);
-        });
-
-        fontSizeIncrease.addEventListener("click", function () {
-            updateFontSize(currentFontSize + stepSize);
-        });
-
-        let defaultFont;
-
-      window.selectFont = function (id) {
-          if (!defaultFont) {
-            defaultFont = reader.rendition.getContents()[0]?.css('font-family');
-          }
-
-          spans = document.getElementById("font").querySelectorAll("span");
-          for(var i = 0; i < spans.length; i++) {
-              spans[i].textContent = "";
-          }
-          document.getElementById(id).querySelector("span").textContent = "✓";
-
-          // Save font selection to localStorage
-          localStorage.setItem("calibre.reader.font", id);
-
-          if (id == "default") {
-              reader.rendition.themes.font(defaultFont);
-              return;
-          }
-          reader.rendition.themes.font(id);
-      };
-
-        function spread(id) {
-          spans = document.getElementById("layout").querySelectorAll("span");
-          for(var i = 0; i < spans.length; i++) {
-            spans[i].textContent = "";
-          }
-          document.getElementById(id).querySelector("span").textContent = "✓";
-          reader.rendition.spread(id==="spread" ? true : "none");
-        }
-
-        // Pages counter visibility setting
-        (function () {
-            var checkbox = document.getElementById("showPagesCount");
-            var pagesEl = document.getElementById("pages-count");
-            var key = "calibre.reader.showPages";
-            var saved = localStorage.getItem(key);
-            var show = saved === null ? true : saved === "true";
-            if (checkbox) checkbox.checked = show;
-            if (pagesEl) pagesEl.style.display = show ? "" : "none";
-            if (checkbox) {
-                checkbox.addEventListener("change", function () {
-                    var val = checkbox.checked;
-                    localStorage.setItem(key, String(val));
-                    var target = document.getElementById("pages-count");
-                    if (target) target.style.visibility = val ? "visible" : "hidden";
+        window._applyReaderStyles = function() {
+            try {
+                reader.rendition.getContents().forEach(function(c) {
+                    if (c.document) window._injectReaderCSS(c.document);
                 });
-            }
+            } catch (e) {}
+            try {
+                var viewer = document.getElementById('viewer');
+                if (viewer) Array.from(viewer.querySelectorAll('iframe')).forEach(function(f) {
+                    try {
+                        var doc = f.contentDocument || f.contentWindow.document;
+                        if (doc) window._injectReaderCSS(doc);
+                    } catch (e) {}
+                });
+            } catch (e) {}
+        };
+
+        window.selectFont = function(id) {
+            var sel = document.getElementById("fontSelect");
+            if (sel) sel.value = id;
+            localStorage.setItem("calibre.reader.font", id);
+            window._readerFont = id;
+            window._applyReaderStyles();
+        };
+
+        // Line spacing
+        var currentLineSpacing = 1.5;
+        function updateLineSpacing(v) {
+            v = Math.max(1.0, Math.min(3.0, Math.round(v * 10) / 10));
+            currentLineSpacing = v;
+            document.getElementById("lineSpacingDisplay").textContent = v.toFixed(1);
+            localStorage.setItem("calibre.reader.lineSpacing", v);
+            if (reader && reader.rendition) reader.rendition.themes.override("line-height", String(v), true);
+        }
+        saved = localStorage.getItem("calibre.reader.lineSpacing");
+        if (saved) { currentLineSpacing = parseFloat(saved); document.getElementById("lineSpacingDisplay").textContent = currentLineSpacing.toFixed(1); }
+        document.getElementById("lineSpacingDecrease").addEventListener("click", function() { updateLineSpacing(currentLineSpacing - 0.1); });
+        document.getElementById("lineSpacingIncrease").addEventListener("click", function() { updateLineSpacing(currentLineSpacing + 0.1); });
+
+        // Text alignment
+        function updateTextAlign(align) {
+            window._readerTextAlign = align;
+            document.querySelectorAll(".justify-btn").forEach(function(btn) {
+                btn.classList.toggle("active", btn.getAttribute("data-align") === align);
+            });
+            localStorage.setItem("calibre.reader.textAlign", align);
+            window._applyReaderStyles();
+        }
+        saved = localStorage.getItem("calibre.reader.textAlign");
+        if (saved) document.querySelectorAll(".justify-btn").forEach(function(btn) {
+            btn.classList.toggle("active", btn.getAttribute("data-align") === saved);
+        });
+        document.querySelectorAll(".justify-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() { updateTextAlign(this.getAttribute("data-align")); });
+        });
+
+        // Font weight
+        function updateFontWeight(weight) {
+            window._readerFontWeight = weight;
+            document.querySelectorAll(".weight-btn").forEach(function(btn) {
+                btn.classList.toggle("active", btn.getAttribute("data-weight") === weight);
+            });
+            localStorage.setItem("calibre.reader.fontWeight", weight);
+            window._applyReaderStyles();
+        }
+        saved = localStorage.getItem("calibre.reader.fontWeight");
+        if (saved) {
+            window._readerFontWeight = saved;
+            document.querySelectorAll(".weight-btn").forEach(function(btn) {
+                btn.classList.toggle("active", btn.getAttribute("data-weight") === saved);
+            });
+        }
+        document.querySelectorAll(".weight-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() { updateFontWeight(this.getAttribute("data-weight")); });
+        });
+
+        // Spread
+        function spread(id) {
+            document.querySelectorAll("#layout .spread-icon").forEach(function(btn) { btn.classList.remove("active"); });
+            document.getElementById(id).classList.add("active");
+            reader.rendition.spread(id === "spread" ? true : "none");
+        }
+
+        // Toggle visibility settings
+        function initToggle(checkboxId, targetId, key) {
+            var cb = document.getElementById(checkboxId);
+            var el = document.getElementById(targetId);
+            var show = localStorage.getItem(key);
+            show = show === null ? true : show === "true";
+            if (cb) cb.checked = show;
+            if (el) el.style.visibility = show ? "visible" : "hidden";
+            if (cb) cb.addEventListener("change", function() {
+                localStorage.setItem(key, String(cb.checked));
+                if (el) el.style.visibility = cb.checked ? "visible" : "hidden";
+            });
+        }
+        initToggle("showPagesCount", "pages-count", "calibre.reader.showPages");
+        initToggle("showProgress", "progress", "calibre.reader.showProgress");
+
+        // Bookmarks blank state
+        (function() {
+            var list = document.getElementById("bookmarks");
+            var empty = document.getElementById("bookmarks-empty");
+            if (!list || !empty) return;
+            function update() { empty.style.display = list.children.length ? "none" : "block"; }
+            update();
+            new MutationObserver(update).observe(list, { childList: true });
         })();
     </script>
-    <script type="text/javascript">
-      // Initialize custom theme UI and Pickr once Pickr is available
-      (function () {
-        var swatch = document.getElementById("customThemeSwatch");
-        var saved =
-          window.themes &&
-          window.themes.customTheme &&
-          window.themes.customTheme.bgColor
-            ? window.themes.customTheme.bgColor
-            : "#ffffff";
-        if (swatch) swatch.style.background = saved;
-
-        function _hexToRgb(hex) {
-          hex = hex.replace("#", "");
-          if (hex.length === 3) {
-            hex = hex
-              .split("")
-              .map(function (h) {
-                return h + h;
-              })
-              .join("");
-          }
-          var bigint = parseInt(hex, 16);
-          return {
-            r: (bigint >> 16) & 255,
-            g: (bigint >> 8) & 255,
-            b: bigint & 255,
-          };
-        }
-
-        // Better contrast decision using WCAG relative luminance and contrast ratio
-        // Returns true if black text is the better choice (i.e. background is light)
-        function _isLight(hex) {
-          try {
-            var rgb = _hexToRgb(hex);
-            // convert 0-255 to 0-1
-            var srgb = { r: rgb.r / 255, g: rgb.g / 255, b: rgb.b / 255 };
-            function lin(c) {
-              return c <= 0.03928
-                ? c / 12.92
-                : Math.pow((c + 0.055) / 1.055, 2.4);
-            }
-            var R = lin(srgb.r),
-              G = lin(srgb.g),
-              B = lin(srgb.b);
-            var L = 0.2126 * R + 0.7152 * G + 0.0722 * B; // relative luminance
-
-            // contrast ratios against black (L=0) and white (L=1)
-            var contrastWithBlack = (L + 0.05) / (0.0 + 0.05);
-            var contrastWithWhite = (1.0 + 0.05) / (L + 0.05);
-
-            // pick the text color that gives higher contrast. If black gives >= contrast, treat bg as light
-            return contrastWithBlack >= contrastWithWhite;
-          } catch (e) {
-            return true;
-          }
-        }
-
-        function applyCustomColor(hex) {
-          if (!hex) return;
-          if (hex[0] !== "#") hex = "#" + hex;
-          window.themes.customTheme.bgColor = hex;
-          try {
-            localStorage.setItem("calibre.reader.customTheme", hex);
-          } catch (e) {}
-          if (swatch) swatch.style.background = hex;
-
-          // Mark theme as selected
-          try {
-            localStorage.setItem("calibre.reader.theme", "customTheme");
-          } catch (e) {}
-          // Clear ticks and set custom tick
-          var tickSpans = document
-            .getElementById("themes")
-            .querySelectorAll("span");
-          tickSpans.forEach(function (ts) {
-            ts.textContent = "";
-          });
-          var customTick = document.getElementById("customSelected");
-          if (customTick) customTick.textContent = "✓";
-
-          // Compute title/text color based on contrast (black or white)
-          var titleColor = _isLight(hex) ? "#000000" : "#ffffff";
-          try {
-            document.getElementById("main").style.backgroundColor = hex;
-            document.getElementById("titlebar").style.color = titleColor;
-            document.getElementById("progress").style.color = titleColor;
-          } catch (e) {}
-
-          // Persist title-color in themes map so selectTheme reads a consistent value
-          try {
-            window.themes.customTheme["title-color"] = titleColor;
-          } catch (e) {}
-
-          // Register and select theme in epub rendition (include text color)
-          try {
-            if (reader && reader.rendition && reader.rendition.themes) {
-              reader.rendition.themes.register("customTheme", {
-                body: { background: hex, color: titleColor },
-              });
-              reader.rendition.themes.select("customTheme");
-            }
-          } catch (e) {
-            console.error("Failed to apply custom theme to reader", e);
-          }
-        }
-
-        // Delay init until Pickr is available
-        function ensurePickrAndInit() {
-          if (window.Pickr) {
-            try {
-              var pickr = Pickr.create({
-                el: "#customThemeSwatch",
-                theme: "classic",
-                default: saved,
-                components: {
-                  preview: true,
-                  opacity: false,
-                  hue: true,
-                  interaction: {
-                    hex: true,
-                    input: true,
-                    save: true,
-                  },
-                },
-              });
-
-              // Immediate apply when color changes in the picker
-              pickr.on("change", function (color, instance) {
-                try {
-                  var hex = color.toHEXA().toString();
-                  if (swatch) swatch.style.background = hex;
-                  applyCustomColor(hex);
-                } catch (e) {}
-              });
-
-              // Also respond to save (some pickr configs use save)
-              pickr.on("save", function (color, instance) {
-                try {
-                  var hex = color.toHEXA().toString();
-                  if (swatch) swatch.style.background = hex;
-                  applyCustomColor(hex);
-                  pickr.hide();
-                } catch (e) {}
-              });
-
-              // Clicking swatch opens pickr
-              if (swatch)
-                swatch.addEventListener("click", function () {
-                  pickr.show();
-                });
-            } catch (e) {
-              console.error("Pickr init failed", e);
-            }
-            return;
-          }
-          // wait a bit
-          setTimeout(ensurePickrAndInit, 150);
-        }
-
-        ensurePickrAndInit();
-      })();
-      </script>
-      <script src="{{ url_for('static', filename='js/libs/screenfull.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/libs/reader.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/reading/epub.js') }}"></script>
-    </body>
+    <script src="{{ url_for('static', filename='js/libs/screenfull.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/libs/reader.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reading/epub.js') }}"></script>
+</body>
 </html>
