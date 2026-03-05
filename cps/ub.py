@@ -702,7 +702,9 @@ def init_db(app_db_path):
         clean_database(session)
     else:
         Base.metadata.create_all(engine)
-        create_admin_user(session)
+
+    # Ensure anonymous user always exists
+    if not session.query(User).filter(User.role == constants.ROLE_ANONYMOUS).first():
         create_anonymous_user(session)
 
 def password_change(user_credentials=None):

@@ -93,7 +93,7 @@ class _Settings(_Base):
     config_access_log = Column(SmallInteger, default=0)
     config_access_logfile = Column(String, default=logger.DEFAULT_ACCESS_LOG)
 
-    config_uploading = Column(SmallInteger, default=0)
+    config_uploading = Column(SmallInteger, default=1)
     config_anonbrowse = Column(SmallInteger, default=0)
     config_public_reg = Column(SmallInteger, default=0)
     config_remote_login = Column(Boolean, default=False)
@@ -118,7 +118,7 @@ class _Settings(_Base):
     config_use_goodreads = Column(Boolean, default=False)
     config_goodreads_api_key = Column(String)
     config_googlebooks_api_key = Column(String, default='')
-    config_register_email = Column(Boolean, default=False)
+    config_register_email = Column(Boolean, default=True)
     config_login_type = Column(Integer, default=0)
 
     config_kobo_proxy = Column(Boolean, default=False)

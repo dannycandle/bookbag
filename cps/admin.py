@@ -119,16 +119,28 @@ def before_request():
     g.allow_upload = config.config_uploading
     g.current_theme = config.config_theme
     g.config_authors_max = config.config_authors_max
-    if ('/static/' not in request.path and not config.db_configured and
-        request.endpoint not in ('admin.ajax_db_config',
-                                 'admin.simulatedbchange',
-                                 'admin.db_configuration',
-                                 'web.login',
-                                 'web.login_post',
-                                 'web.logout',
-                                 'admin.load_dialogtexts',
-                                 'admin.ajax_pathchooser')):
-        return redirect(url_for('admin.db_configuration'))
+    g.setup_mode = False
+
+    if '/static/' not in request.path:
+        setup_endpoints = ('setup.wizard', 'setup.create_account', 'setup.validate_library', 'setup.setup_library')
+        allowed_endpoints = setup_endpoints + (
+            'web.login', 'web.login_post', 'web.logout',
+            'admin.load_dialogtexts',
+        )
+        has_admin = ub.session.query(ub.User).filter(
+            ub.User.role.op('&')(constants.ROLE_ADMIN) == constants.ROLE_ADMIN
+        ).first() is not None
+        has_db = config.db_configured
+
+        # Setup wizard takes priority when admin or library is missing
+        if not has_admin or not has_db:
+            if request.endpoint in setup_endpoints:
+                g.setup_mode = True
+            elif request.endpoint not in allowed_endpoints:
+                if has_admin and not current_user.is_authenticated:
+                    return redirect(url_for('web.login', next=url_for('setup.wizard')))
+                g.setup_mode = True
+                return redirect(url_for('setup.wizard'))
 
 
 #@admi.route("/admin")
