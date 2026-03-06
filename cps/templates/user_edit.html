@@ -1,16 +1,5 @@
 {% extends "layout.html" %}
 {% block action_bar %}
-    <div id="save-status" class="save-status">
-        <span class="save-status-dot"></span>
-        <span class="save-status-text"></span>
-    </div>
-    <form class="search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
-        <input type="text" class="search-input" name="query" placeholder="Search..." value="">
-        <button type="submit" class="search-submit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
-        </button>
-    </form>
 {% endblock %}
 {% block body %}
 <div class="admin-page-wrapper">
@@ -239,9 +228,7 @@
 
                 <!-- Actions -->
                 <div class="admin-actions-row">
-                    {% if new_user %}
                     <button type="button" class="btn btn-primary" onclick="saveUserForm()">{{_('Save')}}</button>
-                    {% endif %}
                     {% if current_user and current_user.role_admin() and not profile and not new_user and not content.role_anonymous() %}
                     <button type="button" class="btn btn-danger" id="btn-delete-user">{{_('Delete User')}}</button>
                     <script>
@@ -267,12 +254,6 @@
             </form>
 
             <script>
-                var _saveFadeTimer = null;
-                var _savingStart = 0;
-                var _deferredState = null;
-                var _deferredMessage = null;
-                var _minSavingMs = 500;
-
                 function showToast(message, category) {
                     var container = document.getElementById('toast-container');
                     if (!container) {
@@ -290,59 +271,11 @@
                     }, 3000);
                 }
 
-                function _applyStatus(state, message) {
-                    var el = document.getElementById('save-status');
-                    if (!el) return;
-                    clearTimeout(_saveFadeTimer);
-                    _deferredState = null;
-                    _deferredMessage = null;
-                    el.className = 'save-status save-status--' + state + ' save-status--visible';
-                    el.querySelector('.save-status-text').textContent =
-                        state === 'pending' ? 'Unsaved' :
-                        state === 'saving'  ? 'Saving…' :
-                        state === 'error'   ? 'Error'   : 'Saved';
-                    if (state === 'saved') {
-                        _saveFadeTimer = setTimeout(function() {
-                            el.classList.remove('save-status--visible');
-                            el.classList.add('save-status--fading');
-                        }, 2000);
-                    }
-                    if (state === 'error') {
-                        showToast(message || 'Failed to save settings', 'error');
-                    }
-                }
-
-                function setSaveStatus(state, message) {
-                    if (state === 'pending' || state === 'saving') {
-                        if (state === 'saving') _savingStart = Date.now();
-                        _applyStatus(state);
-                        return;
-                    }
-                    var elapsed = Date.now() - _savingStart;
-                    if (elapsed < _minSavingMs) {
-                        _deferredState = state;
-                        _deferredMessage = message;
-                        setTimeout(function() {
-                            if (_deferredState) _applyStatus(_deferredState, _deferredMessage);
-                        }, _minSavingMs - elapsed);
-                    } else {
-                        _applyStatus(state, message);
-                    }
-                }
-
-                function debounce(fn, delay) {
-                    var timer = null;
-                    return function() {
-                        clearTimeout(timer);
-                        setSaveStatus('pending');
-                        timer = setTimeout(fn, delay);
-                    };
-                }
-
                 function saveUserForm() {
                     var form = document.getElementById('user-edit-form');
                     var formData = new FormData(form);
-                    setSaveStatus('saving');
+                    var btn = form.querySelector('.btn-primary');
+                    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
                     fetch(form.action || window.location.href, {
                         method: 'POST',
                         headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
@@ -353,23 +286,18 @@
                         var doc = new DOMParser().parseFromString(html, 'text/html');
                         var errToast = doc.querySelector('#toast-container .toast-error');
                         if (errToast) {
-                            setSaveStatus('error', errToast.textContent.trim());
+                            showToast(errToast.textContent.trim(), 'error');
                         } else {
-                            setSaveStatus('saved');
+                            showToast('Settings saved', 'success');
                         }
                     })
                     .catch(function() {
-                        setSaveStatus('error');
+                        showToast('Failed to save settings', 'error');
+                    })
+                    .finally(function() {
+                        if (btn) { btn.disabled = false; btn.textContent = '{{ _("Save") }}'; }
                     });
                 }
-
-                var debouncedSaveUser = debounce(saveUserForm, 1500);
-                document.querySelectorAll('#user-edit-form .toggle-boolean').forEach(function(toggle) {
-                    toggle.addEventListener('change', debouncedSaveUser);
-                });
-                document.querySelectorAll('#user-edit-form .setting-input').forEach(function(field) {
-                    field.addEventListener('change', debouncedSaveUser);
-                });
             </script>
 
         </div>

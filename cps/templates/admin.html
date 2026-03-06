@@ -958,6 +958,63 @@
                 </div>
             </div>
 
+            <!-- Scheduled Tasks -->
+            <div class="admin-subsection-wrapper">
+                <h3 class="admin-subsection-title">Scheduled Tasks</h3>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Start Time</span>
+                    <select class="setting-input config-field" name="schedule_start_time">
+                        {% for n in starttime %}
+                        <option value="{{ n[0] }}" {% if config.schedule_start_time == n[0] %}selected{% endif %}>{{ n[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="setting-path-row">
+                    <span class="setting-path-label">Maximum Duration</span>
+                    <select class="setting-input config-field" name="schedule_duration">
+                        {% for n in duration %}
+                        <option value="{{ n[0] }}" {% if config.schedule_duration == n[0] %}selected{% endif %}>{{ n[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="schedule_generate_book_covers" {% if config.schedule_generate_book_covers %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Generate Thumbnails</h3></div>
+                        <div><p class="toggle-desc">Automatically generate cover thumbnails on a schedule.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="schedule_reconnect" {% if config.schedule_reconnect %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Reconnect Calibre Database</h3></div>
+                        <div><p class="toggle-desc">Periodically reconnect to the Calibre database to pick up external changes.</p></div>
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-wrapper">
+                        <label class="toggle-label">
+                        <input class="toggle-boolean config-toggle" type="checkbox" name="schedule_metadata_backup" {% if config.schedule_metadata_backup %}checked{% endif %}>
+                        <span class="toggle-span"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-info-wrapper">
+                        <div><h3 class="toggle-name">Generate Metadata Backup Files</h3></div>
+                        <div><p class="toggle-desc">Create backup files of book metadata on a schedule.</p></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -1219,7 +1276,7 @@
             window.location.href = '{{ url_for("admin.view_logfile") }}';
         });
         document.getElementById('btn-viewtasks').addEventListener('click', function() {
-            window.location.href = '{{ url_for("admin.edit_scheduledtasks") }}';
+            window.location.href = '{{ url_for("tasks.get_tasks_status") }}';
         });
 
         // Reverse proxy toggle — show/hide header name field

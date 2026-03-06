@@ -240,10 +240,21 @@ def admin():
     t = timedelta(hours=config.schedule_duration // 60, minutes=config.schedule_duration % 60)
     schedule_duration = format_timedelta(t, threshold=.99)
 
+    # Build time/duration option lists for scheduled tasks dropdowns
+    time_field = []
+    for n in range(24):
+        time_field.append((n, format_time(datetime_time(hour=n), format="short")))
+    duration_field = []
+    for n in range(5, 65, 5):
+        dt = timedelta(hours=n // 60, minutes=n % 60)
+        duration_field.append((n, format_timedelta(dt, threshold=.97)))
+
     return render_title_template("admin.html", allUser=all_user, config=config, commit=commit,
                                  feature_support=feature_support, provider=oauthblueprints,
                                  schedule_time=schedule_time,
                                  schedule_duration=schedule_duration,
+                                 starttime=time_field,
+                                 duration=duration_field,
                                  title=_("Admin page"), page="admin")
 
 
@@ -1794,6 +1805,7 @@ def _db_configuration_update_helper():
 
 def _configuration_update_helper():
     reboot_required = False
+    schedule_changed = False
     to_save = request.form.to_dict()
     try:
         reboot_required |= _config_int(to_save, "config_port")
@@ -1903,12 +1915,32 @@ def _configuration_update_helper():
                 return _configuration_result(_('client_secrets.json is not configured for web application'))
         _config_checkbox_int(to_save, "config_use_google_drive")
 
+        # Scheduled tasks configuration
+        if "schedule_start_time" in to_save:
+            if 0 <= int(to_save.get("schedule_start_time", "0")) <= 23:
+                schedule_changed |= _config_int(to_save, "schedule_start_time")
+            else:
+                return _configuration_result(_('Invalid start time for task specified'))
+        if "schedule_duration" in to_save:
+            if 0 < int(to_save.get("schedule_duration", "0")) <= 60:
+                schedule_changed |= _config_int(to_save, "schedule_duration")
+            else:
+                return _configuration_result(_('Invalid duration for task specified'))
+        schedule_changed |= _config_checkbox(to_save, "schedule_generate_book_covers")
+        schedule_changed |= _config_checkbox(to_save, "schedule_reconnect")
+        schedule_changed |= _config_checkbox(to_save, "schedule_metadata_backup")
+
     except (OperationalError, InvalidRequestError) as e:
         ub.session.rollback()
         log.error_or_exception("Settings Database error: {}".format(e))
         _configuration_result(_("Oops! Database Error: %(error)s.", error=e.orig))
 
     config.save()
+
+    if schedule_changed:
+        schedule.end_scheduled_tasks()
+        schedule.register_scheduled_tasks(config.schedule_reconnect)
+
     if reboot_required:
         web_server.stop(True)
 

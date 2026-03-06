@@ -4,26 +4,28 @@
 <div class="admin-page-wrapper">
   <div class="admin-card">
     <h3 class="admin-card-title">{{_('Tasks')}}</h3>
-    <table class="table table-no-bordered" id="tasktable" data-url="{{  url_for('tasks.get_email_status_json') }}"  data-sort-name="starttime" data-sort-order="asc" data-locale="{{ current_user.locale }}">
+    <table class="table" id="tasktable" style="display:none;">
       <thead>
         <tr>
-            {% if current_user.role_admin() %}
-            <th data-halign="right" data-align="right" data-field="user" data-sortable="true">{{_('User')}}</th>
-            {% endif %}
-            <th data-halign="right" data-align="right" data-field="taskMessage" data-sortable="true">{{_('Task')}}</th>
-            <th data-halign="right" data-align="right" data-field="status" data-sortable="true">{{_('Status')}}</th>
-            <th data-halign="right" data-align="right" data-field="progress" data-sortable="true" data-sorter="elementSorter">{{_('Progress')}}</th>
-            <th data-halign="right" data-align="right" data-field="runtime" data-sortable="true" data-sort-name="rt">{{_('Run Time')}}</th>
-            <th data-halign="right" data-align="right" data-field="starttime" data-sortable="true" data-sort-name="id">{{_('Start Time')}}</th>
-            <th data-halign="right" data-align="right" data-field="error" data-sortable="true">{{_('Message')}}</th>
-            {% if current_user.role_admin() %}
-            <th data-halign="right" data-align="right" data-formatter="TaskActions" data-switchable="false">{{_('Actions')}}</th>
-            {% endif %}
-            <th data-field="id" data-visible="false"></th>
-            <th data-field="rt" data-visible="false"></th>
+          {% if current_user.role_admin() %}
+          <th>{{_('User')}}</th>
+          {% endif %}
+          <th>{{_('Task')}}</th>
+          <th>{{_('Status')}}</th>
+          <th>{{_('Progress')}}</th>
+          <th>{{_('Run Time')}}</th>
+          <th>{{_('Start Time')}}</th>
+          <th>{{_('Message')}}</th>
+          {% if current_user.role_admin() %}
+          <th>{{_('Actions')}}</th>
+          {% endif %}
         </tr>
       </thead>
+      <tbody></tbody>
     </table>
+    <div id="tasks-empty" class="text-center text-muted" style="padding: 3rem 1rem;">
+      <p>{{_('No tasks have been run since the server was started.')}}</p>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -52,8 +54,72 @@
 {% endif %}
 {% endblock %}
 {% block js %}
-<script src="{{ url_for('static', filename='js/libs/bootstrap-table/bootstrap-table.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/libs/bootstrap-table/bootstrap-table-locale-all.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/table.js') }}"></script>
+<script>
+$(function() {
+    var isAdmin = {{ current_user.role_admin()|tojson }};
+    var cancellableStats = [0, 2];
 
+    function loadTasks() {
+        $.ajax({
+            method: "get",
+            url: getPath() + "/ajax/emailstat",
+            async: true,
+            timeout: 5000,
+            success: function(data) {
+                var tbody = $("#tasktable tbody");
+                tbody.empty();
+                if (data.length === 0) {
+                    $("#tasktable").hide();
+                    $("#tasks-empty").show();
+                    return;
+                }
+                $("#tasktable").show();
+                $("#tasks-empty").hide();
+                $.each(data, function(i, row) {
+                    var tr = "<tr>";
+                    if (isAdmin) {
+                        tr += "<td>" + (row.user || "") + "</td>";
+                    }
+                    tr += "<td>" + (row.taskMessage || "") + "</td>";
+                    tr += "<td>" + (row.status || "") + "</td>";
+                    tr += "<td>" + (row.progress || "") + "</td>";
+                    tr += "<td>" + (row.runtime || "") + "</td>";
+                    tr += "<td>" + (row.starttime || "") + "</td>";
+                    tr += "<td>" + (row.error || "-") + "</td>";
+                    if (isAdmin) {
+                        tr += "<td>";
+                        if (row.task_id && row.is_cancellable && cancellableStats.indexOf(row.stat) !== -1) {
+                            tr += '<a class="danger task-cancel" data-toggle="modal" data-target="#cancelTaskModal" data-task-id="' + row.task_id + '" title="Cancel">';
+                            tr += '<i class="glyphicon glyphicon-ban-circle"></i>';
+                            tr += '</a>';
+                        }
+                        tr += "</td>";
+                    }
+                    tr += "</tr>";
+                    tbody.append(tr);
+                });
+            }
+        });
+    }
+
+    loadTasks();
+    setInterval(loadTasks, 2000);
+
+    $("#cancel_task_confirm").click(function() {
+        var taskId = $(this).data("task-id");
+        $.ajax({
+            method: "post",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            url: getPath() + "/ajax/canceltask",
+            data: JSON.stringify({"task_id": taskId}),
+        });
+    });
+
+    $("#cancelTaskModal").on("show.bs.modal", function(e) {
+        var taskId = $(e.relatedTarget).data("task-id");
+        $(e.currentTarget).find("#cancel_task_confirm").data("task-id", taskId);
+    });
+});
+</script>
 {% endblock %}
