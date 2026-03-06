@@ -1,10 +1,12 @@
 ![Book Bag mockup](books-mockup.png)
 
-# Book Bag
+# Bookbag
 
 **A modern UI redesign of [Calibre-Web](https://github.com/janeczku/calibre-web).**
 
-> ⚠️ Book Bag is in early development and is not stable. It is offered as-is. 
+> ⚠️ Bookbag is in early development and is not stable. It is offered as-is. 
+> ⚠️ Please do not host Bookbag on a public server. There are known security issues and the app has not been properly pen tested. Security vulnerabilities are inherited and will be addressed in a future release.
+
 
 ---
 
@@ -62,7 +64,7 @@ Recommended to set up email config in settings for easy password resets.
 
 ## License
 
-Book Bag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) and is licensed under the [GPL v3 License](LICENSE).
+Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) and is licensed under the [GPL v3 License](LICENSE).
 
 - [Calibre-Web](https://github.com/janeczku/calibre-web) — [GPL v3](LICENSE)
 - [Inter](https://github.com/rsms/inter) — [SIL Open Font License 1.1](cps/static/fonts/Inter/OFL.txt)

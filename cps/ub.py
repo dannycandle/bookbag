@@ -257,6 +257,9 @@ class User(UserBase, Base):
     remote_auth_token = relationship('RemoteAuthToken', backref='user', lazy='dynamic')
     view_settings = Column(JSON, default={})
     kobo_only_shelves_sync = Column(Integer, default=0)
+    reset_code = Column(String(6), default=None)
+    reset_code_expires = Column(DateTime, default=None)
+    reset_code_attempts = Column(Integer, default=0)
 
 
 if oauth_support:
@@ -604,11 +607,32 @@ def migrate_user_session_table(engine, _session):
 # Migrate database to current version, has to be updated after every database change. Currently, migration from
 # maybe 4/5 versions back to current should work.
 # Migration is done by checking if relevant columns are existing, and then adding rows with SQL commands
+def migrate_user_reset_columns(engine, _session):
+    try:
+        _session.query(exists().where(User.reset_code != None)).scalar()
+        _session.commit()
+    except exc.OperationalError:
+        with engine.connect() as conn:
+            trans = conn.begin()
+            conn.execute(text("ALTER TABLE user ADD column 'reset_code' VARCHAR(6)"))
+            conn.execute(text("ALTER TABLE user ADD column 'reset_code_expires' DATETIME"))
+            trans.commit()
+    try:
+        _session.query(exists().where(User.reset_code_attempts != None)).scalar()
+        _session.commit()
+    except exc.OperationalError:
+        with engine.connect() as conn:
+            trans = conn.begin()
+            conn.execute(text("ALTER TABLE user ADD column 'reset_code_attempts' INTEGER DEFAULT 0"))
+            trans.commit()
+
+
 def migrate_Database(_session):
     engine = _session.bind
     add_missing_tables(engine, _session)
     migrate_registration_table(engine, _session)
     migrate_user_session_table(engine, _session)
+    migrate_user_reset_columns(engine, _session)
 
 
 def clean_database(_session):

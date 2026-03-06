@@ -6,14 +6,8 @@
     <div id="save-status" class="save-status">
         <span class="save-status-dot"></span>
         <span class="save-status-text"></span>
+        <span class="save-status-tooltip" id="save-status-tooltip"></span>
     </div>
-    <form class="search-form" role="search" action="{{url_for('search.simple_search')}}" method="GET">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
-        <input type="text" class="search-input" name="query" placeholder="Search..." value="{{searchterm}}">
-        <button type="submit" class="search-submit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#581C1C" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
-        </button>
-    </form>
 {% endblock %}
 
 {% block body %}
@@ -33,12 +27,12 @@
 
 <!-- Google Drive Setup Popover -->
 <div id="gdrive-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 50;">
-    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 10px; padding: 28px; box-shadow: -1px 2px 10px #00000033; z-index: 100; color: #581C1C;">
-        <button id="gdrive-popover-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; color: rgba(88,28,28,0.4); cursor: pointer; padding: 2px 6px; border-radius: 4px;">X</button>
-        <p style="margin: 0 0 14px 0; font-size: 0.9rem;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256" style="vertical-align: middle; margin-right: 6px;"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg><strong>Google drive support is experimental.</strong></p>
-        <p style="font-size: 0.85rem; margin: 0 0 14px 0; line-height: 1.6;">Books stored in Google Drive will be placed in a user visible folder. <strong>All changes to your library must be made via Bookbag to avoid broken links and possible data loss.</strong> Do not move, rename, or delete files directly in Google Drive.</p>
-        <p style="font-size: 0.85rem; margin: 0 0 10px 0; line-height: 1.6;">If you would like to enable Google Drive book storage anyway, please follow the instructions below to get started:</p>
-        <ol style="font-size: 0.85rem; margin: 0; padding-left: 20px; line-height: 1.9;">
+    <div class="gdrive-dialog">
+        <button id="gdrive-popover-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; color: rgba(0,0,0,0.3); cursor: pointer; padding: 2px 6px; border-radius: 4px;">X</button>
+        <p><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256" style="vertical-align: middle; margin-right: 6px;"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg><strong>Google drive support is experimental.</strong></p>
+        <p>Books stored in Google Drive will be placed in a user visible folder. <strong>All changes to your library must be made via Bookbag to avoid broken links and possible data loss.</strong> Do not move, rename, or delete files directly in Google Drive.</p>
+        <p>If you would like to enable Google Drive book storage anyway, please follow the instructions below to get started:</p>
+        <ol>
             <li>Go to the <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> and create a project</li>
             <li>Enable the Google Drive API for your project</li>
             <li>Go to Credentials and create an OAuth 2.0 Client ID (Web Application type)</li>
@@ -212,13 +206,13 @@
             <div class="toggle-group">
                 <div class="toggle-wrapper">
                     <label class="toggle-label">
-                    <input class="toggle-boolean config-toggle" type="checkbox" name="config_public_reg" {% if config.config_public_reg %}checked{% endif %}>
+                    <input class="toggle-boolean config-toggle" type="checkbox" id="config-public-reg-toggle" name="config_public_reg" {% if config.config_public_reg %}checked{% endif %}>
                     <span class="toggle-span"></span>
                     </label>
                 </div>
                 <div class="toggle-info-wrapper">
                     <div><h3 class="toggle-name">Let anyone create an account</h3></div>
-                    <div><p class="toggle-desc">Default User Role must be set to Reader to enable this feature.</p></div>
+                    <div><p class="toggle-desc">Requires email integration to be configured and Default User Role set to Reader.</p></div>
                 </div>
             </div>
             <div class="toggle-group">
@@ -260,70 +254,53 @@
         </div>
         <div class="admin-section-body">
 
-            <!-- Book Files Location -->
+            <!-- Library Location -->
             <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Book Files Location</h3>
+                <h3 class="admin-subsection-title">Library Location</h3>
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_custom_book_location">
+                        <input class="toggle-boolean" type="checkbox" id="library-customize-toggle">
                         <span class="toggle-span"></span>
                     </div>
                     <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Customize the Location Books are Stored</h3></div>
-                        <div><p class="toggle-desc">Turn off if you want to store books on a separate volume that is larger but slower while keeping your metadata database on the faster default volume.</p></div>
+                        <div><h3 class="toggle-name">Customize library location</h3></div>
+                        <div><p class="toggle-desc">When enabled, you can specify a custom path for your library files.</p></div>
                     </div>
                 </div>
-                <div class="radio-group-row" id="book-storage-radios">
-                    <label class="radio-card-block">
-                        <input type="radio" name="book_storage_type" value="local" checked>
-                        <span class="radio-card-dot"></span>
-                        Other Location
-                    </label>
-                    <label class="radio-card-block">
-                        <input type="radio" name="book_storage_type" value="gdrive">
-                        <span class="radio-card-dot"></span>
-                        <!-- Warning icon -->
-                        <svg class="radio-card-warning" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg>
-                        Google Drive
-                    </label>
-                </div>
-                <div class="setting-path-row" id="book-path-row">
-                    <span class="setting-path-label">Server path to book files</span>
-                    <input class="setting-input config-field" type="text" name="config_calibre_dir" data-validate="required path" value="{% if config.config_calibre_dir != None %}{{ config.config_calibre_dir }}{% endif %}" placeholder="/books">
-                </div>
-            </div>
-
-            <!-- Metadata Database Location -->
-            <div class="admin-subsection-wrapper">
-                <h3 class="admin-subsection-title">Metadata Database Location</h3>
-                <div class="toggle-group">
-                    <div class="toggle-wrapper">
-                        <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" name="config_custom_metadata_location" checked>
-                        <span class="toggle-span"></span>
+                <div id="library-settings" style="display:none">
+                    <div class="toggle-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">
+                            <input class="toggle-boolean" type="checkbox" id="library-gdrive-toggle" {% if config.config_use_google_drive %}checked{% endif %}>
+                            <span class="toggle-span"></span>
+                        </div>
+                        <div class="toggle-info-wrapper">
+                            <div><h3 class="toggle-name">Store library on Google Drive</h3></div>
+                            <div><p class="toggle-desc">When enabled, your database and library will both be stored on your Google Drive.</p></div>
+                        </div>
                     </div>
-                    <div class="toggle-info-wrapper">
-                        <div><h3 class="toggle-name">Customize the location of the metadata database</h3></div>
-                        <div><p class="toggle-desc">When enabled, you can move the metadata database to a different location than the book files.</p></div>
+                    <div id="library-local-options">
+                        <div class="toggle-group">
+                            <div class="toggle-wrapper">
+                                <label class="toggle-label">
+                                <input class="toggle-boolean" type="checkbox" id="library-split-toggle" name="config_calibre_split" {% if config.config_calibre_split %}checked{% endif %}>
+                                <span class="toggle-span"></span>
+                            </div>
+                            <div class="toggle-info-wrapper">
+                                <div><h3 class="toggle-name">Keep books and database at different paths</h3></div>
+                                <div><p class="toggle-desc">When enabled, you can store books separately from the metadata database.</p></div>
+                            </div>
+                        </div>
+                        <div class="setting-path-row">
+                            <span class="setting-path-label" id="library-path-label">Path to library</span>
+                            <input class="setting-input config-field" type="text" name="config_calibre_dir" data-validate="required path" value="{% if config.config_calibre_dir != None %}{{ config.config_calibre_dir }}{% endif %}" placeholder="/books">
+                        </div>
+                        <div class="setting-path-row" id="library-split-path-row" style="display:none">
+                            <span class="setting-path-label">Path to book files</span>
+                            <input class="setting-input config-field" type="text" name="config_calibre_split_dir" data-validate="required path" value="{% if config.config_calibre_split_dir != None %}{{ config.config_calibre_split_dir }}{% endif %}" placeholder="/books">
+                        </div>
                     </div>
-                </div>
-                <div class="radio-group-row" id="metadata-storage-radios">
-                    <label class="radio-card-block">
-                        <input type="radio" name="metadata_storage_type" value="local" checked>
-                        <span class="radio-card-dot"></span>
-                        Other Location
-                    </label>
-                    <label class="radio-card-block">
-                        <input type="radio" name="metadata_storage_type" value="gdrive">
-                        <span class="radio-card-dot"></span>
-                        <svg class="radio-card-warning" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"></path></svg>
-                        Google Drive
-                    </label>
-                </div>
-                <div class="setting-path-row" id="metadata-path-row">
-                    <span class="setting-path-label">Path to metadata database:</span>
-                    <input class="setting-input config-field" type="text" name="config_calibre_split_dir" data-validate="required path" value="{% if config.config_calibre_split_dir != None %}{{ config.config_calibre_split_dir }}{% endif %}" placeholder="/books">
                 </div>
             </div>
 
@@ -395,7 +372,7 @@
                 <div class="toggle-group">
                     <div class="toggle-wrapper">
                         <label class="toggle-label">
-                        <input class="toggle-boolean" type="checkbox" id="config_email_enabled" {% if config.get_mail_server_configured() %}checked{% endif %}>
+                        <input class="toggle-boolean" type="checkbox" id="config_email_enabled" {% if config.get_mail_enabled() %}checked{% endif %}>
                         <span class="toggle-span"></span>
                     </div>
                     <div class="toggle-info-wrapper">
@@ -403,16 +380,15 @@
                         <div><p class="toggle-desc">When enabled, Bookbag will be able to send Password Reset emails, Magic Link login becomes available, and eMail.</p></div>
                     </div>
                 </div>
-                <div id="email-settings-fields" {% if not config.get_mail_server_configured() %}style="display:none"{% endif %}>
-                    <div class="radio-group-row">
-                        <label class="radio-card-block">
+                <div id="email-settings-fields" {% if not config.get_mail_enabled() %}style="display:none"{% endif %}>
+                    <div class="radio-group">
+                        <div class="radio-group-thumb"></div>
+                        <label class="radio-card">
                             <input type="radio" name="mail_server_type" value="0" {% if config.mail_server_type == 0 %}checked{% endif %}>
-                            <span class="radio-card-dot"></span>
                             Standard (SMTP)
                         </label>
-                        <label class="radio-card-block">
+                        <label class="radio-card">
                             <input type="radio" name="mail_server_type" value="1" {% if config.mail_server_type == 1 %}checked{% endif %}>
-                            <span class="radio-card-dot"></span>
                             Gmail
                         </label>
                     </div>
@@ -423,7 +399,7 @@
                         </div>
                         <div class="setting-path-row">
                             <span class="setting-path-label">Port</span>
-                            <input class="setting-input email-field" type="number" name="mail_port" data-validate="required" placeholder="25" min="1" max="65535" value="{{ config.mail_port }}">
+                            <input class="setting-input email-field" type="number" name="mail_port" data-validate="required" placeholder="465" min="1" max="65535" value="{{ config.mail_port }}">
                         </div>
                         <div class="setting-path-row">
                             <span class="setting-path-label">Encryption Type</span>
@@ -449,10 +425,10 @@
                             <span class="setting-path-label">Attachment File Size Limit (MB)</span>
                             <input class="setting-input email-field" type="number" name="mail_size" data-validate="required" placeholder="25" min="1" max="600" value="{{ config.mail_size // 1048576 }}">
                         </div>
-                    </div>
-                    <div style="padding: 8px 10px;">
-                        <button type="button" class="btn btn-primary" id="btn-save-email">Save</button>
-                        <button type="button" class="btn btn-primary" id="btn-test-email">Save and Send Test Email</button>
+                        <div id="email-button-row" style="display: none; flex-direction: row; align-items: center; justify-content: flex-end; gap: 10px; padding-top: 12px;">
+                            <button type="button" class="detail-action-btn detail-action-btn-secondary" id="btn-cancel-email">Cancel</button>
+                            <button type="button" class="detail-action-btn email-test-btn" id="btn-test-email">Save and Send Test Email</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -819,24 +795,20 @@
             <!-- Session Hijacking Protection -->
             <div class="admin-subsection-wrapper">
                 <h3 class="admin-subsection-title">Session Hijacking Protection</h3>
-                <div class="radio-group-row">
-                    <label class="radio-card-block radio-card-descriptive">
+                <div class="radio-group">
+                    <div class="radio-group-thumb"></div>
+                    <label class="radio-card">
                         <input type="radio" name="config_session" value="1" {% if config.config_session == 1 %}checked{% endif %}>
-                        <span class="radio-card-dot"></span>
-                        <span class="radio-card-content">
-                            <span class="radio-card-title">Strong</span>
-                            <span class="radio-card-description">Requires new login for all authenticated pages if IP address or user-agent changes.</span>
-                        </span>
+                        Strong
                     </label>
-                    <label class="radio-card-block radio-card-descriptive">
+                    <label class="radio-card">
                         <input type="radio" name="config_session" value="0" {% if config.config_session == 0 %}checked{% endif %}>
-                        <span class="radio-card-dot"></span>
-                        <span class="radio-card-content">
-                            <span class="radio-card-title">Standard</span>
-                            <span class="radio-card-description">Requires new login for sensitive pages if IP address or user-agent changes.</span>
-                        </span>
+                        Standard
                     </label>
                 </div>
+                <p class="radio-group-description" data-descriptions='{"1": "Requires new login for all authenticated pages if IP address or user-agent changes.", "0": "Requires new login for sensitive pages if IP address or user-agent changes."}' data-radio-name="config_session">
+                    {% if config.config_session == 1 %}Requires new login for all authenticated pages if IP address or user-agent changes.{% else %}Requires new login for sensitive pages if IP address or user-agent changes.{% endif %}
+                </p>
             </div>
 
         </div>
@@ -1044,6 +1016,16 @@
                 state === 'pending' ? 'Unsaved' :
                 state === 'saving'  ? 'Saving…' :
                 state === 'error'   ? 'Error'   : 'Saved';
+            var tooltip = document.getElementById('save-status-tooltip');
+            if (state === 'error' && message && tooltip) {
+                tooltip.textContent = message;
+                el.classList.add('save-status--has-tooltip');
+                el.style.pointerEvents = 'auto';
+            } else if (tooltip) {
+                tooltip.textContent = '';
+                el.classList.remove('save-status--has-tooltip');
+                el.style.pointerEvents = '';
+            }
             if (state === 'saved') {
                 _saveFadeTimer = setTimeout(function() {
                     el.classList.remove('save-status--visible');
@@ -1162,10 +1144,15 @@
             if (sessionRadio) {
                 formData.append('config_session', sessionRadio.value);
             }
-            // Include Google Drive flag if gdrive radio is selected
-            var gdriveRadio = document.querySelector('input[name="book_storage_type"][value="gdrive"]');
-            if (gdriveRadio && gdriveRadio.checked) {
+            // Include Google Drive flag if toggle is checked
+            var gdriveToggle = document.getElementById('library-gdrive-toggle');
+            if (gdriveToggle && gdriveToggle.checked) {
                 formData.append('config_use_google_drive', 'on');
+            }
+            // Include split toggle
+            var splitToggle = document.getElementById('library-split-toggle');
+            if (splitToggle && splitToggle.checked) {
+                formData.append('config_calibre_split', 'on');
             }
 
             setSaveStatus('saving');
@@ -1178,18 +1165,6 @@
             .then(function(data) {
                 if (data.result && data.result[0] && data.result[0].type === 'danger') {
                     setSaveStatus('error', data.result[0].message);
-                    if (data.result[0].message.indexOf('client_secrets') !== -1) {
-                        // Show gdrive setup popover and revert radio
-                        document.getElementById('gdrive-overlay').style.display = '';
-                        var localRadio = document.querySelector('input[name="book_storage_type"][value="local"]');
-                        var pathRow = document.getElementById('book-path-row');
-                        if (localRadio) {
-                            localRadio.checked = true;
-                        }
-                        if (pathRow) {
-                            pathRow.style.display = '';
-                        }
-                    }
                 } else {
                     setSaveStatus('saved');
                 }
@@ -1208,6 +1183,17 @@
         });
         document.querySelectorAll('input[name="config_session"]').forEach(function(radio) {
             radio.addEventListener('change', debouncedSaveConfig);
+        });
+
+        // Update radio group descriptions on change
+        document.querySelectorAll('.radio-group-description').forEach(function(desc) {
+            var descriptions = JSON.parse(desc.dataset.descriptions);
+            var radioName = desc.dataset.radioName;
+            document.querySelectorAll('input[name="' + radioName + '"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    desc.textContent = descriptions[this.value] || '';
+                });
+            });
         });
 
         // Server action buttons
@@ -1267,93 +1253,61 @@
             loginType.addEventListener('change', update);
         })();
 
-        // Book files location — toggle controls radios, radio controls path field
+        // Library location — customize toggle, storage radio, split toggle, path fields
         (function() {
-            var toggle = document.querySelector('input[name="config_custom_book_location"]');
-            var radios = document.getElementById('book-storage-radios');
-            var pathRow = document.getElementById('book-path-row');
-            var pathField = document.querySelector('input[name="config_calibre_dir"]');
-            var localRadio = document.querySelector('input[name="book_storage_type"][value="local"]');
+            var customizeToggle = document.getElementById('library-customize-toggle');
+            var settings = document.getElementById('library-settings');
+            var splitToggle = document.getElementById('library-split-toggle');
+            var pathLabel = document.getElementById('library-path-label');
+            var splitPathRow = document.getElementById('library-split-path-row');
+            var calibreDirField = document.querySelector('input[name="config_calibre_dir"]');
+            var gdriveToggle = document.getElementById('library-gdrive-toggle');
+            var localOptions = document.getElementById('library-local-options');
 
-            function updateStorageView() {
-                if (toggle.checked) {
-                    radios.style.display = '';
-                    pathRow.style.display = localRadio.checked ? '' : 'none';
-                    if (!localRadio.checked) {
-                        debouncedSaveConfig();
-                    }
+            function updateView() {
+                if (customizeToggle.checked) {
+                    settings.style.display = '';
+                    localOptions.style.display = gdriveToggle.checked ? 'none' : '';
                 } else {
-                    radios.style.display = 'none';
-                    pathRow.style.display = 'none';
-                    pathField.value = '/books';
+                    settings.style.display = 'none';
+                    calibreDirField.value = '/books';
                     debouncedSaveConfig();
                 }
             }
 
-            function onRadioChange() {
-                pathRow.style.display = localRadio.checked ? '' : 'none';
-                if (!localRadio.checked) {
-                    debouncedSaveConfig();
+            function updateSplitView() {
+                if (splitToggle.checked) {
+                    pathLabel.textContent = 'Path to database';
+                    splitPathRow.style.display = '';
+                } else {
+                    pathLabel.textContent = 'Path to library';
+                    splitPathRow.style.display = 'none';
                 }
+            }
+
+            function onGdriveToggleChange() {
+                if (gdriveToggle.checked) {
+                    document.getElementById('gdrive-overlay').style.display = '';
+                    gdriveToggle.checked = false;
+                }
+                localOptions.style.display = gdriveToggle.checked ? 'none' : '';
             }
 
             // Derive initial state
-            if (!pathField.value || pathField.value === '/books') {
-                toggle.checked = false;
-            }
-            if (!toggle.checked) {
-                radios.style.display = 'none';
-                pathRow.style.display = 'none';
+            if (!calibreDirField.value || calibreDirField.value === '/books') {
+                customizeToggle.checked = false;
             } else {
-                pathRow.style.display = localRadio.checked ? '' : 'none';
+                customizeToggle.checked = true;
             }
+            updateView();
+            updateSplitView();
 
-            toggle.addEventListener('change', updateStorageView);
-            document.querySelectorAll('input[name="book_storage_type"]').forEach(function(radio) {
-                radio.addEventListener('change', onRadioChange);
+            customizeToggle.addEventListener('change', updateView);
+            splitToggle.addEventListener('change', function() {
+                updateSplitView();
+                debouncedSaveConfig();
             });
-        })();
-
-        // Metadata database location — toggle controls radios, radio controls path field
-        (function() {
-            var toggle = document.querySelector('input[name="config_custom_metadata_location"]');
-            var radios = document.getElementById('metadata-storage-radios');
-            var pathRow = document.getElementById('metadata-path-row');
-            var pathField = document.querySelector('input[name="config_calibre_split_dir"]');
-            var localRadio = document.querySelector('input[name="metadata_storage_type"][value="local"]');
-            var gdriveRadio = document.querySelector('input[name="metadata_storage_type"][value="gdrive"]');
-
-            function updateMetadataView() {
-                if (toggle.checked) {
-                    radios.style.display = '';
-                    pathRow.style.display = localRadio.checked ? '' : 'none';
-                } else {
-                    radios.style.display = 'none';
-                    pathRow.style.display = 'none';
-                }
-            }
-
-            function onRadioChange() {
-                if (gdriveRadio.checked) {
-                    // Show gdrive setup overlay and revert to local
-                    document.getElementById('gdrive-overlay').style.display = '';
-                    localRadio.checked = true;
-                    pathRow.style.display = '';
-                    return;
-                }
-                pathRow.style.display = localRadio.checked ? '' : 'none';
-            }
-
-            // Derive initial state from saved value
-            if (!pathField.value || pathField.value === '/books') {
-                toggle.checked = false;
-            }
-            updateMetadataView();
-
-            toggle.addEventListener('change', updateMetadataView);
-            document.querySelectorAll('input[name="metadata_storage_type"]').forEach(function(radio) {
-                radio.addEventListener('change', onRadioChange);
-            });
+            gdriveToggle.addEventListener('change', onGdriveToggleChange);
         })();
 
         // Kobo sync — toggle controls visibility of sub-options
@@ -1494,6 +1448,25 @@
                 var smtpRadio = document.querySelector('input[name="mail_server_type"][value="0"]');
                 if (smtpRadio) smtpRadio.checked = true;
                 saveEmailSettings(false);
+                // Also disable public registration since email is required for it
+                var regToggle = document.getElementById('config-public-reg-toggle');
+                if (regToggle && regToggle.checked) {
+                    regToggle.checked = false;
+                    debouncedSaveConfig();
+                }
+            });
+        })();
+
+        // Public registration — require email to be configured and tested
+        (function() {
+            var regToggle = document.getElementById('config-public-reg-toggle');
+            if (!regToggle) return;
+
+            regToggle.addEventListener('change', function() {
+                if (this.checked && !isEmailVerified()) {
+                    this.checked = false;
+                    showToast('Email integration must be configured and tested before enabling public registration.', 'error');
+                }
             });
         })();
 
@@ -1512,54 +1485,203 @@
             return formData;
         }
 
+        var _emailTestPassed = {{ 'true' if config.get_mail_server_configured() else 'false' }};
+
+        function isEmailVerified() {
+            var emailToggle = document.getElementById('config_email_enabled');
+            return emailToggle && emailToggle.checked && _emailTestPassed;
+        }
+
+        function handleTestFailure(message) {
+            _emailTestPassed = false;
+            showToast(message, 'error');
+            setEmailErrorState();
+            // Disable public registration if email is not verified
+            var regToggle = document.getElementById('config-public-reg-toggle');
+            if (regToggle && regToggle.checked) {
+                regToggle.checked = false;
+                debouncedSaveConfig();
+            }
+        }
+
         function saveEmailSettings(includeTest) {
             var formData = collectEmailFormData(includeTest);
+            if (includeTest) {
+                setEmailTestingState();
+            }
             setSaveStatus('saving');
-            fetch('{{ url_for("admin.update_mailsettings") }}', {
+            var fetchOpts = {
                 method: 'POST',
                 headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
                 body: formData
+            };
+            // Add a 15s client-side timeout for test emails
+            if (includeTest && typeof AbortController !== 'undefined') {
+                var controller = new AbortController();
+                fetchOpts.signal = controller.signal;
+                setTimeout(function() { controller.abort(); }, 25000);
+            }
+            fetch('{{ url_for("admin.update_mailsettings") }}', fetchOpts)
+            .then(function(resp) {
+                if (!resp.ok) throw new Error('Server error (' + resp.status + ')');
+                return resp.json();
             })
-            .then(function(resp) { return resp.text(); })
-            .then(function(html) {
-                var doc = new DOMParser().parseFromString(html, 'text/html');
-                var errToast = doc.querySelector('#toast-container .toast-error');
-                if (errToast) {
-                    setSaveStatus('error', errToast.textContent.trim());
+            .then(function(data) {
+                var messages = data.result || [];
+                var error = messages.find(function(m) { return m.type === 'danger'; });
+                if (error) {
+                    setSaveStatus('error', error.message);
+                    if (includeTest) {
+                        handleTestFailure(error.message);
+                    }
                 } else {
                     setSaveStatus('saved');
+                    if (includeTest) {
+                        _emailTestPassed = true;
+                        _emailTestPassed_snapshot = true;
+                        showToast('Test email sent successfully.', 'success');
+                        snapshotEmailFields();
+                        setEmailVerifiedState();
+                    }
                 }
             })
-            .catch(function() {
+            .catch(function(err) {
                 setSaveStatus('error');
+                if (includeTest) {
+                    var msg = (err.name === 'AbortError')
+                        ? 'Connection timed out. Check your mail server and port settings.'
+                        : (err.message || 'Failed to reach the server.');
+                    handleTestFailure(msg);
+                }
             });
         }
 
-        var debouncedSaveEmail = debounce(function() { saveEmailSettings(false); }, 1500);
-        document.querySelectorAll('.email-field').forEach(function(field) {
-            field.addEventListener('change', debouncedSaveEmail);
-        });
-        var btnSaveEmail = document.getElementById('btn-save-email');
-        if (btnSaveEmail) {
-            btnSaveEmail.addEventListener('click', function() { saveEmailSettings(false); });
+        // Snapshot email field values for cancel/revert
+        var _emailSnapshot = {};
+        var _emailReverting = false;
+        var _emailTestPassed_snapshot = _emailTestPassed;
+        function snapshotEmailFields() {
+            _emailSnapshot = {};
+            document.querySelectorAll('.email-field').forEach(function(field) {
+                _emailSnapshot[field.name] = field.value;
+            });
+            var serverType = document.querySelector('input[name="mail_server_type"]:checked');
+            _emailSnapshot['mail_server_type'] = serverType ? serverType.value : '0';
         }
+        function revertEmailFields() {
+            _emailReverting = true;
+            document.querySelectorAll('.email-field').forEach(function(field) {
+                if (_emailSnapshot.hasOwnProperty(field.name)) {
+                    field.value = _emailSnapshot[field.name];
+                }
+            });
+            if (_emailSnapshot['mail_server_type']) {
+                var radio = document.querySelector('input[name="mail_server_type"][value="' + _emailSnapshot['mail_server_type'] + '"]');
+                if (radio) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                }
+            }
+            _emailReverting = false;
+        }
+        snapshotEmailFields();
+
+        // Show/hide button row and verified state
+        var emailButtonRow = document.getElementById('email-button-row');
         var btnTestEmail = document.getElementById('btn-test-email');
+        var btnCancelEmail = document.getElementById('btn-cancel-email');
+
+        function resetEmailTestBtn() {
+            if (!btnTestEmail) return;
+            btnTestEmail.textContent = 'Save and Send Test Email';
+            btnTestEmail.classList.remove('email-verified', 'email-testing', 'email-error');
+            btnTestEmail.disabled = false;
+        }
+
+        function setEmailTestingState() {
+            if (!btnTestEmail || !emailButtonRow) return;
+            emailButtonRow.style.display = 'flex';
+            btnTestEmail.innerHTML = '<span class="email-spinner"></span> Sending Test Email\u2026';
+            btnTestEmail.classList.remove('email-error');
+            btnTestEmail.classList.add('email-testing');
+            btnTestEmail.disabled = true;
+            if (btnCancelEmail) btnCancelEmail.style.display = 'none';
+        }
+
+        function setEmailErrorState() {
+            if (!btnTestEmail || !emailButtonRow) return;
+            emailButtonRow.style.display = 'flex';
+            btnTestEmail.textContent = 'Test Failed — Retry';
+            btnTestEmail.classList.remove('email-testing');
+            btnTestEmail.classList.add('email-error');
+            btnTestEmail.disabled = false;
+            if (btnCancelEmail) btnCancelEmail.style.display = '';
+        }
+
+        function setEmailVerifiedState() {
+            if (!btnTestEmail || !emailButtonRow) return;
+            emailButtonRow.style.display = 'flex';
+            btnTestEmail.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 256 256"><path d="M149.61,85.71l-89.6,88a8,8,0,0,1-11.22,0L10.39,136a8,8,0,1,1,11.22-11.41L54.4,156.79l84-82.5a8,8,0,1,1,11.22,11.42Zm96.1-11.32a8,8,0,0,0-11.32-.1l-84,82.5-18.83-18.5a8,8,0,0,0-11.21,11.42l24.43,24a8,8,0,0,0,11.22,0l89.6-88A8,8,0,0,0,245.71,74.39Z"></path></svg> Email Verified';
+            btnTestEmail.classList.add('email-verified');
+            if (btnCancelEmail) btnCancelEmail.style.display = 'none';
+        }
+
+        function showEmailButtons() {
+            if (_emailReverting) return;
+            if (emailButtonRow) emailButtonRow.style.display = 'flex';
+            if (btnCancelEmail) btnCancelEmail.style.display = '';
+            resetEmailTestBtn();
+            _emailTestPassed = false;
+        }
+
+        function hideEmailButtons() {
+            if (emailButtonRow) emailButtonRow.style.display = 'none';
+            resetEmailTestBtn();
+        }
+
+        document.querySelectorAll('.email-field').forEach(function(field) {
+            field.addEventListener('change', function() {
+                if (_emailReverting) return;
+                saveEmailSettings(false);
+                showEmailButtons();
+            });
+            field.addEventListener('input', showEmailButtons);
+        });
+
+        // Save and Send Test Email button
         if (btnTestEmail) {
             btnTestEmail.addEventListener('click', function() { saveEmailSettings(true); });
+            // Show verified or test state on load
+            if (_emailTestPassed && document.getElementById('config_email_enabled').checked) {
+                setEmailVerifiedState();
+            } else if (!_emailTestPassed && document.getElementById('config_email_enabled').checked) {
+                showEmailButtons();
+            }
+        }
+
+        // Cancel button — revert fields, save reverted values, restore previous state
+        if (btnCancelEmail) {
+            btnCancelEmail.addEventListener('click', function() {
+                revertEmailFields();
+                saveEmailSettings(false);
+                if (_emailTestPassed_snapshot) {
+                    _emailTestPassed = true;
+                    setEmailVerifiedState();
+                } else {
+                    hideEmailButtons();
+                }
+            });
         }
 
         // Email Integration — mail server type toggle (Standard vs Gmail)
         (function() {
             var smtpFields = document.getElementById('smtp-fields');
-            var btnSave = document.getElementById('btn-save-email');
-            var btnRow = btnSave ? btnSave.parentNode : null;
             var smtpRadio = document.querySelector('input[name="mail_server_type"][value="0"]');
             var gmailRadio = document.querySelector('input[name="mail_server_type"][value="1"]');
 
             function updateMailView() {
                 var isGmail = gmailRadio && gmailRadio.checked;
                 if (smtpFields) smtpFields.style.display = isGmail ? 'none' : '';
-                if (btnRow) btnRow.style.display = isGmail ? 'none' : '';
             }
 
             // Set initial state on page load
@@ -1576,10 +1698,11 @@
                         headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
                         body: formData
                     })
-                    .then(function(resp) { return resp.text(); })
-                    .then(function(html) {
-                        var doc = new DOMParser().parseFromString(html, 'text/html');
-                        if (doc.querySelector('#toast-container .toast-error')) {
+                    .then(function(resp) { return resp.json(); })
+                    .then(function(data) {
+                        var messages = data.result || [];
+                        var error = messages.find(function(m) { return m.type === 'danger'; });
+                        if (error) {
                             // Gmail not available (missing deps or missing gmail.json) — show overlay and revert
                             document.getElementById('gdrive-overlay').style.display = '';
                             if (smtpRadio) smtpRadio.checked = true;
@@ -1596,15 +1719,17 @@
                 });
             }
 
-            // When Standard is selected, show SMTP fields
+            // When Standard is selected, show SMTP fields and buttons
             if (smtpRadio) {
-                smtpRadio.addEventListener('change', updateMailView);
+                smtpRadio.addEventListener('change', function() {
+                    updateMailView();
+                    showEmailButtons();
+                });
             }
         })();
 
         // Inline field validation on blur (all [data-validate] fields)
         (function() {
-            var btnSave = document.getElementById('btn-save-email');
             var btnTest = document.getElementById('btn-test-email');
             var hostnameRe = /^[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?$/;
             var emailRe = /\S+@\S+\.\S+/;
@@ -1660,8 +1785,9 @@
                 document.querySelectorAll('#smtp-fields input[data-validate]').forEach(function(field) {
                     if (validateField(field) !== '') valid = false;
                 });
-                if (btnSave) btnSave.disabled = !valid;
-                if (btnTest) btnTest.disabled = !valid;
+                if (btnTest && !btnTest.classList.contains('email-verified')) {
+                    btnTest.disabled = !valid;
+                }
             }
 
             // Attach blur/input listeners to all [data-validate] fields on the page

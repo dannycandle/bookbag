@@ -46,8 +46,8 @@ from sqlalchemy.sql.expression import func, or_, text
 from . import constants, logger, helper, services, cli_param
 from . import db, calibre_db, ub, web_server, config, updater_thread, gdriveutils, \
     kobo_sync_status, schedule
-from .helper import check_valid_domain, send_test_mail, reset_password, generate_password_hash, check_email, \
-    valid_email, check_username
+from .helper import check_valid_domain, send_test_mail, send_test_mail_sync, reset_password, generate_password_hash, \
+    check_email, valid_email, check_username
 from .embed_helper import get_calibre_binarypath
 from .gdriveutils import is_gdrive_ready, gdrive_support
 from .render_template import render_title_template, get_sidebar_config
@@ -115,6 +115,7 @@ def before_request():
     g.constants = constants
     g.google_site_verification = os.getenv('GOOGLE_SITE_VERIFICATION', '')
     g.allow_registration = config.config_public_reg
+    g.mail_configured = config.get_mail_enabled()
     g.allow_anonymous = config.config_anonbrowse
     g.allow_upload = config.config_uploading
     g.current_theme = config.config_theme
@@ -1307,14 +1308,6 @@ def new_user():
                                  kobo_support=kobo_support, registered_oauth=oauth_check)
 
 
-@admi.route("/admin/mailsettings", methods=["GET"])
-@user_login_required
-@admin_required
-def edit_mailsettings():
-    content = config.get_mail_settings()
-    return render_title_template("email_edit.html", content=content, title=_("Edit Email Server Settings"),
-                                 page="mailset", feature_support=feature_support)
-
 
 @admi.route("/admin/mailsettings", methods=["POST"])
 @user_login_required
@@ -1331,11 +1324,10 @@ def update_mailsettings():
     elif to_save.get("gmail"):
         try:
             config.mail_gmail_token = services.gmail.setup_gmail(config.mail_gmail_token)
-            flash(_("Success! Gmail Account Verified."), category="success")
         except Exception as ex:
-            flash(str(ex), category="error")
             log.error(ex)
-            return edit_mailsettings()
+            return make_response(jsonify(
+                {"result": [{"type": "danger", "message": str(ex)}]}))
 
     else:
         _config_int(to_save, "mail_port")
@@ -1346,31 +1338,40 @@ def update_mailsettings():
         config.mail_server = strip_whitespaces(to_save.get('mail_server', ""))
         config.mail_from = strip_whitespaces(to_save.get('mail_from', ""))
         config.mail_login = strip_whitespaces(to_save.get('mail_login', ""))
+        # Settings changed — mark as unverified until next test
+        if not to_save.get("test"):
+            config.mail_server_verified = False
     try:
         config.save()
     except (OperationalError, InvalidRequestError) as e:
         ub.session.rollback()
         log.error_or_exception("Settings Database error: {}".format(e))
-        flash(_("Oops! Database Error: %(error)s.", error=e.orig), category="error")
-        return edit_mailsettings()
+        return make_response(jsonify(
+            {"result": [{"type": "danger", "message": _("Oops! Database Error: %(error)s.", error=e.orig)}]}))
     except Exception as e:
-        flash(_("Oops! Database Error: %(error)s.", error=e.orig), category="error")
-        return edit_mailsettings()
+        return make_response(jsonify(
+            {"result": [{"type": "danger", "message": _("Oops! Database Error: %(error)s.", error=e.orig)}]}))
 
     if to_save.get("test"):
         if current_user.email:
-            result = send_test_mail(current_user.email, current_user.name)
+            result = send_test_mail_sync(current_user.email, current_user.name)
             if result is None:
-                flash(_("Test e-mail queued for sending to %(email)s, please check Tasks for result",
-                        email=current_user.email), category="info")
+                config.mail_server_verified = True
+                config.save()
+                return make_response(jsonify(
+                    {"result": [{"type": "success", "message": _("Test e-mail sent successfully to %(email)s",
+                                                              email=current_user.email)}]}))
             else:
-                flash(_("There was an error sending the Test e-mail: %(res)s", res=result), category="error")
+                config.mail_server_verified = False
+                config.save()
+                return make_response(jsonify(
+                    {"result": [{"type": "danger", "message": _("There was an error sending the test e-mail: %(res)s", res=result)}]}))
         else:
-            flash(_("Please configure your e-mail address first..."), category="error")
-    else:
-        flash(_("Email Server Settings updated"), category="success")
+            return make_response(jsonify(
+                {"result": [{"type": "danger", "message": _("Please configure your e-mail address first...")}]}))
 
-    return edit_mailsettings()
+    return make_response(jsonify(
+        {"result": [{"type": "success", "message": _("Email Server Settings updated")}]}))
 
 
 @admi.route("/admin/scheduledtasks")
@@ -1460,7 +1461,7 @@ def edit_user(user_id):
                                  content=content,
                                  config=config,
                                  registered_oauth=oauth_check,
-                                 mail_configured=config.get_mail_server_configured(),
+                                 mail_configured=config.get_mail_enabled(),
                                  kobo_support=kobo_support,
                                  title=_("Edit User %(nick)s", nick=content.name),
                                  page="edituser")
@@ -2106,7 +2107,7 @@ def _handle_edit_user(to_save, content, languages, translations, kobo_support):
             return render_title_template("user_edit.html",
                                          translations=translations,
                                          languages=languages,
-                                         mail_configured=config.get_mail_server_configured(),
+                                         mail_configured=config.get_mail_enabled(),
                                          kobo_support=kobo_support,
                                          new_user=0,
                                          content=content,

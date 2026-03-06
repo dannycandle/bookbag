@@ -17,7 +17,7 @@
 <!-- BEGIN MAIN APP-->    
 <body class="{{ page }} {{ bodyClass }}">
 <div class="app-wrapper">
-{% if not g.get('setup_mode') %}
+{% if not g.get('setup_mode') and page not in ('login', 'register') %}
 {% if current_user.is_authenticated or g.allow_anonymous %}
     <div id="navbar">
       <div id="navbar-menus-wrapper">        

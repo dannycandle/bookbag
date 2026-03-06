@@ -97,11 +97,61 @@
   <input type="file" id="upload-file-input" name="btn-upload" multiple>
 </form>
 
-<button class="fab-button" onclick="document.getElementById('upload-file-input').click()">
+<button class="fab-button" id="fab-upload-btn">
   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256">
     <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
   </svg>
 </button>
+
+<!-- Upload safety warning overlay (shown once) -->
+<div id="uploadWarningOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(2px); z-index:50;">
+  <div style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:420px; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-radius:10px; padding:28px; box-shadow:-1px 2px 10px #00000033; z-index:100; color:#581C1C;">
+    <p style="margin:0 0 10px 0; font-size:0.9rem;"><strong>{{_('Upload Safety')}}</strong></p>
+    <p style="font-size:0.85rem; margin:0 0 18px 0; line-height:1.6;">
+      {{_('Book files (EPUB, PDF, etc.) can contain active content. Only upload books from sources you trust.')}}
+    </p>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button type="button" id="uploadWarning-cancel" class="btn" style="padding:6px 16px;">{{_('Cancel')}}</button>
+      <button type="button" id="uploadWarning-confirm" class="btn" style="padding:6px 16px; background:#581C1C; border-color:#581C1C; color:white;">{{_('I Understand')}}</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var fab = document.getElementById('fab-upload-btn');
+  var overlay = document.getElementById('uploadWarningOverlay');
+  var confirmBtn = document.getElementById('uploadWarning-confirm');
+  var cancelBtn = document.getElementById('uploadWarning-cancel');
+  var fileInput = document.getElementById('upload-file-input');
+
+  function openFilePicker() {
+    fileInput.click();
+  }
+
+  fab.addEventListener('click', function() {
+    if (localStorage.getItem('uploadWarningAcknowledged')) {
+      openFilePicker();
+    } else {
+      overlay.style.display = '';
+    }
+  });
+
+  confirmBtn.addEventListener('click', function() {
+    localStorage.setItem('uploadWarningAcknowledged', '1');
+    overlay.style.display = 'none';
+    openFilePicker();
+  });
+
+  cancelBtn.addEventListener('click', function() {
+    overlay.style.display = 'none';
+  });
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.style.display = 'none';
+  });
+})();
+</script>
 {% endif %}
 
 </div><!-- end main-content -->

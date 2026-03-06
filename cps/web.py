@@ -21,6 +21,8 @@
 import os
 import json
 import mimetypes
+import random
+import time
 import chardet  # dependency of requests
 import copy
 from importlib.metadata import metadata
@@ -46,8 +48,8 @@ from .search import render_search_results, render_adv_search_results
 from .gdriveutils import getFileFromEbooksFolder, do_gdrive_download
 from .helper import check_valid_domain, check_email, check_username, \
     get_book_cover, get_series_cover_thumbnail, get_download_link, send_mail, generate_random_password, \
-    send_registration_mail, check_send_to_ereader, check_read_formats, tags_filters, reset_password, valid_email, \
-    edit_book_read_status, valid_password
+    send_registration_mail, check_send_to_ereader, check_read_formats, tags_filters, valid_email, \
+    edit_book_read_status, valid_password, send_reset_code, verify_reset_code, complete_password_reset
 from .pagination import Pagination
 from .redirect import get_redirect_location
 from .cw_babel import get_available_locale
@@ -1266,7 +1268,7 @@ def download_link(book_id, book_format, anyname):
 @login_required_if_no_ano
 @download_required
 def send_to_ereader(book_id, book_format, convert):
-    if not config.get_mail_server_configured():
+    if not config.get_mail_enabled():
         return make_response(jsonify(type="danger", message=_("Please configure the SMTP mail settings first...")))
     elif current_user.kindle_mail:
         result = send_mail(book_id, book_format, convert, current_user.kindle_mail, config.get_book_path(),
@@ -1302,7 +1304,7 @@ def register_post():
         return render_title_template('register.html', config=config, title=_("Register"), page="register")
     if current_user is not None and current_user.is_authenticated:
         return redirect(url_for('web.index'))
-    if not config.get_mail_server_configured():
+    if not config.get_mail_enabled():
         flash(_("Oops! Email server is not configured, please contact your administrator."), category="error")
         return render_title_template('register.html', title=_("Register"), page="register")
     nickname = strip_whitespaces(to_save.get("email", "")) if config.config_register_email else to_save.get('name')
@@ -1353,7 +1355,7 @@ def register():
         abort(404)
     if current_user is not None and current_user.is_authenticated:
         return redirect(url_for('web.index'))
-    if not config.get_mail_server_configured():
+    if not config.get_mail_enabled():
         flash(_("Oops! Email server is not configured, please contact your administrator."), category="error")
         return render_title_template('register.html', title=_("Register"), page="register")
     if feature_support['oauth']:
@@ -1368,7 +1370,7 @@ def handle_login_user(user, remember, message, category):
     return redirect(get_redirect_location(request.form.get('next', None), "web.index"))
 
 
-def render_login(username="", password=""):
+def render_login(username=""):
     next_url = request.args.get('next', default=url_for("web.index"), type=str)
     if url_for("web.logout") == next_url:
         next_url = url_for("web.index")
@@ -1377,9 +1379,8 @@ def render_login(username="", password=""):
                                  next_url=next_url,
                                  config=config,
                                  username=username,
-                                 password=password,
                                  oauth_check=oauth_check,
-                                 mail=config.get_mail_server_configured(), page="login")
+                                 mail=config.get_mail_enabled(), page="login")
 
 
 @web.route('/login', methods=['GET'])
@@ -1402,11 +1403,11 @@ def login_post():
         limiter.check()
     except RateLimitExceeded:
         flash(_("Please wait one minute before next login"), category="error")
-        return render_login(username, form.get("password", ""))
+        return render_login(username)
     except (ConnectionError, Exception) as e:
         log.error("Connection error to limiter backend: %s", e)
         flash(_("Connection error to limiter backend, please contact your administrator"), category="error")
-        return render_login(username, form.get("password", ""))
+        return render_login(username)
     if current_user is not None and current_user.is_authenticated:
         return redirect(url_for('web.index'))
     if config.config_login_type == constants.LOGIN_LDAP and not services.ldap:
@@ -1439,30 +1440,74 @@ def login_post():
             flash(_(u"Wrong Username or Password"), category="error")
     else:
         ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
-        if form.get('forgot', "") == 'forgot':
-            if user is not None and user.name != "Guest":
-                ret, __ = reset_password(user.id)
-                if ret == 1:
-                    flash(_(u"New Password was sent to your email address"), category="info")
-                    log.info('Password reset for user "%s" IP-address: %s', username, ip_address)
-                else:
-                    log.error(u"An unknown error occurred. Please try again later")
-                    flash(_(u"An unknown error occurred. Please try again later."), category="error")
-            else:
-                flash(_(u"Please enter valid username to reset password"), category="error")
-                log.warning('Username missing for password reset IP-address: %s', ip_address)
+        if user and check_password_hash(str(user.password), form['password']) and user.name != "Guest":
+            config.config_is_initial = False
+            log.debug(u"You are now logged in as: '{}'".format(user.name))
+            return handle_login_user(user,
+                                     remember_me,
+                                     _(u"You are now logged in as: '%(nickname)s'", nickname=user.name),
+                                     "success")
         else:
-            if user and check_password_hash(str(user.password), form['password']) and user.name != "Guest":
-                config.config_is_initial = False
-                log.debug(u"You are now logged in as: '{}'".format(user.name))
-                return handle_login_user(user,
-                                         remember_me,
-                                         _(u"You are now logged in as: '%(nickname)s'", nickname=user.name),
-                                         "success")
-            else:
-                log.warning('Login failed for user "{}" IP-address: {}'.format(username, ip_address))
-                flash(_(u"Wrong Username or Password"), category="error")
-    return render_login(username, form.get("password", ""))
+            log.warning('Login failed for user "{}" IP-address: {}'.format(username, ip_address))
+            flash(_(u"Wrong Username or Password"), category="error")
+    return render_login(username)
+
+
+@web.route('/reset/request', methods=['POST'])
+@limiter.limit("10/hour", key_func=get_remote_address)
+def reset_request():
+    form = request.form.to_dict()
+    username = strip_whitespaces(form.get('username', '')).lower().replace("\n", "").replace("\r", "")
+    if not username:
+        return jsonify({'success': False, 'error': _("Please enter your email address.")})
+    user = ub.session.query(ub.User).filter(
+        or_(func.lower(ub.User.name) == username, func.lower(ub.User.email) == username)
+    ).first()
+    if not user or user.name == "Guest":
+        # Don't reveal whether the user exists — add delay to match timing of real requests
+        time.sleep(random.uniform(0.5, 1.5))
+        return jsonify({'success': True})
+    ret, __ = send_reset_code(user.id)
+    if ret == 2:
+        return jsonify({'success': False, 'error': _("Email server is not configured.")})
+    if ret == 0:
+        return jsonify({'success': False, 'error': _("An error occurred. Please try again.")})
+    flask_session['reset_user_id'] = user.id
+    return jsonify({'success': True})
+
+
+@web.route('/reset/verify', methods=['POST'])
+@limiter.limit("20/hour", key_func=get_remote_address)
+def reset_verify():
+    user_id = flask_session.get('reset_user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': _("Reset session expired. Please start over.")})
+    code = request.form.get('code', '').strip()
+    if not code:
+        return jsonify({'success': False, 'error': _("Please enter the code.")})
+    if not verify_reset_code(user_id, code):
+        return jsonify({'success': False, 'error': _("Invalid or expired code.")})
+    return jsonify({'success': True})
+
+
+@web.route('/reset/complete', methods=['POST'])
+@limiter.limit("10/hour", key_func=get_remote_address)
+def reset_complete():
+    user_id = flask_session.get('reset_user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': _("Reset session expired. Please start over.")})
+    code = request.form.get('code', '').strip()
+    new_password = request.form.get('password', '')
+    if not verify_reset_code(user_id, code):
+        return jsonify({'success': False, 'error': _("Invalid or expired code.")})
+    try:
+        new_password = valid_password(new_password)
+    except Exception as ex:
+        return jsonify({'success': False, 'error': str(ex)})
+    if not complete_password_reset(user_id, new_password):
+        return jsonify({'success': False, 'error': _("An error occurred. Please try again.")})
+    flask_session.pop('reset_user_id', None)
+    return jsonify({'success': True})
 
 
 @web.route('/logout')

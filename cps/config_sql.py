@@ -59,8 +59,8 @@ class _Settings(_Base):
 
     id = Column(Integer, primary_key=True)
     mail_server = Column(String, default=constants.DEFAULT_MAIL_SERVER)
-    mail_port = Column(Integer, default=25)
-    mail_use_ssl = Column(SmallInteger, default=0)
+    mail_port = Column(Integer, default=465)
+    mail_use_ssl = Column(SmallInteger, default=2)
     mail_login = Column(String, default='mail@example.com')
     mail_password_e = Column(String)
     mail_password = Column(String)
@@ -68,6 +68,7 @@ class _Settings(_Base):
     mail_size = Column(Integer, default=25*1024*1024)
     mail_server_type = Column(SmallInteger, default=0)
     mail_gmail_token = Column(JSON, default={})
+    mail_server_verified = Column(Boolean, default=False)
 
     config_calibre_dir = Column(String)
     config_calibre_uuid = Column(String)
@@ -289,9 +290,16 @@ class ConfigSQL(object):
     def get_mail_settings(self):
         return {k: v for k, v in self.__dict__.items() if k.startswith('mail_')}
 
+    def get_mail_enabled(self):
+        """Returns True if email settings have been filled in (regardless of verification)."""
+        return bool(
+            (self.mail_server != constants.DEFAULT_MAIL_SERVER and self.mail_server_type == 0)
+            or (self.mail_gmail_token != {} and self.mail_server_type == 1)
+        )
+
     def get_mail_server_configured(self):
-        return bool((self.mail_server != constants.DEFAULT_MAIL_SERVER and self.mail_server_type == 0)
-                    or (self.mail_gmail_token != {} and self.mail_server_type == 1))
+        """Returns True only if email is enabled AND has been verified by a successful test."""
+        return bool(self.mail_server_verified and self.get_mail_enabled())
 
     def get_scheduled_task_settings(self):
         return {k: v for k, v in self.__dict__.items() if k.startswith('schedule_')}

@@ -23,7 +23,7 @@
   font-optical-sizing: auto;
   font-display: swap;
 }
-
+/* f34848 */
 :root {
     --primary: #f34848;
     --primary-hover: color-mix(in srgb, var(--primary) 85%, black);
@@ -562,6 +562,23 @@ details[open] .user-popover-menu {
 
 .save-status--error {
     color: #c0392b;
+}
+
+.save-status-tooltip {
+    display: none;
+}
+
+.save-status--has-tooltip .save-status-tooltip {
+    display: none;
+    white-space: nowrap;
+}
+
+.save-status--has-tooltip .save-status-tooltip::before {
+    content: '— ';
+}
+
+.save-status--has-tooltip:hover .save-status-tooltip {
+    display: inline;
 }
 
 @keyframes pulse-dot {
@@ -1280,24 +1297,43 @@ body.login .action-bar {
 }
 
 /* Login-specific styles (layout reuses setup-* classes) */
-.login-forgot {
-    text-align: right;
-    margin-bottom: 8px;
+.login-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    margin-top: 20px;
+    font-size: 14px;
 }
 
-.login-forgot-link {
+.login-links a,
+.login-links .login-link-btn {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
     background: none;
     border: none;
-    color: #333;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
     padding: 0;
-    text-decoration: none;
+    font-family: inherit;
 }
 
-.login-forgot-link:hover {
-    color: var(--primary);
+.login-links a:hover,
+.login-links .login-link-btn:hover {
+    text-decoration: underline;
+}
+
+.login-links a + a::before,
+.login-links a + .login-link-btn::before,
+.login-links .login-link-btn + a::before,
+.login-links .login-link-btn + .login-link-btn::before {
+    content: "|";
+    color: #ccc;
+    margin: 0 12px;
+    font-weight: 400;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .login-register {
@@ -1315,19 +1351,6 @@ body.login .action-bar {
 
 .login-register a:hover {
     text-decoration: underline;
-}
-
-.login-secondary-link {
-    display: block;
-    text-align: center;
-    margin-top: 12px;
-    font-size: 13px;
-    color: #666;
-    text-decoration: none;
-}
-
-.login-secondary-link:hover {
-    color: var(--primary);
 }
 
 .login-oauth {
@@ -2125,6 +2148,7 @@ select.book-edit-field {
 /* Radio Toggle Group — track */
 .radio-group {
     display: inline-flex;
+    align-self: flex-start;
     position: relative;
     border-radius: 999px;
     background: white;
@@ -2152,6 +2176,11 @@ select.book-edit-field {
 /* Move thumb right when second option is selected */
 .radio-group:has(.radio-card:last-child input:checked) .radio-group-thumb {
     transform: translateX(100%);
+}
+
+.radio-group-description {
+    padding: 0;
+    margin: 6px 0 0 0;
 }
 
 .radio-card {
@@ -2235,6 +2264,9 @@ select.book-edit-field {
 
 .user-card-name {
     margin: 0 0 4px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-card-role {
@@ -2314,6 +2346,65 @@ select.book-edit-field {
 }
 
 /* Setting path row (label + value inline) */
+#smtp-fields {
+    max-width: 700px;
+    margin-left: 50px;
+}
+
+.email-test-btn {
+    background-color: #2563eb;
+    color: white;
+}
+
+.email-test-btn:hover {
+    background-color: #1d4ed8;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.email-test-btn.email-verified {
+    background-color: #16a34a;
+    cursor: default;
+    pointer-events: none;
+}
+
+.email-test-btn.email-testing {
+    background-color: #64748b;
+    cursor: wait;
+}
+
+.email-test-btn.email-error {
+    background-color: var(--primary);
+    color: white;
+}
+
+.email-test-btn.email-error:hover {
+    background-color: var(--primary-hover);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.email-test-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.email-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: email-spin 0.6s linear infinite;
+    vertical-align: middle;
+}
+
+@keyframes email-spin {
+    to { transform: rotate(360deg); }
+}
+
 .setting-path-row {
     display: flex;
     flex-direction: row;
@@ -2381,110 +2472,44 @@ select.setting-input {
     cursor: pointer;
 }
 
-/* Radio card blocks (horizontal row of pill-shaped options) */
-.radio-group-row {
-    display: flex;
-    flex-direction: row;
-    gap: 0;
-    padding: 0 10px;
-}
-
-.radio-card-block {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    border: 1.5px solid #e1e1e1;
-    background: white;
-    color: rgba(0, 0, 0, 0.45);
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
-    user-select: none;
-}
-
-.radio-card-block:first-child {
-    border-radius: 12px 0 0 12px;
-    border-right: none;
-}
-
-.radio-card-block:last-child {
-    border-radius: 0 12px 12px 0;
-}
-
-.radio-card-block:has(input:checked) {
-    background: #f0f0ff;
-    border-color: #082dff;
+/* Google Drive setup dialog */
+.gdrive-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 28px;
+    box-shadow: -1px 2px 10px #00000033;
+    z-index: 100;
     color: #000;
 }
 
-.radio-card-block input {
-    display: none;
+.gdrive-dialog p {
+    margin: 0 0 14px 0;
+    color: #000;
+    opacity: 1;
 }
 
-/* Custom radio dot */
-.radio-card-dot {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    position: relative;
-    flex-shrink: 0;
-    transition: border-color 0.2s;
+.gdrive-dialog ol {
+    margin: 0;
+    padding-left: 20px;
+    list-style: decimal;
 }
 
-.radio-card-block:has(input:checked) .radio-card-dot {
-    border-color: #082dff;
+.gdrive-dialog li {
+    color: #000 !important;
+    font-weight: 300 !important;
+    font-size: inherit !important;
+    margin: 4px 0 !important;
+    list-style: decimal !important;
+    display: list-item !important;
+    padding: 0 !important;
 }
 
-.radio-card-dot::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: transparent;
-    transition: background 0.2s;
-}
-
-.radio-card-block:has(input:checked) .radio-card-dot::after {
-    background: #082dff;
-}
-
-/* Warning icon in radio card */
-.radio-card-warning {
-    color: #d4a017;
-    flex-shrink: 0;
-}
-
-/* Descriptive radio cards (with title + description) */
-.radio-card-descriptive {
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 14px 16px;
-    flex: 1;
-}
-
-.radio-card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.radio-card-title {
-    font-weight: 600;
-    font-size: 14px;
-    color: #1a1a1a;
-}
-
-.radio-card-description {
-    font-size: 12px;
-    color: #666;
-    line-height: 1.4;
-}
 
 /* Server action buttons */
 .server-action-buttons {
@@ -2692,6 +2717,45 @@ select.setting-input {
     font-size: 14px;
     min-height: 20px;
     margin-top: 4px;
+}
+
+.setup-success {
+    color: #5cb85c;
+    font-size: 14px;
+    font-weight: 500;
+}
+.setup-password-rules {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    font-size: 13px;
+}
+.setup-password-rules li {
+    padding: 2px 0 2px 20px;
+    position: relative;
+}
+.setup-password-rules li::before {
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+}
+.setup-password-rules .rule-pending {
+    color: #999;
+}
+.setup-password-rules .rule-pending::before {
+    content: "○";
+}
+.setup-password-rules .rule-pass {
+    color: #5cb85c;
+}
+.setup-password-rules .rule-pass::before {
+    content: "✓";
+}
+.setup-password-rules .rule-fail {
+    color: #d9534f;
+}
+.setup-password-rules .rule-fail::before {
+    content: "✗";
 }
 
 .setup-library-group {

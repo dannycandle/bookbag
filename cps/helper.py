@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import hmac
 import os
 import random
 import io
@@ -124,6 +125,135 @@ def send_test_mail(ereader_mail, user_name):
                          config.get_mail_settings(), email, N_("Test Email"),
                                               _('This Email has been sent via Bookbag.')))
     return
+
+
+def send_test_mail_sync(recipient, user_name):
+    """Send a test email synchronously with pre-flight server verification.
+
+    Security flow:
+    1. TCP connect — verify something is listening
+    2. Read SMTP 220 banner — verify it's an SMTP server
+    3. EHLO — verify the server responds correctly
+    4. TLS handshake (if configured) — verify server certificate matches hostname
+    5. Only THEN send credentials via login()
+    6. Send test email
+    """
+    import smtplib
+    import ssl
+    import signal
+    from io import StringIO
+    from email.message import EmailMessage
+    from email.utils import formatdate, make_msgid
+    from email.generator import Generator
+
+    settings = config.get_mail_settings()
+    recipient = strip_whitespaces(recipient)
+    use_ssl = int(settings.get('mail_use_ssl', 0))
+    timeout = 8
+
+    # Block plaintext auth — credentials should never be sent unencrypted
+    if use_ssl == 0 and settings.get("mail_password_e"):
+        return ("Sending credentials over an unencrypted connection is not allowed. "
+                "Please select SSL/TLS or STARTTLS encryption.")
+
+    def _timeout_handler(signum, frame):
+        raise TimeoutError("Email test timed out")
+
+    # Set a hard 20s alarm to catch DNS hangs and other blocking calls
+    old_handler = None
+    try:
+        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(20)
+    except (OSError, AttributeError, ValueError):
+        pass  # SIGALRM not available on Windows or non-main thread
+
+    smtp = None
+    try:
+        # --- Phase 1: Connect and verify SMTP server (no credentials yet) ---
+        if use_ssl == 2:
+            # SSL/TLS — certificate is verified during the TCP handshake
+            context = ssl.create_default_context()
+            smtp = smtplib.SMTP_SSL(settings["mail_server"], settings["mail_port"],
+                                    timeout=timeout, context=context)
+        else:
+            # Plain or STARTTLS — connect without encryption first
+            smtp = smtplib.SMTP(settings["mail_server"], settings["mail_port"], timeout=timeout)
+
+        # EHLO — verify the server speaks SMTP
+        try:
+            code, ehlo_msg = smtp.ehlo()
+            if not isinstance(code, int) or code < 200 or code >= 300:
+                return "Server did not respond to EHLO correctly (code {}). This may not be a mail server.".format(code)
+        except Exception as ehlo_err:
+            return "Server did not respond to EHLO. This may not be a mail server: {}".format(ehlo_err)
+
+        # STARTTLS — upgrade to encrypted connection and verify certificate
+        if use_ssl == 1:
+            try:
+                context = ssl.create_default_context()
+                resp = smtp.starttls(context=context)
+                starttls_code = resp[0] if isinstance(resp, tuple) else resp
+                if starttls_code != 220:
+                    return "STARTTLS handshake failed (code {}). The server may not support encryption.".format(starttls_code)
+                # Re-EHLO after STARTTLS as required by RFC 3207
+                smtp.ehlo()
+            except ssl.SSLCertVerificationError as e:
+                raise  # Let the outer handler catch this with a specific message
+            except Exception as tls_err:
+                return "STARTTLS failed: {}".format(tls_err)
+
+        # --- Phase 2: Authenticate (credentials sent over verified+encrypted connection) ---
+        if settings["mail_password_e"]:
+            smtp.login(str(settings["mail_login"]), str(settings["mail_password_e"]))
+
+        # --- Phase 3: Send the test email ---
+        msg = EmailMessage()
+        msg['From'] = settings["mail_from"]
+        msg['To'] = recipient
+        msg['Subject'] = _('Bookbag Test Email')
+        msg['Date'] = formatdate(localtime=True)
+        msg['Message-ID'] = make_msgid(domain='bookbag')
+        msg.set_content(_('This Email has been sent via Bookbag.').encode('UTF-8'), "text", "plain")
+
+        fp = StringIO()
+        gen = Generator(fp, mangle_from_=False)
+        gen.flatten(msg)
+        smtp.sendmail(settings["mail_from"], recipient, fp.getvalue())
+        smtp.quit()
+        return None  # Success
+
+    except ssl.SSLCertVerificationError as e:
+        log.error("Test email SSL certificate verification failed: %s", e)
+        return "SSL certificate verification failed for '{}'. The server's identity could not be confirmed.".format(
+            settings["mail_server"])
+    except smtplib.SMTPAuthenticationError as e:
+        log.error("Test email authentication failed: %s", e)
+        return "Authentication failed. Check your username and password."
+    except TimeoutError:
+        log.error("Test email timed out")
+        return "Connection timed out. Check your mail server and port settings."
+    except ConnectionRefusedError:
+        log.error("Test email connection refused")
+        return "Connection refused by {}:{}. Check the server address and port.".format(
+            settings["mail_server"], settings["mail_port"])
+    except socket.gaierror:
+        log.error("Test email DNS lookup failed for %s", settings["mail_server"])
+        return "Could not resolve '{}'. Check the server address.".format(settings["mail_server"])
+    except Exception as e:
+        log.error_or_exception("Test email failed: %s", e)
+        return str(e)
+    finally:
+        if smtp:
+            try:
+                smtp.quit()
+            except Exception:
+                pass
+        try:
+            signal.alarm(0)
+            if old_handler is not None:
+                signal.signal(signal.SIGALRM, old_handler)
+        except (OSError, AttributeError, ValueError):
+            pass
 
 
 # Send registration email or password reset email, depending on parameter resend (False means welcome email)
@@ -589,7 +719,7 @@ def reset_password(user_id):
     existing_user = ub.session.query(ub.User).filter(ub.User.id == user_id).first()
     if not existing_user:
         return 0, None
-    if not config.get_mail_server_configured():
+    if not config.get_mail_enabled():
         return 2, None
     try:
         password = generate_random_password(config.config_password_min_length)
@@ -600,6 +730,76 @@ def reset_password(user_id):
     except Exception:
         ub.session.rollback()
         return 0, None
+
+
+def send_reset_code(user_id):
+    existing_user = ub.session.query(ub.User).filter(ub.User.id == user_id).first()
+    if not existing_user:
+        return 0, None
+    if not config.get_mail_server_configured():
+        return 2, None
+    try:
+        code = str(random.SystemRandom().randint(100000, 999999))
+        existing_user.reset_code = code
+        existing_user.reset_code_expires = datetime.utcnow() + timedelta(minutes=15)
+        existing_user.reset_code_attempts = 0
+        ub.session.commit()
+        txt = "Hi %s!\r\n\r\n" % existing_user.name
+        txt += "Your password reset code is: %s\r\n\r\n" % code
+        txt += "This code expires in 15 minutes.\r\n\r\n"
+        txt += "If you didn't request this, you can ignore this email.\r\n\r\n"
+        txt += "Regards,\r\n"
+        txt += "Bookbag"
+        WorkerThread.add(None, TaskEmail(
+            subject=_('Password Reset Code'),
+            filepath=None,
+            attachment=None,
+            settings=config.get_mail_settings(),
+            recipient=existing_user.email,
+            task_message=N_("Password reset code for user: %(name)s", name=existing_user.name),
+            text=txt
+        ))
+        return 1, existing_user.name
+    except Exception:
+        ub.session.rollback()
+        return 0, None
+
+
+def verify_reset_code(user_id, code):
+    existing_user = ub.session.query(ub.User).filter(ub.User.id == user_id).first()
+    if not existing_user:
+        return False
+    if not existing_user.reset_code or not existing_user.reset_code_expires:
+        return False
+    if (existing_user.reset_code_attempts or 0) >= 5:
+        existing_user.reset_code = None
+        existing_user.reset_code_expires = None
+        existing_user.reset_code_attempts = 0
+        ub.session.commit()
+        return False
+    if existing_user.reset_code_expires < datetime.utcnow():
+        return False
+    if not hmac.compare_digest(existing_user.reset_code, code):
+        existing_user.reset_code_attempts = (existing_user.reset_code_attempts or 0) + 1
+        ub.session.commit()
+        return False
+    return True
+
+
+def complete_password_reset(user_id, new_password):
+    existing_user = ub.session.query(ub.User).filter(ub.User.id == user_id).first()
+    if not existing_user:
+        return False
+    try:
+        existing_user.password = generate_password_hash(new_password)
+        existing_user.reset_code = None
+        existing_user.reset_code_expires = None
+        existing_user.reset_code_attempts = 0
+        ub.session.commit()
+        return True
+    except Exception:
+        ub.session.rollback()
+        return False
 
 
 def generate_random_password(min_length):
