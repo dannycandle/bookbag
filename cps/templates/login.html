@@ -128,17 +128,9 @@
             <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#999" viewBox="0 0 256 256"><path d="M228,175a8,8,0,0,1-10.92-3l-19-33.2A123.23,123.23,0,0,1,162,155.46l5.87,35.22a8,8,0,0,1-6.58,9.21A8.4,8.4,0,0,1,160,200a8,8,0,0,1-7.88-6.69l-5.77-34.58a133.06,133.06,0,0,1-36.68,0l-5.77,34.58A8,8,0,0,1,96,200a8.4,8.4,0,0,1-1.32-.11,8,8,0,0,1-6.58-9.21L94,155.46a123.23,123.23,0,0,1-36.06-16.69L39,172A8,8,0,1,1,25.06,164l20-35a153.47,153.47,0,0,1-19.3-20A8,8,0,1,1,38.22,99c16.6,20.54,45.64,45,89.78,45s73.18-24.49,89.78-45A8,8,0,1,1,230.22,109a153.47,153.47,0,0,1-19.3,20l20,35A8,8,0,0,1,228,175Z"></path></svg>
             <svg class="eye-open" style="display:none" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#999" viewBox="0 0 256 256"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"></path></svg>
           </button>
-          <input type="password" id="new-password" placeholder="{{_('Password')}}"
-            data-policy="{{ config.config_password_policy }}"
-            data-min="{{ config.config_password_min_length }}"
-            data-lower="{{ config.config_password_lower }}"
-            data-upper="{{ config.config_password_upper }}"
-            data-number="{{ config.config_password_number }}"
-            data-special="{{ config.config_password_special }}"
-            data-character="{{ config.config_password_character }}">
+          <input type="password" id="new-password" placeholder="{{_('Password')}}">
         </div>
       </div>
-      <ul id="newpass-rules" class="setup-password-rules"></ul>
       <div id="newpass-error" class="setup-error"></div>
       <button type="button" id="reset-password-btn" class="setup-submit-btn">{{_('Reset Password')}}</button>
     </div>
@@ -174,41 +166,6 @@
       npToggle.querySelector('.eye-closed').style.display = isHidden ? 'none' : '';
       npToggle.querySelector('.eye-open').style.display = isHidden ? '' : 'none';
     });
-  }
-
-  // --- Password policy validation ---
-  var policyRules = [];
-  if (npInput && npInput.dataset.policy === 'True') {
-    var rulesEl = document.getElementById('newpass-rules');
-    var minLen = parseInt(npInput.dataset.min, 10) || 0;
-    if (minLen > 0) policyRules.push({ test: function(pw) { return pw.length >= minLen; }, label: 'At least ' + minLen + ' characters' });
-    if (npInput.dataset.lower === 'True') policyRules.push({ test: function(pw) { return /[a-z]/.test(pw); }, label: 'A lowercase letter' });
-    if (npInput.dataset.upper === 'True') policyRules.push({ test: function(pw) { return /[A-Z]/.test(pw); }, label: 'An uppercase letter' });
-    if (npInput.dataset.number === 'True') policyRules.push({ test: function(pw) { return /\d/.test(pw); }, label: 'A number' });
-    if (npInput.dataset.special === 'True') policyRules.push({ test: function(pw) { return /[^a-zA-Z0-9\s]/.test(pw); }, label: 'A special character' });
-    if (npInput.dataset.character === 'True') policyRules.push({ test: function(pw) { return /[a-zA-Z]/.test(pw); }, label: 'A letter' });
-
-    policyRules.forEach(function(rule) {
-      var li = document.createElement('li');
-      li.textContent = rule.label;
-      li.className = 'rule-pending';
-      rule.el = li;
-      rulesEl.appendChild(li);
-    });
-
-    npInput.addEventListener('input', function() {
-      var pw = npInput.value;
-      policyRules.forEach(function(rule) {
-        rule.el.className = rule.test(pw) ? 'rule-pass' : 'rule-fail';
-      });
-    });
-  }
-
-  function validatePassword(pw) {
-    for (var i = 0; i < policyRules.length; i++) {
-      if (!policyRules[i].test(pw)) return false;
-    }
-    return true;
   }
 
   // --- Card navigation ---
@@ -335,7 +292,6 @@
       var pw = npInput.value;
       newPassError.textContent = '';
       if (!pw) { newPassError.textContent = 'Please enter a new password.'; return; }
-      if (!validatePassword(pw)) { newPassError.textContent = "Password doesn't meet the requirements."; return; }
       resetBtn.textContent = 'Resetting...';
       postForm('{{ url_for("web.reset_complete") }}',
         { code: verifiedCode, password: pw }, resetBtn, 'Reset Password',

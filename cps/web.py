@@ -48,8 +48,9 @@ from .search import render_search_results, render_adv_search_results
 from .gdriveutils import getFileFromEbooksFolder, do_gdrive_download
 from .helper import check_valid_domain, check_email, check_username, \
     get_book_cover, get_series_cover_thumbnail, get_download_link, send_mail, generate_random_password, \
-    send_registration_mail, check_send_to_ereader, check_read_formats, tags_filters, valid_email, \
-    edit_book_read_status, valid_password, send_reset_code, verify_reset_code, complete_password_reset
+    send_registration_mail, send_registration_code, check_send_to_ereader, check_read_formats, tags_filters, \
+    valid_email, edit_book_read_status, valid_password, send_reset_code, verify_reset_code, \
+    complete_password_reset
 from .pagination import Pagination
 from .redirect import get_redirect_location
 from .cw_babel import get_available_locale
@@ -1296,57 +1297,98 @@ def register_post():
     try:
         limiter.check()
     except RateLimitExceeded:
-        flash(_(u"Please wait one minute to register next user"), category="error")
-        return render_title_template('register.html', config=config, title=_("Register"), page="register")
+        return jsonify({'success': False, 'error': _("Please wait one minute before trying again.")})
     except (ConnectionError, Exception) as e:
         log.error("Connection error to limiter backend: %s", e)
-        flash(_("Connection error to limiter backend, please contact your administrator"), category="error")
-        return render_title_template('register.html', config=config, title=_("Register"), page="register")
+        return jsonify({'success': False, 'error': _("Server error. Please try again later.")})
     if current_user is not None and current_user.is_authenticated:
-        return redirect(url_for('web.index'))
+        return jsonify({'success': False, 'error': _("You are already logged in.")})
     if not config.get_mail_enabled():
-        flash(_("Oops! Email server is not configured, please contact your administrator."), category="error")
-        return render_title_template('register.html', title=_("Register"), page="register")
+        return jsonify({'success': False, 'error': _("Email server is not configured, please contact your administrator.")})
     nickname = strip_whitespaces(to_save.get("email", "")) if config.config_register_email else to_save.get('name')
     if not nickname or not to_save.get("email"):
-        flash(_("Oops! Please complete all fields."), category="error")
-        return render_title_template('register.html', title=_("Register"), page="register")
+        return jsonify({'success': False, 'error': _("Please enter your email address.")})
     try:
         nickname = check_username(nickname)
         email = check_email(to_save.get("email", ""))
     except Exception as ex:
-        flash(str(ex), category="error")
-        return render_title_template('register.html', title=_("Register"), page="register")
+        return jsonify({'success': False, 'error': str(ex)})
+
+    if not check_valid_domain(email):
+        log.warning('Registering failed for user "{}" Email: {}'.format(nickname, to_save.get("email", "")))
+        return jsonify({'success': False, 'error': _("This email domain is not allowed.")})
 
     content = ub.User()
-    if check_valid_domain(email):
-        content.name = nickname
-        content.email = email
-        password = generate_random_password(config.config_password_min_length)
-        content.password = generate_password_hash(password)
-        content.role = config.config_default_role
-        content.locale = config.config_default_locale
-        content.sidebar_view = config.config_default_show
-        content.allowed_tags = config.config_allowed_tags
-        content.denied_tags = config.config_denied_tags
-        content.allowed_column_value = config.config_allowed_column_value
-        content.denied_column_value = config.config_denied_column_value
-        try:
-            ub.session.add(content)
-            ub.session.commit()
-            if feature_support['oauth']:
-                register_user_with_oauth(content)
-            send_registration_mail(strip_whitespaces(to_save.get("email", "")), nickname, password)
-        except Exception:
-            ub.session.rollback()
-            flash(_("Oops! An unknown error occurred. Please try again later."), category="error")
-            return render_title_template('register.html', title=_("Register"), page="register")
-    else:
-        flash(_("Oops! Your Email is not allowed."), category="error")
-        log.warning('Registering failed for user "{}" Email: {}'.format(nickname, to_save.get("email","")))
-        return render_title_template('register.html', title=_("Register"), page="register")
-    flash(_("Success! Confirmation Email has been sent."), category="success")
-    return redirect(url_for('web.login'))
+    content.name = nickname
+    content.email = email
+    content.password = generate_password_hash(generate_random_password(32))  # Temporary unusable password
+    content.role = config.config_default_role
+    content.locale = config.config_default_locale
+    content.sidebar_view = config.config_default_show
+    content.allowed_tags = config.config_allowed_tags
+    content.denied_tags = config.config_denied_tags
+    content.allowed_column_value = config.config_allowed_column_value
+    content.denied_column_value = config.config_denied_column_value
+    try:
+        ub.session.add(content)
+        ub.session.commit()
+        if feature_support['oauth']:
+            register_user_with_oauth(content)
+    except Exception:
+        ub.session.rollback()
+        return jsonify({'success': False, 'error': _("An error occurred. Please try again later.")})
+
+    ret, __ = send_registration_code(content.id)
+    if ret != 1:
+        return jsonify({'success': False, 'error': _("Failed to send verification code. Please try again.")})
+    flask_session['register_user_id'] = content.id
+    return jsonify({'success': True})
+
+
+@web.route('/register/verify', methods=['POST'])
+@limiter.limit("20/hour", key_func=get_remote_address)
+def register_verify():
+    user_id = flask_session.get('register_user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': _("Registration session expired. Please start over.")})
+    code = request.form.get('code', '').strip()
+    if not code:
+        return jsonify({'success': False, 'error': _("Please enter the code.")})
+    if not verify_reset_code(user_id, code):
+        return jsonify({'success': False, 'error': _("Invalid or expired code.")})
+    return jsonify({'success': True})
+
+
+@web.route('/register/complete', methods=['POST'])
+@limiter.limit("10/hour", key_func=get_remote_address)
+def register_complete():
+    user_id = flask_session.get('register_user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': _("Registration session expired. Please start over.")})
+    code = request.form.get('code', '').strip()
+    new_password = request.form.get('password', '')
+    if not verify_reset_code(user_id, code):
+        return jsonify({'success': False, 'error': _("Invalid or expired code.")})
+    try:
+        new_password = valid_password(new_password)
+    except Exception as ex:
+        return jsonify({'success': False, 'error': str(ex)})
+    if not complete_password_reset(user_id, new_password):
+        return jsonify({'success': False, 'error': _("An error occurred. Please try again.")})
+    flask_session.pop('register_user_id', None)
+    return jsonify({'success': True})
+
+
+@web.route('/register/resend', methods=['POST'])
+@limiter.limit("5/hour", key_func=get_remote_address)
+def register_resend():
+    user_id = flask_session.get('register_user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': _("Registration session expired. Please start over.")})
+    ret, __ = send_registration_code(user_id)
+    if ret != 1:
+        return jsonify({'success': False, 'error': _("Failed to send verification code. Please try again.")})
+    return jsonify({'success': True})
 
 
 @web.route('/register', methods=['GET'])
@@ -1357,10 +1399,10 @@ def register():
         return redirect(url_for('web.index'))
     if not config.get_mail_enabled():
         flash(_("Oops! Email server is not configured, please contact your administrator."), category="error")
-        return render_title_template('register.html', title=_("Register"), page="register")
+        return render_title_template('register.html', config=config, oauth_check=oauth_check, title=_("Register"), page="register")
     if feature_support['oauth']:
         register_user_with_oauth()
-    return render_title_template('register.html', config=config, title=_("Register"), page="register")
+    return render_title_template('register.html', config=config, oauth_check=oauth_check, title=_("Register"), page="register")
 
 
 def handle_login_user(user, remember, message, category):

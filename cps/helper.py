@@ -732,11 +732,45 @@ def reset_password(user_id):
         return 0, None
 
 
+def send_registration_code(user_id):
+    """Send a 6-digit verification code for new account registration."""
+    existing_user = ub.session.query(ub.User).filter(ub.User.id == user_id).first()
+    if not existing_user:
+        return 0, None
+    if not config.get_mail_enabled():
+        return 2, None
+    try:
+        code = str(random.SystemRandom().randint(100000, 999999))
+        existing_user.reset_code = code
+        existing_user.reset_code_expires = datetime.utcnow() + timedelta(minutes=15)
+        existing_user.reset_code_attempts = 0
+        ub.session.commit()
+        txt = "Welcome to Bookbag!\r\n\r\n"
+        txt += "Your verification code is: %s\r\n\r\n" % code
+        txt += "This code expires in 15 minutes.\r\n\r\n"
+        txt += "If you didn't create this account, you can ignore this email.\r\n\r\n"
+        txt += "Regards,\r\n"
+        txt += "Bookbag"
+        WorkerThread.add(None, TaskEmail(
+            subject=_('Verify Your Bookbag Account'),
+            filepath=None,
+            attachment=None,
+            settings=config.get_mail_settings(),
+            recipient=existing_user.email,
+            task_message=N_("Registration code for user: %(name)s", name=existing_user.name),
+            text=txt
+        ))
+        return 1, existing_user.name
+    except Exception:
+        ub.session.rollback()
+        return 0, None
+
+
 def send_reset_code(user_id):
     existing_user = ub.session.query(ub.User).filter(ub.User.id == user_id).first()
     if not existing_user:
         return 0, None
-    if not config.get_mail_server_configured():
+    if not config.get_mail_enabled():
         return 2, None
     try:
         code = str(random.SystemRandom().randint(100000, 999999))

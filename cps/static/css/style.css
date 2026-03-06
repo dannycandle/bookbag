@@ -1265,34 +1265,26 @@ or design guidelines. I am in the process of updating them. */
 
 /* Login Page */
 
-body.login .app-wrapper {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-body.login {
-    background-color: var(--primary); 
-}
-
-body.login .main-content-area {
+body.login .main-content-area,
+body.register .main-content-area {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
     width: 100%;
-    min-height: 100vh;
+    height: 100%;
 }
 
-body.login .main-content-wrapper {
+body.login .main-content-wrapper,
+body.register .main-content-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
 }
 
-body.login .action-bar {
+body.login .action-bar,
+body.register .action-bar {
     display: none;
 }
 
@@ -2561,7 +2553,7 @@ select.setting-input {
     background: #fff;
     border-radius: 34px;
     overflow: hidden;
-    box-shadow: inset 0 0 8px -1px rgba(0,0,0,0.25);
+    box-shadow: inset 3px 4px 4px 0 rgba(0, 0, 0, 0.25);
 }
 
 
@@ -2723,39 +2715,6 @@ select.setting-input {
     color: #5cb85c;
     font-size: 14px;
     font-weight: 500;
-}
-.setup-password-rules {
-    list-style: none;
-    padding: 0;
-    margin: 8px 0 0;
-    font-size: 13px;
-}
-.setup-password-rules li {
-    padding: 2px 0 2px 20px;
-    position: relative;
-}
-.setup-password-rules li::before {
-    position: absolute;
-    left: 0;
-    font-size: 14px;
-}
-.setup-password-rules .rule-pending {
-    color: #999;
-}
-.setup-password-rules .rule-pending::before {
-    content: "○";
-}
-.setup-password-rules .rule-pass {
-    color: #5cb85c;
-}
-.setup-password-rules .rule-pass::before {
-    content: "✓";
-}
-.setup-password-rules .rule-fail {
-    color: #d9534f;
-}
-.setup-password-rules .rule-fail::before {
-    content: "✗";
 }
 
 .setup-library-group {
