@@ -36,5 +36,7 @@ gdrive_credentials
 client_secrets.json
 gmail.json
 /.key
+books/
 Books/
+.DS_Store
 .claude/

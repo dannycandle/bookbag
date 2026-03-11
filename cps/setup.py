@@ -19,10 +19,10 @@ log = logger.create()
 
 setup = Blueprint('setup', __name__)
 
-# In Docker: set BOOKBAG_LIBRARY_PATH=/books
+# Docker: set BOOKBAG_LIBRARY_PATH=/books
 # Locally: defaults to <project_root>/books
-DEFAULT_LIBRARY_PATH = os.environ.get('BOOKBAG_LIBRARY_PATH',
-                                       os.path.join(constants.BASE_DIR, 'books'))
+DEFAULT_LIBRARY_PATH = os.environ.get('BOOKBAG_LIBRARY_PATH', '/books')
+
 
 
 def _needs_setup():

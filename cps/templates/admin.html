@@ -873,13 +873,15 @@
                         <div><p class="toggle-desc">Only required if you are not using a mesh VPN or Reverse Proxy to access Bookbag.</p></div>
                     </div>
                 </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">SSL Certfile Path</span>
-                    <input class="setting-input config-field" type="text" name="config_certfile" data-validate="path" placeholder="/path/to/SSL/certfile">
-                </div>
-                <div class="setting-path-row">
-                    <span class="setting-path-label">SSL Keyfile Path</span>
-                    <input class="setting-input config-field" type="text" name="config_keyfile" data-validate="path" placeholder="/path/to/SSL/keyfile">
+                <div id="ssl-fields" style="display:none;">
+                    <div class="setting-path-row">
+                        <span class="setting-path-label">SSL Certfile Path</span>
+                        <input class="setting-input config-field" type="text" name="config_certfile" data-validate="path" placeholder="/path/to/SSL/certfile">
+                    </div>
+                    <div class="setting-path-row">
+                        <span class="setting-path-label">SSL Keyfile Path</span>
+                        <input class="setting-input config-field" type="text" name="config_keyfile" data-validate="path" placeholder="/path/to/SSL/keyfile">
+                    </div>
                 </div>
                 <div class="setting-path-row">
                     <span class="setting-path-label">Trusted Hosts (Comma Separated)</span>
@@ -1413,6 +1415,28 @@
             }
 
             toggle.addEventListener('change', updatePortVisibility);
+        })();
+
+        // SSL toggle — show/hide certfile and keyfile fields
+        (function() {
+            var toggle = document.querySelector('input[name="config_ssl"]');
+            var fields = document.getElementById('ssl-fields');
+            if (!toggle || !fields) return;
+            var certField = fields.querySelector('input[name="config_certfile"]');
+            var keyField = fields.querySelector('input[name="config_keyfile"]');
+
+            function update() {
+                fields.style.display = toggle.checked ? '' : 'none';
+                if (!toggle.checked) {
+                    certField.value = '';
+                    keyField.value = '';
+                }
+            }
+
+            // Derive initial state from whether paths are populated
+            toggle.checked = !!(certField.value || keyField.value);
+            update();
+            toggle.addEventListener('change', update);
         })();
 
         // "Disable uploads" toggle — inverted, handled by saveConfig via data-inverted

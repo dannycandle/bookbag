@@ -1,0 +1,36 @@
+FROM python:3.13-slim AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libmagic1 \
+    libxml2 libxslt1.1 \
+    imagemagick libmagickwand-dev \
+    libldap-common libldap2 libsasl2-2 libldap-dev libsasl2-dev \
+    unrar-free \
+    build-essential libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt optional-requirements.txt /tmp/
+RUN pip install --no-cache-dir --prefix=/install \
+    -r /tmp/requirements.txt -r /tmp/optional-requirements.txt
+
+FROM python:3.13-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libmagic1 \
+    libxml2 libxslt1.1 \
+    libmagickwand-7.q16hdri-10 imagemagick-7-common \
+    libldap-common libldap2 libsasl2-2 \
+    unrar-free \
+    libfreetype6 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/local/man
+
+COPY --from=builder /install /usr/local
+
+COPY . .
+
+EXPOSE 8084
+
+CMD ["python", "cps.py"]
