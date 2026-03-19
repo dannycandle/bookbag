@@ -19,8 +19,9 @@ vendor/
 .installed.cfg
 *.egg
 .pylint.d
+.env
 
-# calibre-web
+# bookbag
 *.db
 *.log
 cps/cache
