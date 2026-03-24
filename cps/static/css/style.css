@@ -1065,7 +1065,7 @@ body:has(.empty-state) .action-bar {
     justify-content: center;
     border: 1px solid rgba(255,255,255 0.9);
     box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.15);
-    z-index: 40;
+    z-index: 60;
     transition: background-color 0.2s, transform 0.2s;
 }
 
