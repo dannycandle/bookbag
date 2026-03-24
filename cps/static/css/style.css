@@ -2032,6 +2032,27 @@ select.book-edit-field {
     margin: 0 0 10px 0;
 }
 
+.book-format-list {
+    margin-bottom: 8px;
+}
+
+.book-format-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #581C1C;
+    background: rgba(88, 28, 28, 0.08);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 0 4px 4px 0;
+}
+
+.book-format-empty {
+    font-size: 12px;
+    color: #8A5353;
+    margin: 0 0 8px 0;
+}
+
 .book-edit-sidebar-actions {
     display: flex;
     flex-direction: column;

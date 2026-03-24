@@ -39,13 +39,22 @@
 
     {% if current_user.role_upload() and g.allow_upload %}
     <div class="book-edit-sidebar-section">
-      <h4>{{_('Upload Format')}}</h4>
+      <h4>{{_('Book Formats Available')}}</h4>
+      {% if book.data|length > 0 %}
+      <div class="book-format-list">
+        {% for file in book.data %}
+        <span class="book-format-badge">{{ file.format }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="book-format-empty">{{_('No formats available')}}</p>
+      {% endif %}
       <form id="form-upload-format" action="{{ url_for('edit-book.upload') }}" data-title="{{_('Uploading...')}}" data-footer="{{_('Close')}}" data-failed="{{_('Error')}}" data-message="{{_('Upload done, processing, please wait...')}}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="book_id" value="{{ book.id }}">
         <label class="btn-secondary" for="btn-upload-format" style="cursor:pointer; margin:0;">
           <svg width="14" height="14" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"></path></svg>
-          {{ _('Upload Format') }}
+          {{ _('Add Format') }}
         </label>
         <input id="btn-upload-format" name="btn-upload-format" type="file" accept="{% for format in accept %}.{% if format != ''%}{{format}}{% else %}*{% endif %}{{ ',' if not loop.last }}{% endfor %}" multiple style="display:none;">
         <div class="upload-format-input-text" id="upload-format" style="font-size:12px; color:#8A5353; margin-top:4px;"></div>
