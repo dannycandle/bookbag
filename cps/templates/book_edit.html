@@ -4,31 +4,38 @@
 {% endblock %}
 {% block body %}
 {% if book %}
+<div class="book-detail-wrapper">
 <div class="book-detail-layout">
   <!-- Cover column -->
   <div class="book-detail-cover-col cover">
-    <img class="book-detail-cover-img" id="detailcover" title="{{book.title}}" src="{{url_for('web.get_cover', book_id=book.id, resolution='og', c=book|last_modified)}}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-    <div class="book-cover-fallback" style="display:none;">
-      <div class="book-cover-fallback-title">{{ book.title }}</div>
-      <div class="book-cover-fallback-author">{{ ' & '.join(authors) }}</div>
-    </div>
-
-    {% if current_user.role_upload() and g.allow_upload %}
-    <div class="book-edit-cover-manage">
-      <div class="book-edit-group">
-        <label class="book-edit-label" for="cover_url">{{_('Cover URL')}}</label>
-        <input type="text" class="book-edit-field" name="cover_url" id="cover_url" form="book_edit_frm" value="" placeholder="{{_('https://...')}}">
+    <div class="book-edit-cover-container">
+      <img class="book-detail-cover-img" id="detailcover" title="{{book.title}}" src="{{url_for('web.get_cover', book_id=book.id, resolution='og', c=book|last_modified)}}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="book-cover-fallback" style="display:none;">
+        <div class="book-cover-fallback-title">{{ book.title }}</div>
+        <div class="book-cover-fallback-author">{{ ' & '.join(authors) }}</div>
       </div>
-      <div class="book-edit-group">
-        <label class="detail-action-btn detail-action-btn-ghost" for="btn-upload-cover" style="cursor:pointer; margin:0;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66-5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,113.37V32a8,8,0,0,0-16,0v81.37L93.66,87a8,8,0,0,0-11.32,11.32Z"></path></svg>
+      {% if current_user.role_upload() and g.allow_upload %}
+      <div class="book-edit-cover-overlay">
+        <label for="btn-upload-cover" class="book-edit-cover-overlay-btn">
+          <svg width="18" height="18" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"></path></svg>
           {{ _('Upload Cover') }}
         </label>
         <input id="btn-upload-cover" name="btn-upload-cover" type="file" form="book_edit_frm" accept=".jpg, .jpeg, .png, .webp" style="display:none;">
-        <div class="upload-cover-input-text" id="upload-cover" style="font-size:12px; color:#8A5353; margin-top:4px;"></div>
+        <details class="detail-action-dropdown book-edit-cover-import-dropdown">
+          <summary class="book-edit-cover-overlay-btn">
+            <svg width="18" height="18" viewBox="0 0 256 256"><path d="M128,24h0A104,104,0,1,0,232,128,104.12,104.12,0,0,0,128,24Zm88,104a87.61,87.61,0,0,1-3.33,24H174.16a157.44,157.44,0,0,0,0-48h38.51A87.61,87.61,0,0,1,216,128ZM102,168H154a115.11,115.11,0,0,1-26,45A115.27,115.27,0,0,1,102,168Zm-3.9-16a140.84,140.84,0,0,1,0-48h59.88a140.84,140.84,0,0,1,0,48ZM40,128a87.61,87.61,0,0,1,3.33-24H81.84a157.44,157.44,0,0,0,0,48H43.33A87.61,87.61,0,0,1,40,128ZM154,88H102a115.11,115.11,0,0,1,26-45A115.27,115.27,0,0,1,154,88Zm52.33,0H170.71a135.28,135.28,0,0,0-22.3-45.6A88.29,88.29,0,0,1,206.37,88ZM107.59,42.4A135.28,135.28,0,0,0,85.29,88H49.63A88.29,88.29,0,0,1,107.59,42.4ZM49.63,168H85.29a135.28,135.28,0,0,0,22.3,45.6A88.29,88.29,0,0,1,49.63,168Zm98.78,45.6a135.28,135.28,0,0,0,22.3-45.6h35.66A88.29,88.29,0,0,1,148.41,213.6Z"></path></svg>
+            {{ _('Import Cover') }}
+          </summary>
+          <div class="detail-action-popover book-edit-cover-url-popover">
+            <div style="display:flex; gap:6px; align-items:center; width:100%;">
+              <input type="text" class="book-edit-field" id="cover-url-input" placeholder="{{ _('https://...') }}" style="flex:1; margin:0;">
+              <button type="button" class="btn-primary" id="cover-url-import" style="padding:8px 14px; font-size:13px; white-space:nowrap;">{{ _('Import') }}</button>
+            </div>
+          </div>
+        </details>
       </div>
+      {% endif %}
     </div>
-    {% endif %}
 
     {% if current_user.role_upload() and g.allow_upload %}
     <div class="book-edit-sidebar-section">
@@ -36,8 +43,8 @@
       <form id="form-upload-format" action="{{ url_for('edit-book.upload') }}" data-title="{{_('Uploading...')}}" data-footer="{{_('Close')}}" data-failed="{{_('Error')}}" data-message="{{_('Upload done, processing, please wait...')}}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="book_id" value="{{ book.id }}">
-        <label class="detail-action-btn detail-action-btn-ghost" for="btn-upload-format" style="cursor:pointer; margin:0;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66-5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,113.37V32a8,8,0,0,0-16,0v81.37L93.66,87a8,8,0,0,0-11.32,11.32Z"></path></svg>
+        <label class="btn-secondary" for="btn-upload-format" style="cursor:pointer; margin:0;">
+          <svg width="14" height="14" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"></path></svg>
           {{ _('Upload Format') }}
         </label>
         <input id="btn-upload-format" name="btn-upload-format" type="file" accept="{% for format in accept %}.{% if format != ''%}{{format}}{% else %}*{% endif %}{{ ',' if not loop.last }}{% endfor %}" multiple style="display:none;">
@@ -69,7 +76,7 @@
             {% endfor %}
           </select>
         </div>
-        <button type="submit" class="detail-action-btn detail-action-btn-ghost" id="btn-book-convert" name="btn-book-convert">{{_('Convert book')}}</button>
+        <button type="submit" class="btn-secondary" id="btn-book-convert" name="btn-book-convert">{{_('Convert book')}}</button>
       </form>
     </div>
     {% endif %}
@@ -77,49 +84,43 @@
     {% if current_user.role_delete_books() %}
     <div class="book-edit-sidebar-section">
       <h4>{{_('Danger Zone')}}</h4>
-      <div class="book-edit-sidebar-actions">
-        <button type="button" class="detail-action-btn detail-action-btn-ghost btn-delete-trigger" style="color:#F94C4C !important; border-color: rgba(249,76,76,0.3) !important;" data-delete-id="{{ book.id }}">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z" fill="currentColor"></path></svg>
-          {{_("Delete Book")}}
-        </button>
-        {% if book.data|length > 1 %}
+      <details class="detail-action-dropdown">
+        <summary class="btn-secondary book-edit-delete-btn">
+          <svg width="14" height="14" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z" fill="currentColor"></path></svg>
+          {{_("Delete")}}
+        </summary>
+        <div class="detail-action-popover">
+          <a class="detail-action-popover-item book-edit-delete-item" data-delete-url="{{ url_for('edit-book.delete_book', book_id=book.id) }}" data-delete-label="{{ _('book') }}">
+            {{_("Delete Entire Book")}}
+          </a>
           {% for file in book.data %}
-          <button type="button" class="detail-action-btn detail-action-btn-ghost btn-delete-trigger" style="color:#F94C4C !important; border-color: rgba(249,76,76,0.3) !important; font-size:12px !important;" data-delete-id="{{ book.id }}" data-delete-format="{{ file.format }}">
-            {{_('Delete')}} {{file.format}}
-          </button>
+          <a class="detail-action-popover-item book-edit-delete-item" data-delete-url="{{ url_for('edit-book.delete_book', book_id=book.id, book_format=file.format) }}" data-delete-label="{{ file.format }}">
+            {{_('Delete')}} {{ file.format }}
+          </a>
           {% endfor %}
-        {% endif %}
-      </div>
+        </div>
+      </details>
     </div>
     {% endif %}
   </div>
 
   <!-- Metadata column -->
   <div class="book-detail-meta-col">
+    <div class="book-detail-meta-cont">
     <!-- Icon action row -->
-    <div class="book-detail-icon-actions">
-      <a href="{{ url_for('web.show_book', book_id=book.id) }}" class="detail-icon-btn" title="{{ _('Cancel') }}">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
-      </a>
-    </div>
 
     <form role="form" action="{{ url_for('edit-book.edit_book', book_id=book.id) }}" method="post" enctype="multipart/form-data" id="book_edit_frm">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
       <!-- Title -->
       <div class="book-edit-group">
+        <label class="book-edit-label" for="title">{{_('Title')}}</label>
         <input type="text" class="book-edit-field book-edit-title-input" name="title" id="title" value="{{book.title}}" placeholder="{{_('Book Title')}}">
-      </div>
-
-      <!-- Author swap button -->
-      <div class="book-edit-xchange">
-        <button type="button" class="detail-icon-btn" id="xchange" title="{{_('Swap Title and Author')}}">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path d="M119.39,172.94a8,8,0,0,1-1.73,8.72l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L72,188.69V48a8,8,0,0,1,16,0V188.69l18.34-18.35A8,8,0,0,1,119.39,172.94Zm94.27-98.6-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L168,67.31V208a8,8,0,0,0,16,0V67.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z"></path></svg>
-        </button>
       </div>
 
       <!-- Authors -->
       <div class="book-edit-group form-group" id="author_div">
+        <label class="book-edit-label" for="authors">{{_('Author')}}</label>
         <input type="text" class="book-edit-field book-edit-author-input typeahead" autocomplete="off" name="authors" id="authors" value="{{' & '.join(authors)}}" placeholder="{{_('Author')}}">
       </div>
 
@@ -131,14 +132,20 @@
         </div>
         <div class="book-edit-group book-edit-group-narrow">
           <label class="book-edit-label" for="series_index">{{_('Series ID')}}</label>
-          <input type="number" step="0.01" min="0" placeholder="1" class="book-edit-field" name="series_index" id="series_index" value="{{book.series_index|formatfloat(2)}}">
+          <input type="number" step="1" min="0" placeholder="1" class="book-edit-field" name="series_index" id="series_index" value="{{book.series_index|int}}">
         </div>
       </div>
 
       <!-- Rating -->
       <div class="book-edit-group">
         <label class="book-edit-label" for="rating">{{_('Rating')}}</label>
-        <input type="number" name="rating" id="rating" class="rating input-lg" data-clearable="" value="{% if book.ratings %}{{(book.ratings[0].rating / 2)|int}}{% endif %}">
+        <input type="hidden" name="rating" id="rating" value="{% if book.ratings %}{{(book.ratings[0].rating / 2)|int}}{% endif %}">
+        <div class="book-edit-star-rating" id="star-rating">
+          {% set current_rating = (book.ratings[0].rating / 2)|int if book.ratings else 0 %}
+          {% for i in range(1, 6) %}
+          <span class="book-edit-star {% if i <= current_rating %}filled{% endif %}" data-value="{{ i }}">★</span>
+          {% endfor %}
+        </div>
       </div>
 
       <!-- Tags -->
@@ -155,22 +162,21 @@
         </div>
         <div class="book-edit-group">
           <label class="book-edit-label" for="pubdate">{{_('Published Date')}}</label>
-          <div class="input-group" style="display:flex; align-items:center; gap:6px;">
+          <div class="book-edit-field-with-clear">
             <input type="text" class="datepicker book-edit-field" name="pubdate" id="pubdate" value="{% if book.pubdate %}{{book.pubdate|formatdateinput}}{% endif %}">
             <input type="text" class="fake-input" id="fake_pubdate" value="{% if book.pubdate %}{{book.pubdate|formatdate}}{% endif %}" style="display:none !important;">
-            <span class="input-group-btn">
-              <button type="button" id="pubdate_delete" class="datepicker_delete detail-icon-btn" style="width:32px; height:32px;" title="{{_('Clear date')}}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
-              </button>
-            </span>
+            <button type="button" class="datepicker_delete book-edit-field-clear" title="{{_('Clear date')}}">
+              <svg width="12" height="12" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Languages -->
-      <div class="book-edit-group form-group">
+      <div class="book-edit-group form-group" style="position:relative;">
         <label class="book-edit-label" for="languages">{{_('Language')}}</label>
-        <input type="text" class="book-edit-field typeahead" autocomplete="off" name="languages" id="languages" value="{% for language in book.languages %}{{language.language_name.strip()}}{% if not loop.last %}, {% endif %}{% endfor %}">
+        <input type="text" class="book-edit-field" autocomplete="off" name="languages" id="languages" value="{% for language in book.languages %}{{language.language_name.strip()}}{% if not loop.last %}, {% endif %}{% endfor %}">
+        <div class="book-edit-autocomplete" id="languages-autocomplete"></div>
       </div>
 
       <!-- Identifiers -->
@@ -181,11 +187,13 @@
         <tr>
           <td><input type="text" class="book-edit-field" name="identifier-type-{{identifier.type}}" value="{{identifier.type}}" required="required" placeholder="{{_('Identifier Type')}}"></td>
           <td><input type="text" class="book-edit-field" name="identifier-val-{{identifier.type}}" value="{{identifier.val}}" required="required" placeholder="{{_('Identifier Value')}}"></td>
-          <td><a class="detail-action-btn detail-action-btn-ghost" style="font-size:12px !important; padding:5px 10px !important;" onclick="removeIdentifierLine(this)">{{_('Remove')}}</a></td>
+          <td><button type="button" class="book-edit-row-remove" onclick="removeIdentifierLine(this)" title="{{_('Remove')}}">
+            <svg width="12" height="12" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
+          </button></td>
         </tr>
         {% endfor %}
         </tbody></table>
-        <a id="add-identifier-line" class="detail-action-btn detail-action-btn-ghost" style="margin-top:6px;">{{_('Add Identifier')}}</a>
+        <a id="add-identifier-line" class="btn-secondary" style="margin-top:6px;">{{_('Add Identifier')}}</a>
       </div>
 
       <!-- Custom columns -->
@@ -215,7 +223,7 @@
               {% endif %}>
             {% endif %}
             {% if c.datatype == 'datetime' %}
-              <div class="input-group" style="display:flex; align-items:center; gap:6px;">
+              <div class="book-edit-field-with-clear">
                 <input type="text" class="datepicker book-edit-field" name="{{ 'custom_column_' ~ c.id }}" id="{{ 'custom_column_' ~ c.id }}"
                   {% if book['custom_column_' ~ c.id]|length > 0 %}
                     value="{% if book['custom_column_' ~ c.id][0].value %}{{ book['custom_column_' ~ c.id][0].value|formatdateinput}}{% endif %}"
@@ -224,11 +232,9 @@
                   {% if book['custom_column_' ~ c.id]|length > 0 %}
                     value="{% if book['custom_column_' ~ c.id][0].value %}{{book['custom_column_' ~ c.id][0].value|formatdate}}{% endif %}"
                   {% endif %} style="display:none !important;">
-                <span class="input-group-btn">
-                  <button type="button" id="{{ 'custom_column_' ~ c.id }}_delete" class="datepicker_delete detail-icon-btn" style="width:32px; height:32px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
-                  </button>
-                </span>
+                <button type="button" class="datepicker_delete book-edit-field-clear" title="{{_('Clear date')}}">
+                  <svg width="12" height="12" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
+                </button>
               </div>
             {% endif %}
             {% if c.datatype == 'comments' %}
@@ -269,26 +275,23 @@
       </div>
 
       <div class="book-detail-actions">
-        <button type="submit" id="submit" class="detail-action-btn detail-action-btn-primary">
+        <button type="submit" id="submit" class="btn-primary" style="display:none;">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z" fill="currentColor"></path></svg>
           {{_('Save')}}
         </button>
-        <a href="#" id="get_meta" class="detail-action-btn detail-action-btn-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.07a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.31ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" fill="currentColor"></path></svg>
-          {{_('Fetch Metadata')}}
-        </a>
-        <a href="{{ url_for('web.show_book', book_id=book.id) }}" id="edit_cancel" class="detail-action-btn detail-action-btn-ghost">{{_('Cancel')}}</a>
+        <a href="{{ url_for('web.show_book', book_id=book.id) }}" id="edit_cancel" class="btn-secondary">{{_('Cancel')}}</a>
       </div>
     </form>
+    </div> <!-- book-detail-meta-cont -->
   </div>
 </div>
+</div> <!-- book-detail-wrapper -->
 {% endif %}
 
 <!-- Delete confirmation overlay -->
 {% if current_user.role_delete_books() %}
 <div id="deleteOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(2px); z-index:50;">
   <div style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:420px; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-radius:10px; padding:28px; box-shadow:-1px 2px 10px #00000033; z-index:100; color:#581C1C;">
-    <button id="deleteOverlay-close" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; color:rgba(88,28,28,0.4); cursor:pointer; padding:2px 6px; border-radius:4px;">X</button>
     <p style="margin:0 0 14px 0; font-size:0.9rem;"><strong>{{_('Are you really sure?')}}</strong></p>
     <p id="delete_message" style="font-size:0.85rem; margin:0 0 18px 0; line-height:1.6;"></p>
     {% if config.config_kobo_sync %}
@@ -298,8 +301,8 @@
     </p>
     {% endif %}
     <div style="display:flex; gap:10px; justify-content:flex-end;">
-      <button type="button" id="deleteOverlay-cancel" class="btn" style="padding:6px 16px;">{{_('Cancel')}}</button>
-      <button type="button" id="deleteOverlay-confirm" class="btn" style="padding:6px 16px; background:#F94C4C; border-color:#F94C4C; color:white;">{{_('Delete')}}</button>
+      <button type="button" id="deleteOverlay-cancel" style="padding:8px 18px; background:#2E7D32; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;">{{_('Go back')}}</button>
+      <button type="button" id="deleteOverlay-confirm" style="padding:8px 18px; background:transparent; color:#F94C4C; border:1.5px solid #F94C4C; border-radius:8px; font-weight:600; cursor:pointer;"></button>
     </div>
   </div>
 </div>
@@ -313,7 +316,7 @@
     <form id="meta-search" style="margin-bottom:12px;">
       <div style="display:flex; gap:8px;">
         <input type="text" class="book-edit-field" id="keyword" name="keyword" placeholder="{{_('Search keyword')}}" style="flex:1;">
-        <button type="submit" class="detail-action-btn detail-action-btn-primary" id="do-search" style="white-space:nowrap;">{{_("Search")}}</button>
+        <button type="submit" class="btn-primary" id="do-search" style="white-space:nowrap;">{{_("Search")}}</button>
       </div>
     </form>
     <p style="font-size:0.85rem; color:#8A5353; margin-bottom:12px;">{{_('Click the cover to load metadata to the form')}}</p>
@@ -324,156 +327,264 @@
 {% endblock %}
 
 {% block js %}
-<script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
 <script>
-  // Provide getPath() needed by edit_books.js, get_meta.js
-  function getPath() {
-    var src = $("script[src*=jquery]").attr("src");
-    return src.substr(0, src.search("/static/js/libs/jquery.min.js"));
+(function() {
+  var input = document.getElementById('btn-upload-cover');
+  var img = document.getElementById('detailcover');
+  if (!input || !img) return;
+
+  input.addEventListener('change', function() {
+    if (!input.files || !input.files[0]) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      img.src = e.target.result;
+      img.style.display = '';
+      var fallback = img.nextElementSibling;
+      if (fallback) fallback.style.display = 'none';
+    };
+    reader.readAsDataURL(input.files[0]);
+  });
+})();
+
+// Show save button on any change
+(function() {
+  var form = document.getElementById('book_edit_frm');
+  var saveBtn = document.getElementById('submit');
+  if (!form || !saveBtn) return;
+
+  function showSave() {
+    saveBtn.style.display = '';
   }
-  // CSRF token for all AJAX requests
-  var csrftoken = $("input[name='csrf_token']").val();
-  $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      }
+
+  form.addEventListener('input', showSave);
+  form.addEventListener('change', showSave);
+
+  var coverInput = document.getElementById('btn-upload-cover');
+  if (coverInput) coverInput.addEventListener('change', showSave);
+})();
+
+// Import cover from URL
+(function() {
+  var dropdown = document.querySelector('.book-edit-cover-import-dropdown');
+  var urlInput = document.getElementById('cover-url-input');
+  var doImport = document.getElementById('cover-url-import');
+  var img = document.getElementById('detailcover');
+  var saveBtn = document.getElementById('submit');
+  if (!dropdown || !doImport) return;
+
+  doImport.addEventListener('click', function() {
+    var url = urlInput.value.trim();
+    if (!url) return;
+
+    img.src = url;
+    img.style.display = '';
+    var fallback = img.nextElementSibling;
+    if (fallback) fallback.style.display = 'none';
+
+    var hiddenInput = document.getElementById('cover_url');
+    if (!hiddenInput) {
+      hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'cover_url';
+      hiddenInput.id = 'cover_url';
+      document.getElementById('book_edit_frm').appendChild(hiddenInput);
+    }
+    hiddenInput.value = url;
+
+    dropdown.removeAttribute('open');
+    urlInput.value = '';
+    if (saveBtn) saveBtn.style.display = '';
+  });
+})();
+
+// Clear date buttons
+(function() {
+  document.querySelectorAll('.datepicker_delete').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var row = btn.closest('.book-edit-field-with-clear');
+      var dateInput = row.querySelector('.datepicker');
+      if (dateInput) dateInput.value = '';
+      var fakeInput = row.querySelector('.fake-input');
+      if (fakeInput) fakeInput.value = '';
+      var saveBtn = document.getElementById('submit');
+      if (saveBtn) saveBtn.style.display = '';
+    });
+  });
+})();
+
+// Remove identifier row
+function removeIdentifierLine(btn) {
+  var row = btn.closest('tr');
+  if (row) row.remove();
+  var saveBtn = document.getElementById('submit');
+  if (saveBtn) saveBtn.style.display = '';
+}
+
+// Add identifier row
+(function() {
+  var addBtn = document.getElementById('add-identifier-line');
+  if (!addBtn) return;
+
+  var counter = 0;
+  addBtn.addEventListener('click', function() {
+    counter++;
+    var tbody = document.querySelector('#identifier-table tbody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="text" class="book-edit-field" name="identifier-type-new' + counter + '" placeholder="Type" required></td>' +
+      '<td><input type="text" class="book-edit-field" name="identifier-val-new' + counter + '" placeholder="Value" required></td>' +
+      '<td><button type="button" class="book-edit-row-remove" onclick="removeIdentifierLine(this)" title="Remove">' +
+      '<svg width="12" height="12" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>' +
+      '</button></td>';
+    tbody.appendChild(tr);
+    tr.querySelector('input').focus();
+    var saveBtn = document.getElementById('submit');
+    if (saveBtn) saveBtn.style.display = '';
+  });
+})();
+
+// Language autocomplete
+(function() {
+  var input = document.getElementById('languages');
+  var dropdown = document.getElementById('languages-autocomplete');
+  if (!input || !dropdown) return;
+
+  var debounceTimer;
+
+  input.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    // Get the text after the last comma (for multi-language support)
+    var parts = input.value.split(',');
+    var query = parts[parts.length - 1].trim();
+    if (query.length < 1) { dropdown.style.display = 'none'; return; }
+
+    debounceTimer = setTimeout(function() {
+      fetch('{{ url_for("web.get_languages_json") }}?q=' + encodeURIComponent(query))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.length) { dropdown.style.display = 'none'; return; }
+          dropdown.innerHTML = '';
+          data.forEach(function(item) {
+            var div = document.createElement('div');
+            div.className = 'book-edit-autocomplete-item';
+            div.textContent = item.name;
+            div.addEventListener('click', function() {
+              // Replace the last part with the selected value
+              var parts = input.value.split(',').map(function(s) { return s.trim(); });
+              parts[parts.length - 1] = item.name;
+              input.value = parts.join(', ');
+              dropdown.style.display = 'none';
+              input.focus();
+              var saveBtn = document.getElementById('submit');
+              if (saveBtn) saveBtn.style.display = '';
+            });
+            dropdown.appendChild(div);
+          });
+          dropdown.style.display = 'block';
+        });
+    }, 200);
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target !== input && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
     }
   });
-  // Auto-submit format upload on file selection
-  $("#btn-upload-format").change(function() { $("#form-upload-format").submit(); });
-</script>
-<script type="text/template" id="template-book-result">
-  <li class="media" data-related="<%= source.id %>">
-    <img class="pull-left img-responsive"
-         data-toggle="modal"
-         data-target="#metaModal"
-         src="<%= cover || "{{ url_for('static', filename='img/academicpaper.svg') }}" %>"
-         alt="Cover"
-    >
-    <div class="media-body">
-      <h4 class="media-heading">
-        <a class="meta_title" href="<%= url %>" target="_blank" rel="noopener"><%= title %></a>
-      </h4>
-      <p class="meta_author">{{_('Author')}}：<%= authors.join(" & ") %></p>
-      <% if (publisher) { %>
-        <p class="meta_publisher">{{_('Publisher')}}：<%= publisher %></p>
-      <% } %>
-      <% if (description) { %>
-        <p class="meta_description">{{_('Description')}}: <%= description %></p>
-      <% } %>
-      <p>{{_('Source')}}:
-        <a class="meta_source" href="<%= source.link %>" target="_blank" rel="noopener"><%= source.description %></a>
-      </p>
-    </div>
-  </li>
-</script>
-<script>
-  var i18nMsg = {
-    'loading': {{_('Loading...')|safe|tojson}},
-    'search_error': {{_('Search error!')|safe|tojson}},
-    'no_result': {{_('No Result(s) found! Please try another keyword.')|safe|tojson}},
-    'author': {{_('Author')|safe|tojson}},
-    'publisher': {{_('Publisher')|safe|tojson}},
-    'comments': {{_('Description')|safe|tojson}},
-    'source': {{_('Source')|safe|tojson}},
-  };
-  var language = '{{ current_user.locale }}';
+})();
 
-  $("#add-identifier-line").click(function() {
-    var rand_id = Math.floor(Math.random() * 1000000).toString();
-    var line = '<tr>';
-    line += '<td><input type="text" class="book-edit-field" name="identifier-type-'+ rand_id +'" required="required" placeholder={{_('Identifier Type')|safe|tojson}}></td>';
-    line += '<td><input type="text" class="book-edit-field" name="identifier-val-'+ rand_id +'" required="required" placeholder={{_('Identifier Value')|safe|tojson}}></td>';
-    line += '<td><a class="detail-action-btn detail-action-btn-ghost" style="font-size:12px !important; padding:5px 10px !important;" onclick="removeIdentifierLine(this)">{{_('Remove')}}</a></td>';
-    line += '</tr>';
-    $("#identifier-table").append(line);
-  });
-  function removeIdentifierLine(el) {
-    $(el).parent().parent().remove();
+// Star rating
+(function() {
+  var container = document.getElementById('star-rating');
+  var input = document.getElementById('rating');
+  if (!container || !input) return;
+
+  var stars = container.querySelectorAll('.book-edit-star');
+
+  function setStars(value) {
+    stars.forEach(function(star) {
+      star.classList.toggle('filled', parseInt(star.dataset.value) <= value);
+    });
   }
 
-  // Delete overlay handlers
-  (function() {
-    var overlay = document.getElementById('deleteOverlay');
-    if (!overlay) return;
-    var confirmBtn = document.getElementById('deleteOverlay-confirm');
-    var msgEl = document.getElementById('delete_message');
-    var formatMsg = {{_('This book format will be permanently erased from database')|safe|tojson}};
-    var bookMsg = {{_('This book will be permanently erased from database and hard disk')|safe|tojson}};
-
-    document.querySelectorAll('.btn-delete-trigger').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var deleteId = this.getAttribute('data-delete-id');
-        var deleteFormat = this.getAttribute('data-delete-format');
-        confirmBtn.setAttribute('data-delete-id', deleteId);
-        if (deleteFormat) {
-          confirmBtn.setAttribute('data-delete-format', deleteFormat);
-          msgEl.textContent = formatMsg;
-        } else {
-          confirmBtn.removeAttribute('data-delete-format');
-          msgEl.textContent = bookMsg;
-        }
-        overlay.style.display = '';
-      });
+  container.addEventListener('mouseover', function(e) {
+    var star = e.target.closest('.book-edit-star');
+    if (!star) return;
+    var val = parseInt(star.dataset.value);
+    stars.forEach(function(s) {
+      s.classList.toggle('hover', parseInt(s.dataset.value) <= val);
     });
-
-    confirmBtn.addEventListener('click', function() {
-      var deleteId = this.getAttribute('data-delete-id');
-      var deleteFormat = this.getAttribute('data-delete-format');
-      overlay.style.display = 'none';
-      var url = getPath() + '/delete/' + deleteId;
-      if (deleteFormat) url += '/' + deleteFormat;
-      var form = document.createElement('form');
-      form.method = 'POST';
-      form.action = url;
-      var csrf = document.querySelector('input[name="csrf_token"]');
-      if (csrf) {
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'csrf_token';
-        input.value = csrf.value;
-        form.appendChild(input);
-      }
-      document.body.appendChild(form);
-      form.submit();
-    });
-
-    function close() { overlay.style.display = 'none'; }
-    document.getElementById('deleteOverlay-close').addEventListener('click', close);
-    document.getElementById('deleteOverlay-cancel').addEventListener('click', close);
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
-  })();
-
-  // Patch: get_meta.js uses $(".cover img") but our cover is .book-detail-cover-img
-  $(document).on('change', '#cover_url', function() {
-    var url = $(this).val();
-    if (url) { $('#detailcover').attr('src', url).show(); }
   });
 
-  // Metadata overlay handlers
-  (function() {
-    var overlay = document.getElementById('metaOverlay');
-    var openBtn = document.getElementById('get_meta');
+  container.addEventListener('mouseout', function() {
+    stars.forEach(function(s) { s.classList.remove('hover'); });
+  });
 
-    openBtn.addEventListener('click', function(e) {
+  container.addEventListener('click', function(e) {
+    var star = e.target.closest('.book-edit-star');
+    if (!star) return;
+    var val = parseInt(star.dataset.value);
+    // Click same rating to clear
+    if (parseInt(input.value) === val) {
+      input.value = '';
+      setStars(0);
+    } else {
+      input.value = val;
+      setStars(val);
+    }
+    var saveBtn = document.getElementById('submit');
+    if (saveBtn) saveBtn.style.display = '';
+  });
+})();
+
+// Delete book/format
+(function() {
+  var overlay = document.getElementById('deleteOverlay');
+  if (!overlay) return;
+
+  var message = document.getElementById('delete_message');
+  var confirmBtn = document.getElementById('deleteOverlay-confirm');
+  var cancelBtn = document.getElementById('deleteOverlay-cancel');
+  var csrfToken = document.querySelector('input[name="csrf_token"]').value;
+  var pendingUrl = null;
+
+  document.querySelectorAll('.book-edit-delete-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
       e.preventDefault();
+      pendingUrl = item.dataset.deleteUrl;
+      var label = item.dataset.deleteLabel;
+      message.textContent = 'This action cannot be undone. The ' + label + ' will be permanently deleted.';
+      confirmBtn.textContent = "I'm sure, delete " + label;
       overlay.style.display = '';
+      // Close the details popover
+      var details = item.closest('details');
+      if (details) details.removeAttribute('open');
     });
+  });
 
-    function close() { overlay.style.display = 'none'; }
-    document.getElementById('metaOverlay-close').addEventListener('click', close);
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
-  })();
+  cancelBtn.addEventListener('click', function() {
+    overlay.style.display = 'none';
+    pendingUrl = null;
+  });
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      overlay.style.display = 'none';
+      pendingUrl = null;
+    }
+  });
+
+  confirmBtn.addEventListener('click', function() {
+    if (!pendingUrl) return;
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = pendingUrl;
+    var csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrf_token';
+    csrf.value = csrfToken;
+    form.appendChild(csrf);
+    document.body.appendChild(form);
+    form.submit();
+  });
+})();
 </script>
-<script src="{{ url_for('static', filename='js/libs/typeahead.bundle.js') }}"></script>
-<script src="{{ url_for('static', filename='js/libs/bootstrap-rating-input.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/get_meta.js') }}"></script>
-<script src="{{ url_for('static', filename='js/libs/tinymce/tinymce.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}"></script>
-{% if not current_user.locale == 'en' %}
-<script src="{{ url_for('static', filename='js/libs/bootstrap-datepicker/locales/bootstrap-datepicker.' + current_user.locale + '.min.js') }}" charset="UTF-8"></script>
-{% endif %}
-<script src="{{ url_for('static', filename='js/edit_books.js') }}"></script>
-<script src="{{ url_for('static', filename='js/fullscreen.js') }}"></script>
 {% endblock %}

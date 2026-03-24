@@ -320,14 +320,9 @@
 
 
 
-        <script>
-      function goToLastBook() {
-        var last = localStorage.getItem('lastBookUrl');
-        window.location.href = last || '{{ url_for('web.books') }}';
-      }
-    </script>
 
-        <script>
+    <script>
+      // toast timeout
       document.querySelectorAll('.toast').forEach(function(toast) {
         setTimeout(function() {
           toast.classList.add('toast-hiding');
@@ -359,9 +354,8 @@
           if (idx !== -1) closers.splice(idx, 1);
         }
 
-        // Register details-based popovers (user settings, sort menu)
         function registerDetailsPopovers() {
-          document.querySelectorAll('details.user-popover, details.sort-dropdown').forEach(function(d) {
+          document.querySelectorAll('details.user-popover, details.sort-dropdown, details.detail-icon-dropdown, details.detail-action-dropdown').forEach(function(d) {
             if (d.dataset.popoverRegistered) return;
             d.dataset.popoverRegistered = 'true';
             var close = register(function() {
@@ -384,7 +378,7 @@
         // Click outside closes details popovers
         document.addEventListener('click', function(e) {
           if (e.target.closest('summary')) return;
-          document.querySelectorAll('details.sort-dropdown[open], details.user-popover[open]').forEach(function(d) {
+          document.querySelectorAll('details.sort-dropdown[open], details.user-popover[open], details.detail-icon-dropdown[open], details.detail-action-dropdown[open]').forEach(function(d) {
             if (!d.contains(e.target)) d.removeAttribute('open');
           });
         });
