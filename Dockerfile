@@ -93,6 +93,11 @@ COPY --from=builder /usr/local/bin/kepubify /usr/local/bin/kepubify
 
 COPY . .
 
+ENV CALIBRE_DBPATH=/config
+ENV BOOKBAG_LIBRARY_PATH=/books
+
+RUN mkdir -p /config /books
+
 EXPOSE 8084
 
 CMD ["python", "cps.py"]
