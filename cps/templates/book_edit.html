@@ -117,7 +117,9 @@
   <div class="book-detail-meta-col">
     <div class="book-detail-meta-cont">
     <!-- Icon action row -->
-
+      <a href="{{ url_for('web.show_book', book_id=book.id) }}" id="edit-close-btn" class="book-edit-close-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M164.24,100.24,136.48,128l27.76,27.76a6,6,0,1,1-8.48,8.48L128,136.48l-27.76,27.76a6,6,0,0,1-8.48-8.48L119.52,128,91.76,100.24a6,6,0,0,1,8.48-8.48L128,119.52l27.76-27.76a6,6,0,0,1,8.48,8.48ZM230,128A102,102,0,1,1,128,26,102.12,102.12,0,0,1,230,128Zm-12,0a90,90,0,1,0-90,90A90.1,90.1,0,0,0,218,128Z"></path></svg>
+      </a>
     <form role="form" action="{{ url_for('edit-book.edit_book', book_id=book.id) }}" method="post" enctype="multipart/form-data" id="book_edit_frm">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -288,7 +290,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z" fill="currentColor"></path></svg>
           {{_('Save')}}
         </button>
-        <a href="{{ url_for('web.show_book', book_id=book.id) }}" id="edit_cancel" class="btn-secondary">{{_('Cancel')}}</a>
+        <a href="{{ url_for('web.show_book', book_id=book.id) }}" id="edit_cancel" class="btn-secondary" style="{% if not upload_mode %}display:none;{% endif %}">{{_('Cancel')}}</a>
       </div>
     </form>
     </div> <!-- book-detail-meta-cont -->
@@ -383,21 +385,25 @@
   });
 })();
 
-// Show save button on any change
+// Show save/cancel buttons and hide close button on any change
+function showEditActions() {
+  var saveBtn = document.getElementById('submit');
+  var cancelBtn = document.getElementById('edit_cancel');
+  var closeBtn = document.getElementById('edit-close-btn');
+  if (saveBtn) saveBtn.style.display = '';
+  if (cancelBtn) cancelBtn.style.display = '';
+  if (closeBtn) closeBtn.style.display = 'none';
+}
+
 (function() {
   var form = document.getElementById('book_edit_frm');
-  var saveBtn = document.getElementById('submit');
-  if (!form || !saveBtn) return;
+  if (!form) return;
 
-  function showSave() {
-    saveBtn.style.display = '';
-  }
-
-  form.addEventListener('input', showSave);
-  form.addEventListener('change', showSave);
+  form.addEventListener('input', showEditActions);
+  form.addEventListener('change', showEditActions);
 
   var coverInput = document.getElementById('btn-upload-cover');
-  if (coverInput) coverInput.addEventListener('change', showSave);
+  if (coverInput) coverInput.addEventListener('change', showEditActions);
 })();
 
 // Import cover from URL
@@ -406,7 +412,6 @@
   var urlInput = document.getElementById('cover-url-input');
   var doImport = document.getElementById('cover-url-import');
   var img = document.getElementById('detailcover');
-  var saveBtn = document.getElementById('submit');
   if (!dropdown || !doImport) return;
 
   doImport.addEventListener('click', function() {
@@ -430,7 +435,7 @@
 
     dropdown.removeAttribute('open');
     urlInput.value = '';
-    if (saveBtn) saveBtn.style.display = '';
+    showEditActions();
   });
 })();
 
@@ -443,8 +448,7 @@
       if (dateInput) dateInput.value = '';
       var fakeInput = row.querySelector('.fake-input');
       if (fakeInput) fakeInput.value = '';
-      var saveBtn = document.getElementById('submit');
-      if (saveBtn) saveBtn.style.display = '';
+      showEditActions();
     });
   });
 })();
@@ -453,8 +457,7 @@
 function removeIdentifierLine(btn) {
   var row = btn.closest('tr');
   if (row) row.remove();
-  var saveBtn = document.getElementById('submit');
-  if (saveBtn) saveBtn.style.display = '';
+  showEditActions();
 }
 
 // Add identifier row
@@ -474,8 +477,7 @@ function removeIdentifierLine(btn) {
       '</button></td>';
     tbody.appendChild(tr);
     tr.querySelector('input').focus();
-    var saveBtn = document.getElementById('submit');
-    if (saveBtn) saveBtn.style.display = '';
+    showEditActions();
   });
 })();
 
@@ -511,8 +513,7 @@ function removeIdentifierLine(btn) {
               input.value = parts.join(', ');
               dropdown.style.display = 'none';
               input.focus();
-              var saveBtn = document.getElementById('submit');
-              if (saveBtn) saveBtn.style.display = '';
+              showEditActions();
             });
             dropdown.appendChild(div);
           });
@@ -567,8 +568,7 @@ function removeIdentifierLine(btn) {
       input.value = val;
       setStars(val);
     }
-    var saveBtn = document.getElementById('submit');
-    if (saveBtn) saveBtn.style.display = '';
+    showEditActions();
   });
 })();
 

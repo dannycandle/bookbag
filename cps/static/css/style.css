@@ -1483,6 +1483,7 @@ body.register .action-bar {
 
 
 .book-detail-wrapper {
+    position: relative;
     background-color: rgba(255, 255, 255);
     display: flex;
     flex-direction: row;
@@ -2016,6 +2017,21 @@ select.book-edit-field {
     max-height: 400px;
     object-fit: contain;
 }
+
+.book-edit-close-btn {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    z-index: 10;
+    color: #581C1C;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.book-edit-close-btn:hover {
+    opacity: 1;
+}
+
 
 .book-edit-sidebar-section {
     margin-top: 20px;
