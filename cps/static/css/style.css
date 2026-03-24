@@ -1824,6 +1824,10 @@ details[open] .detail-icon-popover {
     position: relative;
 }
 
+.split-btn-main:only-child {
+    border-radius: 15px;
+}
+
 .split-btn-toggle {
     display: inline-flex;
     align-items: center;
