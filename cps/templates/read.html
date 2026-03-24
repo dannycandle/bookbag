@@ -195,7 +195,22 @@
             currentFontSize = n;
             document.getElementById("fontSizeDisplay").value = n + "%";
             localStorage.setItem("calibre.reader.fontSize", n);
-            if (reader && reader.rendition) reader.rendition.themes.fontSize(n + "%");
+            if (reader && reader.rendition) {
+                try { reader.rendition.themes.fontSize(n + "%"); } catch(e) {}
+                // Fallback: inject font-size directly into iframe
+                try {
+                    reader.rendition.getContents().forEach(function(c) {
+                        if (c.document) {
+                            var el = c.document.getElementById('reader-fontsize-override');
+                            if (el) el.remove();
+                            var style = c.document.createElement('style');
+                            style.id = 'reader-fontsize-override';
+                            style.textContent = 'body { font-size: ' + n + '% !important; }';
+                            c.document.head.appendChild(style);
+                        }
+                    });
+                } catch(e) {}
+            }
         }
         var saved = localStorage.getItem("calibre.reader.fontSize");
         if (saved) { currentFontSize = parseInt(saved); document.getElementById("fontSizeDisplay").value = saved + "%"; }

@@ -123,8 +123,8 @@ var reader;
         if (s = localStorage.getItem("calibre.reader.textAlign"))
             window._readerTextAlign = s;
         s = localStorage.getItem("calibre.reader.font");
-        if (s === "default") s = "Inter";
-        if (s && window.selectFont) window.selectFont(s);
+        if (!s || s === "default") s = "Inter";
+        if (window.selectFont) window.selectFont(s);
         if (s = localStorage.getItem("calibre.reader.lineSpacing"))
             reader.rendition.themes.override("line-height", s, true);
     });
