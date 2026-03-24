@@ -31,7 +31,7 @@ Bookbag is early in development, do not install it as your production server.
 
 **Docker Image Coming Soon**
 
-## Setup
+## First-Time Setup
 There is now a flow for first time login and setup. Follow the setup wizard after instaling to import your metadata.db. If you are bringing your own metadata.db, book files must still be migrated manually. Place them in the same folder as your metadata.db (/books by default)
 
 Recommended to set up email config in settings for password resets.
@@ -39,10 +39,6 @@ Recommended to set up email config in settings for password resets.
 ## Requirements
 
 - Python 3.8 or newer (3.12+ recommended)
-- A Calibre library (`metadata.db`)
-- [Calibre CLI Tools](https://calibre-ebook.com) — for ebook conversion
-- [Kepubify](https://github.com/pgaskin/kepubify) — for Kobo support
-- [ImageMagick](https://imagemagick.org) — for cover extraction from EPUBs
 
 ## License
 
@@ -52,4 +48,3 @@ Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) and 
 - [Inter](https://github.com/rsms/inter) — [SIL Open Font License 1.1](cps/static/fonts/Inter/OFL.txt)
 - [Comfortaa](https://github.com/alexeiva/comfortaa) — [SIL Open Font License 1.1](cps/static/fonts/Comfortaa/OFL.txt)
 - [Phosphor Icons](https://phosphoricons.com/) — [MIT License](LICENSE-PHOSPHOR-ICONS.txt)
-
