@@ -158,7 +158,7 @@ def upload():
 
                 if len(request.files.getlist("btn-upload")) < 2:
                     if current_user.role_edit() or current_user.role_admin():
-                        resp = {"location": url_for('edit-book.show_edit_book', book_id=book_id)}
+                        resp = {"location": url_for('edit-book.show_edit_book', book_id=book_id, upload=1)}
                         return make_response(jsonify(resp))
                     else:
                         resp = {"location": url_for('web.show_book', book_id=book_id)}
@@ -1176,7 +1176,8 @@ def render_edit_book(book_id):
                                  title=_("edit metadata"), page="editbook",
                                  conversion_formats=allowed_conversion_formats,
                                  config=config,
-                                 source_formats=valid_source_formats)
+                                 source_formats=valid_source_formats,
+                                 upload_mode=request.args.get('upload', False))
 
 
 def edit_book_ratings(to_save, book):
