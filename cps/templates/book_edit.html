@@ -346,6 +346,34 @@
   });
 })();
 
+// Submit upload format form on file selection
+(function() {
+  var formatInput = document.getElementById('btn-upload-format');
+  var formatForm = document.getElementById('form-upload-format');
+  if (!formatInput || !formatForm) return;
+
+  formatInput.addEventListener('change', function() {
+    if (!formatInput.files || !formatInput.files.length) return;
+
+    var formData = new FormData(formatForm);
+    fetch(formatForm.action, {
+      method: 'POST',
+      body: formData
+    })
+    .then(function(resp) { return resp.json(); })
+    .then(function(data) {
+      if (data.location) {
+        window.location.href = data.location;
+      } else {
+        window.location.reload();
+      }
+    })
+    .catch(function() {
+      window.location.reload();
+    });
+  });
+})();
+
 // Show save button on any change
 (function() {
   var form = document.getElementById('book_edit_frm');

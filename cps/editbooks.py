@@ -734,7 +734,7 @@ def do_edit_book(book_id, upload_formats=None):
             flash(_("Metadata successfully updated"), category="success")
 
         if upload_formats:
-            resp = {"location": url_for('edit-book.show_edit_book', book_id=book_id)}
+            resp = {"location": url_for('edit-book.show_edit_book', book_id=book_id, upload=1)}
             return make_response(jsonify(resp))
 
         if "detail_view" in to_save:
