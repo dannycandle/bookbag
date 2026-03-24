@@ -1,4 +1,4 @@
-![Book Bag mockup](books-mockup.png)
+![Book Bag mockup](bookbag-mockup.png)
 
 # Bookbag
 
