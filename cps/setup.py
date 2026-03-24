@@ -305,6 +305,10 @@ def _create_empty_metadata_db(path):
             is_multiple INTEGER NOT NULL DEFAULT 0,
             normalized INTEGER NOT NULL DEFAULT 0
         )'''))
+        conn.execute(text('''CREATE TABLE IF NOT EXISTS metadata_dirtied (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            book INTEGER NOT NULL UNIQUE
+        )'''))
         conn.execute(text('''CREATE TABLE IF NOT EXISTS library_id (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT NOT NULL
