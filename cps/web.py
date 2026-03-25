@@ -1244,8 +1244,13 @@ def serve_book(book_id, book_format, anyname):
                 log.error("File Not Found")
                 return "File Not Found"
         # enable byte range read of pdf
-        response = make_response(
-            send_from_directory(os.path.join(config.get_book_path(), book.path), data.name + "." + book_format))
+        book_dir = os.path.join(config.get_book_path(), book.path)
+        book_file = data.name + "." + book_format
+        if not os.path.isfile(os.path.join(book_dir, book_file)):
+            book_file = data.name + "." + book_format.lower()
+        if not os.path.isfile(os.path.join(book_dir, book_file)):
+            book_file = data.name + "." + book_format.upper()
+        response = make_response(send_from_directory(book_dir, book_file))
         if not range_header:
             response.headers['Accept-Ranges'] = 'bytes'
         return response
