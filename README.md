@@ -1,49 +1,84 @@
-![Book Bag mockup](bookbag-mockup.png)
-
 # Bookbag
-
-**A modern redesign of [Calibre-Web](https://github.com/janeczku/calibre-web).**
-
-> ⚠️ Bookbag is in early development and is not stable. It is offered as-is. 
-> ⚠️ Please do not host Bookbag on a public server. There are known security issues and the app has not been properly pen tested.
+![Book Bag mockup](./readme-assets/bookbag-mockup.png)
 
 ## About
 
-Bookbag is a fork of calibre-web that incorporates a complete redesign of the user interface. The goal is to make a foss alternatives to the popular proprietary ebook management apps that provides a user experience is just as good, if not better, than what they provide. We shouldn't have to choose between having beautiful, fucntional apps and supporting FOSS.
+Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) that incorporates a complete redesign of the user interface. It is fully self-hostable and has no user tracking or telemetry.
 
 ## Features
+![Instant Loads](./readme-assets/instant.gif)
+- **Instant Filters, Search, Sort, and Resize:** Instantly sort, search, filter, and resize book covers.
+- **Advanced Search:** Search using any combination of metadata.
+- **Advanced Settings:** One page with instantly applied settings.
+- **Easy Setup Wizard:** First-time setup wizard to create admin account and create/upload book library.
+- **Advanced Web Reader:** Font, text size, themes, line height, justification, & columns.
+- **One-Time-Password Flow:** For password resets and public registrations.
+- **Most of what Calibre-Web Includes:** Retains features such as Kobo Sync, email to ereader, magic links, ldap & oauth, etc., although many need further testing.
 
-**Live Filtering** simply select a filter from the sidepanel and matching books are instantly shown.
-**Live Book Cover Resize** Instantly resize book covers.
-**Instant Search** Search is instantly applied, just start typing in the search field.
-**Advanced Search** New Advanced Search design lets you search using any combination of metadata.
-**Instant Sort** Sorting of books is instantly applied.
-**Complete Redesign of Admin Settings** Single page settings using AJAX form submission to instantly apply any setting changes. Care has been taken to preserve as many settings from Calibre-Web as is practical at this stage. Beware, advanced features require further testing.
-**Easy Setup Wizard** No temporary dummy admin account. Setup wizard automatically starts on first launch and lets you create your own account and upload your book library.
-**Kobo Sync & Email to eReader** Retains calibre-web functionality for ereaders, although testing is still needed to ensure a smooth experience.
+## Planned Future Updates (Dates TBD):
+- **Responsive Design** (In progress)
+- **User & Magic Shelves** (In progress)
+- **Dark Mode** (In progress)
+- **Bulk Editing**
+- **Author's Page**
+- **Audiobooks**
+- **Auto-ingest**
+- **Metadata Automation**
+- **Deduplication**
+- **Free eBook Discovery**
+- **Ebook upload sanitation (for security)**
+- **Website**
 
-## Quick Start
-  
-Bookbag is early in development, do not install it as your production server.
-- Download and unpack files to your server/container
-- Create venv and install dependencies in requirements.txt and optionally optional-requirements.txt
-- run python cps.py
+## Set up a development environment
+1. Clone repository
 
-**Docker Image Coming Soon**
+`git clone https://codeberg.org/bookbag/bookbag.git && cd bookbag`
 
-## First-Time Setup
-There is now a flow for first time login and setup. Follow the setup wizard after instaling to import your metadata.db. If you are bringing your own metadata.db, book files must still be migrated manually. Place them in the same folder as your metadata.db (/books by default)
+2. Install system dependencies*
 
-Recommended to set up email config in settings for password resets.
+- **Debian 13:** `sudo apt install -y python3-dev gcc g++ libffi-dev libmagic-dev libxml2-dev libxslt1-dev imagemagick libmagickwand-dev libldap2-dev libsasl2-dev unrar-free`
 
-## Requirements
+- **Fedora 43:** `sudo dnf install -y python3-devel gcc gcc-c++ openssl-devel cyrus-sasl-devel libffi-devel libxml2-devel libxslt-devel ImageMagick ImageMagick-devel openldap-devel`
 
-- Python 3.8 or newer (3.12+ recommended)
+- **MacOS:** `xcode-select --install` and `brew install python libmagic imagemagick libxml2 libxslt libffi openssl`
+
+*These are general guidelines, package names and requirements may vary based on your system. If you are missing system dependencies, pip installs in step 3 may fail.
+
+3. Create and activate python virtual environment
+
+```
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt -r optional-requirements.txt
+```
+
+If builds in this stage fail, it is likely that you are missing a system dependency, go back to step 2.
+
+4. Start server in debug mode
+
+`FLASK_DEBUG=1 python cps.py`
+
+5. In a web browser, open http://localhost:8084
+
+## Install via Docker
+1. Download docker-compose.yml from this repo.
+2. In the file, replace "PATH/FOR/YOUR/LIBRARY/FOLDER" (stores metadata.db and book files) and "PATH/FOR/YOUR/CONFIG/FOLDER" (stores app.db and other install-specific files) with the paths you want. Map your desired port to container port 8084.
+3. Run `docker compose up -d`
+
+> ⚠️ While I have tested bookbag for release 0.1.0, I still advise against using it on a public server or as your primary book server. There may be vulnerabilities and bugs that prevent normal use. Bookbag is still in early development and is offered as-is.
+
+## First-Time User Setup
+Follow the setup wizard after starting the server.
+1. Create admin account.
+2. If you are bringing your own metadata.db, choose "Bring my own". You can then upload your metadata.db file. The book files themselves must still be manually placed in the folder your metadata.db expects, usually the same folder as the metadata.db file (/books in container, ./books for dev environments).
+3. If you want to start with a fresh (empty) library, choose "Start fresh". A new metadata.db file with a unique uuid is created.
+4. It is recommended you go to the settings page and set up email so you can easily reset passwords, etc.
 
 ## License
 
 Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) and is licensed under the [GPL v3 License](LICENSE).
 
+Many thanks to the following projects:
 - [Calibre-Web](https://github.com/janeczku/calibre-web) — [GPL v3](LICENSE)
 - [Inter](https://github.com/rsms/inter) — [SIL Open Font License 1.1](cps/static/fonts/Inter/OFL.txt)
 - [Comfortaa](https://github.com/alexeiva/comfortaa) — [SIL Open Font License 1.1](cps/static/fonts/Comfortaa/OFL.txt)

@@ -1,12 +1,10 @@
 services:
   bookbag:
     image: codeberg.org/bookbag/bookbag:latest
-    # For the light image (without Calibre tools), use:
-    # image: codeberg.org/bookbag/bookbag:light
     container_name: bookbag
     ports:
       - "8084:8084"
     volumes:
-      - ./books:/books
-      - ./config:/config
+      - PATH/FOR/YOUR/LIBRARY/FOLDER:/books
+      - PATH/FOR/YOUR/CONFIG/FOLDER:/config
     restart: unless-stopped
