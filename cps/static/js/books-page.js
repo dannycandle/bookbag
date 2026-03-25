@@ -348,7 +348,7 @@ window.initBooksPage = function() {
         if (path.length >= 4) path[3] = '1';
         return '/' + path.join('/');
       }
-      return window.location.pathname;
+      return window.location.pathname + '?sort=' + sortParam;
     }
 
     sortPopover.addEventListener('click', function(e) {
