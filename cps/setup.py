@@ -196,122 +196,14 @@ def _validate_metadata_db(path):
 
 
 def _create_empty_metadata_db(path):
-    """Create a minimal Calibre-compatible metadata.db."""
-    from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, text
-    from sqlalchemy import TIMESTAMP
-    engine = create_engine('sqlite:///{}'.format(path), echo=False)
-    with engine.begin() as conn:
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS books (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL DEFAULT 'Unknown',
-            sort TEXT,
-            "author_sort" TEXT,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            pubdate TIMESTAMP DEFAULT '0101-01-01 00:00:00+00:00',
-            series_index TEXT NOT NULL DEFAULT '1.0',
-            last_modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            path TEXT NOT NULL DEFAULT '',
-            has_cover INTEGER DEFAULT 0,
-            uuid TEXT,
-            isbn TEXT DEFAULT '',
-            lccn TEXT DEFAULT '',
-            flags INTEGER NOT NULL DEFAULT 1
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS authors (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            sort TEXT,
-            link TEXT NOT NULL DEFAULT ''
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS series (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            sort TEXT
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS tags (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS publishers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            sort TEXT
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS languages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lang_code TEXT NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS comments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            text TEXT NOT NULL DEFAULT ''
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS ratings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            rating INTEGER
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS identifiers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            type TEXT NOT NULL DEFAULT 'isbn',
-            val TEXT NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            format TEXT NOT NULL,
-            uncompressed_size INTEGER NOT NULL,
-            name TEXT NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS books_authors_link (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            author INTEGER NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS books_tags_link (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            tag INTEGER NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS books_series_link (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            series INTEGER NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS books_publishers_link (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            publisher INTEGER NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS books_languages_link (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            lang_code INTEGER NOT NULL,
-            item_order INTEGER NOT NULL DEFAULT 0
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS books_ratings_link (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL,
-            rating INTEGER NOT NULL
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS custom_columns (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            label TEXT NOT NULL,
-            name TEXT NOT NULL,
-            datatype TEXT NOT NULL,
-            mark_for_delete INTEGER NOT NULL DEFAULT 0,
-            editable INTEGER NOT NULL DEFAULT 1,
-            display TEXT DEFAULT '{}',
-            is_multiple INTEGER NOT NULL DEFAULT 0,
-            normalized INTEGER NOT NULL DEFAULT 0
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS metadata_dirtied (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book INTEGER NOT NULL UNIQUE
-        )'''))
-        conn.execute(text('''CREATE TABLE IF NOT EXISTS library_id (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            uuid TEXT NOT NULL
-        )'''))
-        lib_uuid = str(uuid.uuid4())
-        conn.execute(text("INSERT INTO library_id (uuid) VALUES (:uuid)"), {"uuid": lib_uuid})
+    """Create a Calibre-compatible metadata.db by copying the template database."""
+    template_db = os.path.join(constants.STATIC_DIR, 'db-bak', 'metadata.db')
+    shutil.copy2(template_db, path)
+
+    # Generate a fresh library UUID
+    conn = sqlite3.connect(path)
+    conn.execute("DELETE FROM library_id")
+    lib_uuid = str(uuid.uuid4())
+    conn.execute("INSERT INTO library_id (uuid) VALUES (?)", (lib_uuid,))
+    conn.commit()
+    conn.close()
