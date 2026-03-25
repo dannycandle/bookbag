@@ -34,6 +34,7 @@ LICENSE-*
 books/
 Books/
 *.db
+!cps/static/db-bak/metadata.db
 *.log
 *.log.*
 *.bak
