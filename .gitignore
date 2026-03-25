@@ -1,10 +1,6 @@
-### Python ###
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Distribution / packaging
 .Python
 .python-version
 env/
@@ -20,18 +16,16 @@ vendor/
 *.egg
 .pylint.d
 .env
-
-# bookbag
 *.db
+!cps/static/db-bak/metadata.db
+config/
 *.log
 cps/cache
 cps/static/img/login-illustration.png
-
 .idea/
 *.bak
 *.log.*
 .key
-
 settings.yaml
 gdrive_credentials
 client_secrets.json
