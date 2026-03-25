@@ -11,6 +11,7 @@
 {% block body %}
 <div class="book-detail-wrapper">
   <div class="book-detail-layout">
+    <div class="book-detail-columns">
     <!-- Cover column -->
     <div class="book-detail-cover-col">
       <img class="book-detail-cover-img" title="{{ entry.title }}" src="{{ url_for('web.get_cover', book_id=entry.id, resolution='og', c=entry|last_modified) }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -266,6 +267,7 @@
          </div> <!-- book details content-->
       </div> <!-- book details meta cont-->
     </div> <!--details wrapper-->
+    </div> <!--book-detail-columns-->
   </div><!--content container-->
 </div> <!--Wrapper-->
 {% endblock %}
