@@ -185,7 +185,7 @@
     <summary class="filter-section-title">Tags</summary>
     <div class="filter-options" data-max-visible="5">
       {% for tag in filter_tags %}
-      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="tags" data-filter-value="{{ tag.name }}"> {{ tag.name }}</label>
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="tags" data-filter-id="{{ tag.id }}" data-filter-value="{{ tag.name }}"> {{ tag.name }}</label>
       {% endfor %}
       {% if filter_tags|length > 5 %}
       <button class="filter-show-more" type="button">Show {{ filter_tags|length - 5 }} more</button>
@@ -199,7 +199,7 @@
     <summary class="filter-section-title">Authors</summary>
     <div class="filter-options" data-max-visible="5">
       {% for author in filter_authors %}
-      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="author" data-filter-value="{{ author.name }}"> {{ author.name }}</label>
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="author" data-filter-id="{{ author.id }}" data-filter-value="{{ author.name }}"> {{ author.name }}</label>
       {% endfor %}
       {% if filter_authors|length > 5 %}
       <button class="filter-show-more" type="button">Show {{ filter_authors|length - 5 }} more</button>
@@ -213,7 +213,7 @@
     <summary class="filter-section-title">Series</summary>
     <div class="filter-options" data-max-visible="5">
       {% for s in filter_series %}
-      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="series" data-filter-value="{{ s.name }}"> {{ s.name }}</label>
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="series" data-filter-id="{{ s.id }}" data-filter-value="{{ s.name }}"> {{ s.name }}</label>
       {% endfor %}
       {% if filter_series|length > 5 %}
       <button class="filter-show-more" type="button">Show {{ filter_series|length - 5 }} more</button>
@@ -241,7 +241,7 @@
     <summary class="filter-section-title">Publishers</summary>
     <div class="filter-options" data-max-visible="5">
       {% for pub in filter_publishers %}
-      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="publishers" data-filter-value="{{ pub.name }}"> {{ pub.name }}</label>
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="publishers" data-filter-id="{{ pub.id }}" data-filter-value="{{ pub.name }}"> {{ pub.name }}</label>
       {% endfor %}
       {% if filter_publishers|length > 5 %}
       <button class="filter-show-more" type="button">Show {{ filter_publishers|length - 5 }} more</button>
