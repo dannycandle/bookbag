@@ -164,42 +164,41 @@ window.initBooksPage = function() {
         fetchFiltered();
       });
     }
-  })();
 
+    // --- Sort Handler ---
+    if (sortDropdown && sortPopover) {
+      var sortLabels = {
+        abc: 'Title: A\u2013Z', zyx: 'Title: Z\u2013A',
+        authaz: 'Author: A\u2013Z', authza: 'Author: Z\u2013A',
+        pubold: 'Published: Old to New', pubnew: 'Published: New to Old',
+        'new': 'Added: New to Old', old: 'Added: Old to New'
+      };
 
-  // --- Sort Handler ---
-  if (sortDropdown && sortPopover) {
-    var sortLabels = {
-      abc: 'Title: A\u2013Z', zyx: 'Title: Z\u2013A',
-      authaz: 'Author: A\u2013Z', authza: 'Author: Z\u2013A',
-      pubold: 'Published: Old to New', pubnew: 'Published: New to Old',
-      'new': 'Added: New to Old', old: 'Added: Old to New'
-    };
-
-    function updateActiveOption() {
-      sortPopover.querySelectorAll('.sort-option').forEach(function(btn) {
-        btn.style.display = btn.dataset.sort === currentSort ? 'none' : '';
-      });
-    }
-    updateActiveOption();
-
-    sortPopover.addEventListener('click', function(e) {
-      var btn = e.target.closest('.sort-option');
-      if (!btn) return;
-
-      var newSort = btn.dataset.sort;
-      if (newSort === currentSort) return;
-
-      sortDropdown.removeAttribute('open');
-      sortDropdown.querySelector('.sort-button').textContent = sortLabels[newSort] || 'Sort';
-
-      currentSort = newSort;
-      sortDropdown.dataset.currentSort = newSort;
+      function updateActiveOption() {
+        sortPopover.querySelectorAll('.sort-option').forEach(function(btn) {
+          btn.style.display = btn.dataset.sort === currentSort ? 'none' : '';
+        });
+      }
       updateActiveOption();
 
-      fetchFiltered();
-    });
-  }
+      sortPopover.addEventListener('click', function(e) {
+        var btn = e.target.closest('.sort-option');
+        if (!btn) return;
+
+        var newSort = btn.dataset.sort;
+        if (newSort === currentSort) return;
+
+        sortDropdown.removeAttribute('open');
+        sortDropdown.querySelector('.sort-button').textContent = sortLabels[newSort] || 'Sort';
+
+        currentSort = newSort;
+        sortDropdown.dataset.currentSort = newSort;
+        updateActiveOption();
+
+        fetchFiltered();
+      });
+    }
+  })();
 
 
   // --- Book Popover ---
