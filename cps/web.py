@@ -23,6 +23,7 @@ import json
 import mimetypes
 import random
 import time
+from datetime import datetime
 import chardet  # dependency of requests
 import copy
 from importlib.metadata import metadata
@@ -34,6 +35,7 @@ from flask_babel import get_locale
 from .cw_login import login_user, logout_user, current_user
 from flask_limiter import RateLimitExceeded
 from flask_limiter.util import get_remote_address
+from sqlalchemy import Integer
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, OperationalError
 from sqlalchemy.sql.expression import text, func, false, not_, and_, or_
 from sqlalchemy.orm.attributes import flag_modified
@@ -819,6 +821,82 @@ def index():
 def books(page):
     sort_param = (request.args.get('sort') or 'stored').lower()
     return render_books_list("newest", sort_param, 1, page)
+
+
+# Book filters
+def _parse_ids(param):
+    if not param:
+        return []
+    try:
+        return [int(x) for x in param.split(',') if x.strip()]
+    except ValueError:
+        return []
+
+@web.route("/books/filtered", defaults={'page': 1})
+@web.route("/books/filtered/page/<int:page>")
+@login_required_if_no_ano
+def books_filtered(page):
+    tag_ids = _parse_ids(request.args.get('tag'))
+    author_ids = _parse_ids(request.args.get('author'))
+    series_ids = _parse_ids(request.args.get('series'))
+    publisher_ids = _parse_ids(request.args.get('publisher'))
+    lang_param = request.args.get('language')
+    rating_vals = _parse_ids(request.args.get('rating'))
+    pubdate_vals = _parse_ids(request.args.get('pubdate'))
+    filters = []
+    if tag_ids:
+        filters.append(db.Books.tags.any(db.Tags.id.in_(tag_ids)))
+
+    if author_ids:
+        filters.append(db.Books.authors.any(db.Authors.id.in_(author_ids)))
+
+    if series_ids:
+        filters.append(db.Books.series.any(db.Series.id.in_(series_ids)))
+
+    if publisher_ids:
+        filters.append(db.Books.publishers.any(db.Publishers.id.in_(publisher_ids)))
+
+    if lang_param:
+        codes = [c.strip() for c in lang_param.split(',') if c.strip()]
+        if codes:
+            filters.append(db.Books.languages.any(db.Languages.lang_code.in_(codes)))
+
+    if rating_vals:
+        rating_ids = [val * 2 for val in rating_vals]
+        filters.append(db.Books.ratings.any(db.Ratings.rating.in_(rating_ids)))
+
+    if pubdate_vals:
+        year = datetime.now().year
+        pub_year = func.cast(func.strftime('%Y', db.Books.pubdate), Integer)
+        conditions = []
+        if 2 in pubdate_vals:
+            conditions.append(pub_year >= year - 2)
+        if 5 in pubdate_vals:
+            conditions.append(and_(pub_year < year - 2, pub_year >= year - 5))
+        if 10 in pubdate_vals:
+            conditions.append(and_(pub_year < year - 5, pub_year >= year - 10))
+        if 20 in pubdate_vals:
+            conditions.append(and_(pub_year < year - 10, pub_year >= year - 20))
+        if 999 in pubdate_vals:
+            conditions.append(pub_year < year - 20)
+        if conditions:
+            filters.append(or_(*conditions))
+
+
+    sort_param = (request.args.get('sort') or 'stored').lower()
+    order = get_sort_function(sort_param, "newest")
+    db_filter = and_(*filters) if filters else True
+    filter_params = {k: v for k, v in request.args.items() if k != 'page'}
+    filter_qs = '&'.join('{}={}'.format(k, v) for k, v in filter_params.items())
+
+    entries, randm, pagination = calibre_db.fill_indexpage(page, 0, db.Books, db_filter, order[0],
+                                                           True, config.config_read_column,
+                                                           db.books_series_link,
+                                                           db.Books.id == db.books_series_link.c.book,
+                                                           db.Series)
+
+    return render_title_template('index.html', random=randm, entries=entries, pagination=pagination,
+                                 title=_("Books"), page="newest", order=order[1], filter_qs=filter_qs)
 
 
 @login_required_if_no_ano
