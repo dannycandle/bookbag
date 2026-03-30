@@ -7,7 +7,7 @@ window.initBooksPage = function() {
     documentListeners.push({ event: event, handler: handler });
   }
 
-  // --- Infinite Scroll + Filters ---
+  // --- Infinite Scroll, Filters, Sort ---
   (function() {
     var grid = document.querySelector('.books-grid');
     var wrapper = document.querySelector('.main-content');
@@ -15,11 +15,12 @@ window.initBooksPage = function() {
     var clearBtn = document.getElementById('clear-filters');
     var filterContainer = document.getElementById('sidebar-filters');
     var searchInput = document.getElementById('live-search');
+    var sortDropdown = document.querySelector('.sort-dropdown');
+    var sortPopover = document.querySelector('.sort-popover');
     if (!grid || !wrapper || !spinner) return;
 
     var loading = false;
-    var MIN_VISIBLE = 20;
-    var searchTerm = '';
+    var currentSort = sortDropdown ? (sortDropdown.dataset.currentSort || 'new') : 'new';
 
     // --- Infinite Scroll ---
     function loadMore(callback) {
@@ -59,7 +60,7 @@ window.initBooksPage = function() {
 
     wrapper.addEventListener('scroll', function() {
       if (wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight < 300) {
-        loadMore(function() { applyFilters(false); });
+        loadMore();
       }
     });
 
@@ -70,31 +71,83 @@ window.initBooksPage = function() {
       var checked = filterContainer.querySelectorAll('input[type="checkbox"]:checked');
       checked.forEach(function(cb) {
         var type = cb.dataset.filterType;
-        var val = cb.dataset.filterValue;
+        var val = cb.dataset.filterId || cb.dataset.filterValue;
         if (!filters[type]) filters[type] = [];
         filters[type].push(val);
       });
       return filters;
     }
 
+    function buildFilterUrl(sortParam) {
+      var filters = getActiveFilters();
+      var params = [];
+      if (sortParam) params.push('sort=' + sortParam);
+      for (var type in filters) {
+        params.push(type + '=' + filters[type].join(','));
+      }
+      return '/books/filtered?' + params.join('&');
+    }
+
+    function fetchFiltered() {
+      var hasFilters = Object.keys(getActiveFilters()).length > 0;
+      if (clearBtn) clearBtn.style.display = hasFilters ? '' : 'none';
+      if (spinner) spinner.style.display = 'flex';
+
+      fetch(buildFilterUrl(currentSort))
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var newGrid = doc.querySelector('.books-grid');
+          if (!newGrid) return;
+
+          grid.style.transition = 'opacity 0.15s ease';
+          grid.style.opacity = '0';
+
+          setTimeout(function() {
+            grid.innerHTML = newGrid.innerHTML;
+
+            var newNext = newGrid.dataset.nextUrl;
+            if (newNext) {
+              grid.dataset.nextUrl = newNext;
+            } else {
+              delete grid.dataset.nextUrl;
+            }
+
+            var saved = localStorage.getItem('coverSize');
+            if (saved) grid.style.setProperty('--cover-size', saved + 'px');
+
+            grid.style.opacity = '1';
+            setTimeout(function() { grid.style.transition = ''; }, 150);
+            if (spinner) spinner.style.display = 'none';
+          }, 150);
+        })
+        .catch(function() {
+          if (spinner) spinner.style.display = 'none';
+        });
+    }
 
     // Listen for checkbox changes
     if (filterContainer) {
       filterContainer.addEventListener('change', function(e) {
         if (e.target.matches('input[type="checkbox"]')) {
-          applyFilters(true);
+          fetchFiltered();
         }
       });
     }
 
-    // Live search
+    // Live search (client-side, searches within loaded books)
     if (searchInput) {
       var searchTimer;
       searchInput.addEventListener('input', function() {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
-          searchTerm = searchInput.value.trim().toLowerCase();
-          applyFilters(true);
+          var term = searchInput.value.trim().toLowerCase();
+          grid.querySelectorAll('.book-cover').forEach(function(cover) {
+            if (!term) { cover.style.display = ''; return; }
+            var title = (cover.dataset.title || '').toLowerCase();
+            var author = (cover.dataset.author || '').toLowerCase();
+            cover.style.display = (title.indexOf(term) !== -1 || author.indexOf(term) !== -1) ? '' : 'none';
+          });
         }, 150);
       });
     }
@@ -107,23 +160,15 @@ window.initBooksPage = function() {
             cb.checked = false;
           });
         }
-        if (searchInput) { searchInput.value = ''; searchTerm = ''; }
-        applyFilters(false);
+        if (searchInput) searchInput.value = '';
+        fetchFiltered();
       });
     }
   })();
 
 
-  // --- Sort Handler (AJAX, no page reload) ---
-  (function() {
-    var sortDropdown = document.querySelector('.sort-dropdown');
-    var sortPopover = document.querySelector('.sort-popover');
-    if (!sortDropdown || !sortPopover) return;
-
-    var grid = document.querySelector('.books-grid');
-    var spinner = document.getElementById('books-loading');
-    var currentSort = sortDropdown.dataset.currentSort || 'new';
-
+  // --- Sort Handler ---
+  if (sortDropdown && sortPopover) {
     var sortLabels = {
       abc: 'Title: A\u2013Z', zyx: 'Title: Z\u2013A',
       authaz: 'Author: A\u2013Z', authza: 'Author: Z\u2013A',
@@ -131,34 +176,12 @@ window.initBooksPage = function() {
       'new': 'Added: New to Old', old: 'Added: Old to New'
     };
 
-    // Hide the currently active sort option on load
     function updateActiveOption() {
       sortPopover.querySelectorAll('.sort-option').forEach(function(btn) {
         btn.style.display = btn.dataset.sort === currentSort ? 'none' : '';
       });
     }
     updateActiveOption();
-
-    // Build sort URL from the current next-url or page URL
-    function buildSortUrl(sortParam) {
-      var nextUrl = grid.dataset.nextUrl;
-      if (nextUrl) {
-        // next-url format: /pageType/sortParam/bookId/pageNum
-        var parts = nextUrl.split('/').filter(Boolean);
-        // parts[0]=pageType, parts[1]=sortParam, parts[2]=bookId, parts[3]=pageNum
-        parts[1] = sortParam;
-        parts[3] = '1'; // reset to page 1
-        return '/' + parts.join('/');
-      }
-      // Fallback: use current page URL
-      var path = window.location.pathname.split('/').filter(Boolean);
-      if (path.length >= 2) {
-        path[1] = sortParam;
-        if (path.length >= 4) path[3] = '1';
-        return '/' + path.join('/');
-      }
-      return window.location.pathname + '?sort=' + sortParam;
-    }
 
     sortPopover.addEventListener('click', function(e) {
       var btn = e.target.closest('.sort-option');
@@ -167,65 +190,16 @@ window.initBooksPage = function() {
       var newSort = btn.dataset.sort;
       if (newSort === currentSort) return;
 
-      // Close the dropdown
       sortDropdown.removeAttribute('open');
-
-      // Update button label
       sortDropdown.querySelector('.sort-button').textContent = sortLabels[newSort] || 'Sort';
 
-      // Show loading
-      if (spinner) spinner.style.display = 'flex';
-
-      // Fetch sorted page via AJAX
-      var url = buildSortUrl(newSort);
-      fetch(url)
-        .then(function(r) { return r.text(); })
-        .then(function(html) {
-          var doc = new DOMParser().parseFromString(html, 'text/html');
-          var newGrid = doc.querySelector('.books-grid');
-          if (!newGrid) return;
-
-          // Fade out current content
-          grid.style.transition = 'opacity 0.15s ease';
-          grid.style.opacity = '0';
-
-          setTimeout(function() {
-            // Replace grid content
-            grid.innerHTML = newGrid.innerHTML;
-
-            // Update next-url for infinite scroll
-            var newNext = newGrid.dataset.nextUrl;
-            if (newNext) {
-              grid.dataset.nextUrl = newNext;
-            } else {
-              delete grid.dataset.nextUrl;
-            }
-
-            // Apply saved cover size
-            var saved = localStorage.getItem('coverSize');
-            if (saved) {
-              grid.style.setProperty('--cover-size', saved + 'px');
-            }
-
-            // Fade in new content
-            grid.style.opacity = '1';
-            setTimeout(function() { grid.style.transition = ''; }, 150);
-
-            if (spinner) spinner.style.display = 'none';
-          }, 150);
-        })
-        .catch(function() {
-          grid.style.opacity = '1';
-          grid.style.transition = '';
-          if (spinner) spinner.style.display = 'none';
-        });
-
-      // Update state
       currentSort = newSort;
       sortDropdown.dataset.currentSort = newSort;
       updateActiveOption();
+
+      fetchFiltered();
     });
-  })();
+  }
 
 
   // --- Book Popover ---
@@ -350,7 +324,7 @@ window.initBooksPage = function() {
       requestAnimationFrame(step);
     }
 
-    // Event delegation — works for covers loaded by infinite scroll too
+    // Event delegation - works for covers loaded by infinite scroll too
     grid.addEventListener('click', function(e) {
       var cover = e.target.closest('.book-cover');
       if (cover) {
@@ -383,7 +357,7 @@ window.initBooksPage = function() {
   })();
 
 
-  // --- Upload ---
+  // Upload
   var uploadInput = document.getElementById('upload-file-input');
   if (uploadInput) {
     uploadInput.addEventListener('change', function() {
@@ -410,7 +384,7 @@ window.initBooksPage = function() {
   }
 
 
-  // --- Cover Size Slider ---
+  // Cover Size Slider
   (function() {
     var slider = document.getElementById('cover-size-slider');
     var grid = document.querySelector('.books-grid');
@@ -432,7 +406,7 @@ window.initBooksPage = function() {
   })();
 
 
-  // --- Keyboard shortcut: "/" to focus search ---
+  // Keyboard shortcuts
   addDocListener('keydown', function(e) {
     if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
       var tag = (e.target.tagName || '').toLowerCase();
