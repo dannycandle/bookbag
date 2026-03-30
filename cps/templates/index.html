@@ -49,7 +49,11 @@
     data-page="{{ pagination.page }}"
     data-pages="{{ pagination.pages }}"
     {% if pagination.has_next %}
+      {% if filter_qs is defined and filter_qs %}
+    data-next-url="{{ url_for('web.books_filtered') }}?{{ filter_qs }}&page={{ pagination.page + 1 }}"
+      {% else %}
     data-next-url="{{ url_for('web.books_list', data=page, book_id=id|default(1), sort_param=order, page=pagination.page + 1) }}"
+      {% endif %}
     {% endif %}
   {% endif %}
 >
