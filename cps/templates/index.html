@@ -80,6 +80,9 @@
     </div>
     {% endfor %}
   {% else %}
+    {% if filter_qs is defined and filter_qs %}
+    <div class="no-results">No books match your search or filters.</div>
+    {% else %}
     <div class="empty-state">
       <span class="empty-state-brand">Bookbag</span>
       <img class="empty-state-illustration" src="{{ url_for('static', filename='img/new-beginnings.svg') }}" alt="Girl reading a book in a chair">
@@ -88,6 +91,7 @@
         <img class="empty-state-arrow" src="{{ url_for('static', filename='img/squiggly-arrow.svg') }}" alt="">
       </div>
     </div>
+    {% endif %}
   {% endif %}
 </div>
 <div class="books-loading" id="books-loading">
