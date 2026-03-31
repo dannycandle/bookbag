@@ -158,7 +158,7 @@ class _Settings(_Base):
 
     schedule_start_time = Column(Integer, default=4)
     schedule_duration = Column(Integer, default=10)
-    schedule_generate_book_covers = Column(Boolean, default=False)
+    schedule_generate_book_covers = Column(Boolean, default=True)
     schedule_generate_series_covers = Column(Boolean, default=False)
     schedule_reconnect = Column(Boolean, default=False)
     schedule_metadata_backup = Column(Boolean, default=False)
