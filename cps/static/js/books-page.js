@@ -163,7 +163,7 @@ window.initBooksPage = function() {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
           fetchFiltered();
-        }, 300);
+        }, 100);
       });
     }
 
