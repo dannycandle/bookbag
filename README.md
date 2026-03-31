@@ -46,19 +46,30 @@ Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) that
 
 3. Create and activate python virtual environment
 
+Linux
 ```
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt -r optional-requirements.txt
 ```
 
+MacOS
+```
+$(brew --prefix python@3.14)/bin/python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt -r optional-requirements.txt
+```
+
 If builds in this stage fail, it is likely that you are missing a system dependency, go back to step 2.
 
-4. Start server in debug mode
+4. Define Environment
+`echo "BOOKBAG_LIBRARY_PATH=/FULL/PATH/TO/PROJECT/books"`
+
+5. Start server in debug mode
 
 `FLASK_DEBUG=1 python cps.py`
 
-5. In a web browser, open http://localhost:8084
+6. In a web browser, open http://localhost:8084
 
 ## Install via Docker
 1. Download docker-compose.yml from this repo.
