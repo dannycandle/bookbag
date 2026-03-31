@@ -86,7 +86,7 @@
         <div class="book-detail-author">
           {% for author in entry.ordered_authors %}
             <span class="book-detail-author-name">{{ author.name.replace('|',',') }}</span>
-            <a href="{{ url_for('web.books_list', data='author', sort_param='stored', book_id=author.id) }}"
+            <a href="{{ url_for('web.books', author=author.id) }}"
               class="book-detail-author-arrow" title="{{ author.name.replace('|',',') }}">
               <svg width="16" height="16" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
             </a>
@@ -95,7 +95,7 @@
         <!-- Series -->
         {% if entry.series|length > 0 %}
         <div class="book-detail-series">
-          {{ _("Book %(index)s of %(range)s", index=entry.series_index|formatfloat(2), range=(url_for('web.books_list', data='series', sort_param='stored', book_id=entry.series[0].id)|escapedlink(entry.series[0].name))|safe) }}
+          {{ _("Book %(index)s of %(range)s", index=entry.series_index|formatfloat(2), range=(url_for('web.books', series=entry.series[0].id)|escapedlink(entry.series[0].name))|safe) }}
         </div>
         {% endif %}
         <!-- Ratings -->
@@ -116,13 +116,13 @@
           </a>
           {% endfor %}
           {% for language in entry.languages %}
-          <span class="book-detail-tag">
+          <a href="{{ url_for('web.books', languages=language.lang_code) }}" class="book-detail-tag">
             <svg width="14" height="14" viewBox="0 0 256 256"><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.76,87.76,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"></path></svg>
             {{ language.language_name }}
-          </span>
+          </a>
           {% endfor %}
           {% for tag in entry.tags %}
-          <a href="{{ url_for('web.books_list', data='category', sort_param='stored', book_id=tag.id) }}"
+          <a href="{{ url_for('web.books', tags=tag.id) }}"
             class="book-detail-tag">
             <svg width="14" height="14" viewBox="0 0 256 256"><path d="M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63Zm-96,96L48,132.69V48h84.69L232,147.31ZM96,84A12,12,0,1,1,84,72,12,12,0,0,1,96,84Z"></path></svg>
             {{ tag.name }}
@@ -135,7 +135,7 @@
         <div class="book-detail-pubinfo">
           {% if entry.publishers|length > 0 %}
             {{ _('Published by') }}
-            <a href="{{ url_for('web.books_list', data='publisher', sort_param='stored', book_id=entry.publishers[0].id) }}"
+            <a href="{{ url_for('web.books', publishers=entry.publishers[0].id) }}"
               class="book-detail-pubinfo-link">{{ entry.publishers[0].name }}</a>
             {% if (entry.pubdate|string)[:10] != '0101-01-01' %}
               {{ _('on') }} {{ entry.pubdate|formatdate }}
