@@ -109,12 +109,17 @@ window.initBooksPage = function() {
       return '/books?' + params.join('&');
     }
 
+    var activeController = null;
+
     function fetchFiltered() {
       var hasFilters = Object.keys(getActiveFilters()).length > 0;
       if (clearBtn) clearBtn.style.display = hasFilters ? '' : 'none';
       if (spinner) spinner.style.display = 'flex';
 
-      fetch(buildFilterUrl(currentSort))
+      if (activeController) activeController.abort();
+      activeController = new AbortController();
+
+      fetch(buildFilterUrl(currentSort), { signal: activeController.signal })
         .then(function(r) { return r.text(); })
         .then(function(html) {
           var doc = new DOMParser().parseFromString(html, 'text/html');
@@ -163,7 +168,7 @@ window.initBooksPage = function() {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
           fetchFiltered();
-        }, 100);
+        }, 150);
       });
     }
 
