@@ -64,6 +64,25 @@ window.initBooksPage = function() {
       }
     });
 
+    // Pre-check filter checkboxes from URL params
+    if (filterContainer) {
+      var urlParams = new URLSearchParams(window.location.search);
+      filterContainer.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+        var type = cb.dataset.filterType;
+        var paramVal = urlParams.get(type);
+        if (!paramVal) return;
+        var values = paramVal.split(',');
+        var cbVal = cb.dataset.filterId || cb.dataset.filterValue;
+        if (values.indexOf(cbVal) !== -1) {
+          cb.checked = true;
+        }
+      });
+      if (clearBtn) {
+        var hasChecked = filterContainer.querySelector('input[type="checkbox"]:checked');
+        clearBtn.style.display = hasChecked ? '' : 'none';
+      }
+    }
+
     // --- Filter Logic ---
     function getActiveFilters() {
       var filters = {};
