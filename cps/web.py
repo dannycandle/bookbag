@@ -835,7 +835,15 @@ def books(page):
     lang_param = request.args.get('languages')
     rating_vals = _parse_ids(request.args.get('rating'))
     pubdate_vals = _parse_ids(request.args.get('pubdate'))
+    query = request.args.get('query', '').strip()
     filters = []
+    if query:
+        search_result = calibre_db.search_query(query, config,
+                                                db.books_series_link,
+                                                db.Books.id == db.books_series_link.c.book,
+                                                db.Series)
+        search_ids = [r.Books.id for r in search_result.all()]
+        filters.append(db.Books.id.in_(search_ids)) if search_ids else filters.append(db.Books.id == -1)
     if tag_ids:
         filters.append(db.Books.tags.any(db.Tags.id.in_(tag_ids)))
     if author_ids:

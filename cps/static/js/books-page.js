@@ -104,6 +104,8 @@ window.initBooksPage = function() {
       for (var type in filters) {
         params.push(type + '=' + filters[type].join(','));
       }
+      var term = searchInput ? searchInput.value.trim() : '';
+      if (term) params.push('query=' + encodeURIComponent(term));
       return '/books?' + params.join('&');
     }
 
@@ -154,22 +156,33 @@ window.initBooksPage = function() {
       });
     }
 
-    // Live search (client-side, searches within loaded books)
+    // Live search (server-side with debounce)
     if (searchInput) {
       var searchTimer;
       searchInput.addEventListener('input', function() {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
-          var term = searchInput.value.trim().toLowerCase();
-          grid.querySelectorAll('.book-cover').forEach(function(cover) {
-            if (!term) { cover.style.display = ''; return; }
-            var title = (cover.dataset.title || '').toLowerCase();
-            var author = (cover.dataset.author || '').toLowerCase();
-            cover.style.display = (title.indexOf(term) !== -1 || author.indexOf(term) !== -1) ? '' : 'none';
-          });
-        }, 150);
+          fetchFiltered();
+        }, 300);
       });
     }
+
+    // // Client-side search (commented out — may revisit for hybrid approach)
+    // if (searchInput) {
+    //   var searchTimer;
+    //   searchInput.addEventListener('input', function() {
+    //     clearTimeout(searchTimer);
+    //     searchTimer = setTimeout(function() {
+    //       var term = searchInput.value.trim().toLowerCase();
+    //       grid.querySelectorAll('.book-cover').forEach(function(cover) {
+    //         if (!term) { cover.style.display = ''; return; }
+    //         var title = (cover.dataset.title || '').toLowerCase();
+    //         var author = (cover.dataset.author || '').toLowerCase();
+    //         cover.style.display = (title.indexOf(term) !== -1 || author.indexOf(term) !== -1) ? '' : 'none';
+    //       });
+    //     }, 150);
+    //   });
+    // }
 
     // Clear filters button
     if (clearBtn) {
