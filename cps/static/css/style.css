@@ -1533,7 +1533,6 @@ body.register .action-bar {
     flex-direction: column;
     height: 100%;
     align-items: flex-end;
-    /* flex: 1 0 auto; */
     width: 40%;
 }
 
