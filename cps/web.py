@@ -836,6 +836,7 @@ def _parse_ids(param):
 @web.route("/books/filtered/page/<int:page>")
 @login_required_if_no_ano
 def books_filtered(page):
+    page = int(request.args.get('page', page))
     tag_ids = _parse_ids(request.args.get('tags'))
     author_ids = _parse_ids(request.args.get('author'))
     series_ids = _parse_ids(request.args.get('series'))
