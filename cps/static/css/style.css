@@ -1519,12 +1519,13 @@ body.register .action-bar {
 }
 
 .book-detail-columns {
-    display: flex;
-    flex-direction: row;
     gap: 36px;
     height: 100%;
-    width: fit-content;
+    display: flex;
     max-width: 100%;
+    width: fit-content;
+    flex-direction: row;
+    justify-content: center;
 }
 
 .book-detail-cover-col {
@@ -1532,7 +1533,7 @@ body.register .action-bar {
     flex-direction: column;
     height: 100%;
     align-items: flex-end;
-    flex: 1 0 auto;
+    /* flex: 1 0 auto; */
     width: 40%;
 }
 
