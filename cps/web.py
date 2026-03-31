@@ -815,15 +815,6 @@ def index():
     return redirect(url_for('web.books'))
 
 
-@web.route("/books", defaults={'page': 1})
-@web.route('/books/page/<int:page>')
-@login_required_if_no_ano
-def books(page):
-    sort_param = (request.args.get('sort') or 'stored').lower()
-    return render_books_list("newest", sort_param, 1, page)
-
-
-# Book filters
 def _parse_ids(param):
     if not param:
         return []
@@ -832,10 +823,12 @@ def _parse_ids(param):
     except ValueError:
         return []
 
+@web.route("/books", defaults={'page': 1})
+@web.route('/books/page/<int:page>')
 @web.route("/books/filtered", defaults={'page': 1})
 @web.route("/books/filtered/page/<int:page>")
 @login_required_if_no_ano
-def books_filtered(page):
+def books(page):
     page = int(request.args.get('page', page))
     tag_ids = _parse_ids(request.args.get('tags'))
     author_ids = _parse_ids(request.args.get('author'))

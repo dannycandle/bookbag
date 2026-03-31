@@ -85,7 +85,7 @@ window.initBooksPage = function() {
       for (var type in filters) {
         params.push(type + '=' + filters[type].join(','));
       }
-      return '/books/filtered?' + params.join('&');
+      return '/books?' + params.join('&');
     }
 
     function fetchFiltered() {
