@@ -180,15 +180,15 @@
   <button class="clear-filters-btn" id="clear-filters" style="display:none;">Clear Filters</button>
   <div class="side-wrapper" id="sidebar-filters">
 
-  {% if filter_tags %}
+  {% if g.shelves_access %}
   <details class="filter-section" open>
-    <summary class="filter-section-title">Tags</summary>
+    <summary class="filter-section-title">Shelves</summary>
     <div class="filter-options" data-max-visible="5">
-      {% for tag in filter_tags %}
-      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="tags" data-filter-id="{{ tag.id }}" data-filter-value="{{ tag.name }}"> {{ tag.name }}</label>
+      {% for shelf in g.shelves_access %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="shelf" data-filter-id="{{ shelf.id }}" data-filter-value="{{ shelf.name }}"> {{ shelf.name }}</label>
       {% endfor %}
-      {% if filter_tags|length > 5 %}
-      <button class="filter-show-more" type="button">Show {{ filter_tags|length - 5 }} more</button>
+      {% if g.shelves_access|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ g.shelves_access|length - 5 }} more</button>
       {% endif %}
     </div>
   </details>
@@ -236,20 +236,6 @@
   </details>
   {% endif %}
 
-  {% if filter_publishers %}
-  <details class="filter-section" open>
-    <summary class="filter-section-title">Publishers</summary>
-    <div class="filter-options" data-max-visible="5">
-      {% for pub in filter_publishers %}
-      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="publishers" data-filter-id="{{ pub.id }}" data-filter-value="{{ pub.name }}"> {{ pub.name }}</label>
-      {% endfor %}
-      {% if filter_publishers|length > 5 %}
-      <button class="filter-show-more" type="button">Show {{ filter_publishers|length - 5 }} more</button>
-      {% endif %}
-    </div>
-  </details>
-  {% endif %}
-
   <details class="filter-section" open>
     <summary class="filter-section-title">Rating</summary>
     <div class="filter-options">
@@ -269,6 +255,34 @@
       <label><input type="checkbox" data-filter-type="pubdate" data-filter-value="999"> 20+ years ago</label>
     </div>
   </details>
+
+  {% if filter_publishers %}
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Publishers</summary>
+    <div class="filter-options" data-max-visible="5">
+      {% for pub in filter_publishers %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="publishers" data-filter-id="{{ pub.id }}" data-filter-value="{{ pub.name }}"> {{ pub.name }}</label>
+      {% endfor %}
+      {% if filter_publishers|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ filter_publishers|length - 5 }} more</button>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
+
+  {% if filter_tags %}
+  <details class="filter-section" open>
+    <summary class="filter-section-title">Tags</summary>
+    <div class="filter-options" data-max-visible="5">
+      {% for tag in filter_tags %}
+      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="tags" data-filter-id="{{ tag.id }}" data-filter-value="{{ tag.name }}"> {{ tag.name }}</label>
+      {% endfor %}
+      {% if filter_tags|length > 5 %}
+      <button class="filter-show-more" type="button">Show {{ filter_tags|length - 5 }} more</button>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
 
   </div>
   <script>
