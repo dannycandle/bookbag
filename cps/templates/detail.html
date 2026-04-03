@@ -54,6 +54,22 @@
                 {{ _('Edit Metadata') }}
               </a>
               {% endif %}
+              {% if entry.identifiers|length > 0 %}
+              {% for identifier in entry.identifiers %}
+              <a href="{{ identifier|escape }}" target="_blank" class="detail-icon-popover-item">
+                <svg width="16" height="16" viewBox="0 0 256 256"><path d="M232,48V88a8,8,0,0,1-16,0V56H184a8,8,0,0,1,0-16h40A8,8,0,0,1,232,48ZM72,200H40V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16Zm152-40a8,8,0,0,0-8,8v32H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,224,160ZM32,96a8,8,0,0,0,8-8V56H72a8,8,0,0,0,0-16H32a8,8,0,0,0-8,8V88A8,8,0,0,0,32,96ZM80,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,80,80Zm104,88V88a8,8,0,0,0-16,0v80a8,8,0,0,0,16,0ZM144,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,144,80Zm-32,0a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,112,80Z"></path></svg>
+                {{ _('Book Identifier') }}
+              </a>
+              {% endfor %}
+              {% endif %}
+              {% if entry.languages|length > 0 %}
+              {% for language in entry.languages %}
+              <a href="{{ url_for('web.books', languages=language.lang_code) }}" class="detail-icon-popover-item">
+                <svg width="16" height="16" viewBox="0 0 256 256"><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.76,87.76,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"></path></svg>
+                {{ language.language_name }}
+              </a>
+              {% endfor %}
+              {% endif %}
 
               {% if not current_user.is_anonymous and current_user.check_visibility(32768) %}
               <a class="detail-icon-popover-item" id="toggle-archive-btn"
@@ -82,66 +98,37 @@
           </details>
          </div>
          <div id="book-details-content">
-        <!-- Authors -->
-        <div class="book-detail-author">
-          {% for author in entry.ordered_authors %}
-            <span class="book-detail-author-name">{{ author.name.replace('|',',') }}</span>
-            <a href="{{ url_for('web.books', author=author.id) }}"
-              class="book-detail-author-arrow" title="{{ author.name.replace('|',',') }}">
-              <svg width="16" height="16" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
-            </a>
-          {% endfor %}
+        <div class="book-detail-shelves">
+          <!-- Authors -->
+          <div class="book-detail-author">
+            {% for author in entry.ordered_authors %}
+              <span class="book-detail-author-name">{{ author.name.replace('|',',') }}</span>
+              <a href="{{ url_for('web.books', author=author.id) }}"
+                class="book-detail-author-arrow" title="{{ author.name.replace('|',',') }}">
+                <svg width="16" height="16" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+              </a>
+            {% endfor %}
+          </div>
+          <!-- Ratings -->
+          {% if entry.ratings|length > 0 %}
+          <div class="book-detail-rating">
+            {% for i in range(5) %}
+              <span class="rating-star {% if i < (entry.ratings[0].rating/2)|int %}filled{% endif %}">★</span>
+            {% endfor %}
+          </div>
+          {% endif %}
         </div>
-        <!-- Series -->
-        {% if entry.series|length > 0 %}
-        <div class="book-detail-series">
-          {{ _("Book %(index)s of %(range)s", index=entry.series_index|formatfloat(2), range=(url_for('web.books', series=entry.series[0].id)|escapedlink(entry.series[0].name))|safe) }}
-        </div>
-        {% endif %}
-        <!-- Ratings -->
-        {% if entry.ratings|length > 0 %}
-        <div class="book-detail-rating">
-          {% for i in range(5) %}
-            <span class="rating-star {% if i < (entry.ratings[0].rating/2)|int %}filled{% endif %}">★</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-        <!-- tags etc -->
-        {% if entry.tags|length > 0 or entry.languages|length > 0 or entry.identifiers|length > 0 %}
-        <div class="book-detail-tags">
-          {% for identifier in entry.identifiers %}
-          <a href="{{ identifier|escape }}" target="_blank" class="book-detail-tag">
-            <svg width="14" height="14" viewBox="0 0 256 256"><path d="M232,48V88a8,8,0,0,1-16,0V56H184a8,8,0,0,1,0-16h40A8,8,0,0,1,232,48ZM72,200H40V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16Zm152-40a8,8,0,0,0-8,8v32H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,224,160ZM32,96a8,8,0,0,0,8-8V56H72a8,8,0,0,0,0-16H32a8,8,0,0,0-8,8V88A8,8,0,0,0,32,96ZM80,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,80,80Zm104,88V88a8,8,0,0,0-16,0v80a8,8,0,0,0,16,0ZM144,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,144,80Zm-32,0a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,112,80Z"></path></svg>
-            {{ identifier.format_type() }} {{ identifier.val }}
-          </a>
-          {% endfor %}
-          {% for language in entry.languages %}
-          <a href="{{ url_for('web.books', languages=language.lang_code) }}" class="book-detail-tag">
-            <svg width="14" height="14" viewBox="0 0 256 256"><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.76,87.76,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"></path></svg>
-            {{ language.language_name }}
-          </a>
-          {% endfor %}
-          {% for tag in entry.tags %}
-          <a href="{{ url_for('web.books', tags=tag.id) }}"
-            class="book-detail-tag">
-            <svg width="14" height="14" viewBox="0 0 256 256"><path d="M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63Zm-96,96L48,132.69V48h84.69L232,147.31ZM96,84A12,12,0,1,1,84,72,12,12,0,0,1,96,84Z"></path></svg>
-            {{ tag.name }}
-          </a>
-          {% endfor %}
-        </div>
-        {% endif %}
-        <!-- Publisher & Date -->
-        {% if entry.publishers|length > 0 or (entry.pubdate|string)[:10] != '0101-01-01' %}
-        <div class="book-detail-pubinfo">
-          {% if entry.publishers|length > 0 %}
-            {{ _('Published by') }}
-            <a href="{{ url_for('web.books', publishers=entry.publishers[0].id) }}"
-              class="book-detail-pubinfo-link">{{ entry.publishers[0].name }}</a>
-            {% if (entry.pubdate|string)[:10] != '0101-01-01' %}
-              {{ _('on') }} {{ entry.pubdate|formatdate }}
-            {% endif %}
-          {% else %}
-            {{ _('Published') }}: {{ entry.pubdate|formatdate }}
+        <!-- Description -->
+        {% if entry.comments|length > 0 and entry.comments[0].text|length > 0 or entry.publishers|length > 0 or (entry.pubdate|string)[:10] != '0101-01-01' %}
+        <div class="book-detail-shelves">
+          {% if entry.publishers|length > 0 or (entry.pubdate|string)[:10] != '0101-01-01' %}
+          <span class="book-detail-shelves-label">{% if entry.publishers|length > 0 %}{{ _('Published by') }} {{ entry.publishers[0].name }}{% endif %}{% if entry.publishers|length > 0 and (entry.pubdate|string)[:10] != '0101-01-01' %} {{ _('on') }} {% endif %}{% if (entry.pubdate|string)[:10] != '0101-01-01' %}{{ entry.pubdate|formatdate }}{% endif %}</span>
+          {% endif %}
+          {% if entry.comments|length > 0 and entry.comments[0].text|length > 0 %}
+          <div class="book-detail-description" id="book-description">
+            {{ entry.comments[0].text|safe }}
+          </div>
+          <button class="description-read-more" id="description-toggle" style="display:none;">Read more</button>
           {% endif %}
         </div>
         {% endif %}
@@ -164,13 +151,6 @@
             </div>
             {% endif %}
           {% endfor %}
-        {% endif %}
-        <!-- Description -->
-        {% if entry.comments|length > 0 and entry.comments[0].text|length > 0 %}
-        <div class="book-detail-description" id="book-description">
-          {{ entry.comments[0].text|safe }}
-        </div>
-        <button class="description-read-more" id="description-toggle" style="display:none;">Read more</button>
         {% endif %}
         <!-- Primary action buttons -->
         <div class="book-detail-actions">
@@ -221,47 +201,61 @@
           </div>
           {% endif %}
 
-          {% if current_user.is_authenticated %}
-          <details class="detail-action-dropdown" id="shelf-actions">
-            <summary class="btn-secondary" id="add-to-shelf">
-              <svg width="16" height="16" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
-              {{ _('Add to shelf') }}
-            </summary>
-            <div class="detail-action-popover" id="add-to-shelves">
-              {% if g.shelves_access %}
-              {% for shelf in g.shelves_access %}
-                {% if not shelf.id in books_shelfs and (not shelf.is_public or current_user.role_edit_shelfs()) %}
-                <a data-href="{{ url_for('shelf.add_to_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
-                  data-remove-href="{{ url_for('shelf.remove_from_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
-                  data-shelf-action="add"
-                  class="detail-action-popover-item">
-                  {{ shelf.name }}{% if shelf.is_public == 1 %} {{ _('(Public)') }}{% endif %}
-                </a>
-                {% endif %}
-              {% endfor %}
-              {% endif %}
-              <a href="{{ url_for('shelf.create_shelf') }}" class="detail-action-popover-item">
-                <svg width="14" height="14" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
-                {{ _('New shelf') }}
-              </a>
-            </div>
-          </details>
-          <div id="remove-from-shelves" class="book-detail-shelf-remove">
+        </div>
+        <div class="book-detail-metadata">
+          <div class="book-detail-shelves" id="book-detail-shelves">
+            <span class="book-detail-shelves-label">Shelves:</span>
             {% if books_shelfs %}
-              {% for shelf in g.shelves_access %}
-                {% if shelf.id in books_shelfs %}
-                <a data-href="{{ url_for('shelf.remove_from_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
-                  data-add-href="{{ url_for('shelf.add_to_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
-                  class="btn-secondary"
-                  data-shelf-action="remove">
-                  <svg width="14" height="14" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
-                  {{ shelf.name }}{% if shelf.is_public == 1 %} {{ _('(Public)') }}{% endif %}
-                </a>
+            {% for shelf in g.shelves_access %}
+              {% if shelf.id in books_shelfs %}
+              <span class="book-detail-shelf-tag">
+                <a href="{{ url_for('web.books', shelf=shelf.id) }}">{{ shelf.name }}</a>
+                <button class="book-detail-shelf-remove" data-href="{{ url_for('shelf.remove_from_shelf', book_id=entry.id, shelf_id=shelf.id) }}" data-shelf-name="{{ shelf.name }}">
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M168.49,104.49,145,128l23.52,23.51a12,12,0,0,1-17,17L128,145l-23.51,23.52a12,12,0,0,1-17-17L111,128,87.51,104.49a12,12,0,0,1,17-17L128,111l23.51-23.52a12,12,0,0,1,17,17ZM236,128A108,108,0,1,1,128,20,108.12,108.12,0,0,1,236,128Zm-24,0a84,84,0,1,0-84,84A84.09,84.09,0,0,0,212,128Z"></path></svg>
+                </button>
+              </span>
+              {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% if current_user.is_authenticated %}
+            <details class="shelf-add-dropdown" id="shelf-actions">
+              <summary class="shelf-add-btn">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm52-84a12,12,0,0,1-12,12H140v28a12,12,0,0,1-24,0V140H88a12,12,0,0,1,0-24h28V88a12,12,0,0,1,24,0v28h28A12,12,0,0,1,180,128Z"></path></svg>
+              </summary>
+              <div class="detail-action-popover" id="add-to-shelves">
+                {% if g.shelves_access %}
+                {% for shelf in g.shelves_access %}
+                  {% if not shelf.id in books_shelfs and (not shelf.is_public or current_user.role_edit_shelfs()) %}
+                  <a data-href="{{ url_for('shelf.add_to_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
+                    data-remove-href="{{ url_for('shelf.remove_from_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
+                    data-shelf-action="add"
+                    class="detail-action-popover-item">
+                    {{ shelf.name }}{% if shelf.is_public == 1 %} {{ _('(Public)') }}{% endif %}
+                  </a>
+                  {% endif %}
+                {% endfor %}
                 {% endif %}
-              {% endfor %}
+                <a href="{{ url_for('shelf.create_shelf') }}" class="detail-action-popover-item">
+                  <svg width="14" height="14" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+                  {{ _('New shelf') }}
+                </a>
+              </div>
+            </details>
             {% endif %}
           </div>
-          <div id="shelf-action-errors" role="alert"></div>
+          {% if entry.series|length > 0 %}
+          <div class="book-detail-shelves">
+            <span class="book-detail-shelves-label">Series:</span>
+            <a href="{{ url_for('web.books', series=entry.series[0].id) }}" class="book-detail-shelf-tag">Book {{ entry.series_index|formatfloat(2) }} of {{ entry.series[0].name }}</a>
+          </div>
+          {% endif %}
+          {% if entry.tags|length > 0 %}
+          <div class="book-detail-shelves">
+            <span class="book-detail-shelves-label">Tags:</span>
+            {% for tag in entry.tags %}
+            <a href="{{ url_for('web.books', tags=tag.id) }}" class="book-detail-shelf-tag">{{ tag.name }}</a>
+            {% endfor %}
+          </div>
           {% endif %}
         </div>
          </div> <!-- book details content-->
@@ -272,54 +266,6 @@
 </div> <!--Wrapper-->
 {% endblock %}
 {% block js %}
-<script>
-(function() {
-  var desc = document.getElementById('book-description');
-  var btn = document.getElementById('description-toggle');
-  if (!desc || !btn) return;
-
-  if (desc.scrollHeight > desc.clientHeight) {
-    btn.style.display = '';
-    desc.classList.add('truncated');
-  }
-
-  btn.addEventListener('click', function() {
-    var expanded = desc.classList.toggle('expanded');
-    btn.textContent = expanded ? 'Read less' : 'Read more';
-  });
-})();
-
-// Toggle read/unread
-(function() {
-  var btn = document.getElementById('toggle-read-btn');
-  if (!btn) return;
-
-  var csrfToken = document.querySelector('input[name="csrf_token"]');
-  csrfToken = csrfToken ? csrfToken.value : '{{ csrf_token() }}';
-
-  btn.addEventListener('click', function(e) {
-    e.preventDefault();
-    var url = btn.getAttribute('data-href');
-    var isRead = btn.getAttribute('data-read') === 'true';
-
-    fetch(url, {
-      method: 'POST',
-      headers: { 'X-CSRFToken': csrfToken }
-    }).then(function(res) {
-      if (!res.ok) throw new Error('Failed');
-      var newRead = !isRead;
-      btn.setAttribute('data-read', newRead ? 'true' : 'false');
-
-      if (newRead) {
-        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 256 256"><path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path></svg><span>Mark As Unread</span>';
-      } else {
-        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg><span>Mark As Read</span>';
-      }
-    }).catch(function() {
-      console.error('Failed to toggle read status');
-    });
-  });
-})();
-
-</script>
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<script src="{{ url_for('static', filename='js/details.js') }}"></script>
 {% endblock %}

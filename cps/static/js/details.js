@@ -1,142 +1,140 @@
-/* This file is part of the Calibre-Web (https://github.com/janeczku/calibre-web)
- *    Copyright (C) 2018-2023 jkrehm, OzzieIsaacs
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/* global _ */
-
-function handleResponse (data) {
-    $(".row-fluid.text-center").remove();
-    $("#flash_danger").remove();
-    $("#flash_success").remove();
-    if (!jQuery.isEmptyObject(data)) {
-        if($("#bookDetailsModal").is(":visible")) {
-            data.forEach(function (item) {
-                $(".modal-header").after('<div id="flash_' + item.type +
-                    '" class="text-center alert alert-' + item.type + '">' + item.message + '</div>');
-            });
-        } else {
-            data.forEach(function (item) {
-                $(".navbar").after('<div class="row-fluid text-center">' +
-                    '<div id="flash_' + item.type + '" class="alert alert-' + item.type + '">' + item.message + '</div>' +
-                    '</div>');
-            });
-        }
-    }
-}
-$(".sendbtn-form").click(function() {
-    $.ajax({
-        method: 'post',
-        url: $(this).data('href'),
-        data: {csrf_token: $("input[name='csrf_token']").val()},
-        success: function (data) {
-            handleResponse(data)
-        }
-    })
-});
-
-$(function() {
-    $("#have_read_form").ajaxForm();
-});
-
-$("#have_read_cb").on("change", function() {
-    $.ajax({
-        url: this.closest("form").action,
-        method:"post",
-        data: $(this).closest("form").serialize(),
-        error: function(response) {
-            var data = [{type:"danger", message:response.responseText}]
-            // $("#flash_success").parent().remove();
-            $("#flash_danger").remove();
-            $(".row-fluid.text-center").remove();
-            if (!jQuery.isEmptyObject(data)) {
-                $("#have_read_cb").prop("checked", !$("#have_read_cb").prop("checked"));
-                if($("#bookDetailsModal").is(":visible")) {
-                    data.forEach(function (item) {
-                        $(".modal-header").after('<div id="flash_' + item.type +
-                            '" class="text-center alert alert-' + item.type + '">' + item.message + '</div>');
-                    });
-                } else
-                {
-                    data.forEach(function (item) {
-                        $(".navbar").after('<div class="row-fluid text-center" >' +
-                            '<div id="flash_' + item.type + '" class="alert alert-' + item.type + '">' + item.message + '</div>' +
-                            '</div>');
-                    });
-                }
-            }
-        }
-    });
-});
-
-$(function() {
-    $("#archived_form").ajaxForm();
-});
-
-$("#archived_cb").on("change", function() {
-    $(this).closest("form").submit();
-});
-
 (function() {
-    var templates = {
-        add: _.template(
-            $("#template-shelf-add").html()
-        ),
-        remove: _.template(
-            $("#template-shelf-remove").html()
-        )
-    };
+  var csrfInput = document.querySelector('input[name="csrf_token"]');
+  var csrfToken = csrfInput ? csrfInput.value : '';
 
-    $("#add-to-shelves, #remove-from-shelves").on("click", "[data-shelf-action]", function (e) {
-        e.preventDefault();
-        $.ajax({
-                url: $(this).data('href'),
-                method:"post",
-                data: {csrf_token:$("input[name='csrf_token']").val()},
-            })
-            .done(function() {
-                var $this = $(this);
-                switch ($this.data("shelf-action")) {
-                    case "add":
-                        $("#remove-from-shelves").append(
-                            templates.remove({
-                                add: $this.data('href'),
-                                remove: $this.data("remove-href"),
-                                content: $("<div>").text(this.textContent).html()
-                            })
-                        );
-                        break;
-                    case "remove":
-                        $("#add-to-shelves").append(
-                            templates.add({
-                                add: $this.data("add-href"),
-                                remove: $this.data('href'),
-                                content: $("<div>").text(this.textContent).html(),
-                            })
-                        );
-                        break;
-                }
-                this.parentNode.removeChild(this);
-            }.bind(this))
-            .fail(function(xhr) {
-                var $msg = $("<span/>", { "class": "text-danger"}).text(xhr.responseText);
-                $("#shelf-action-status").html($msg);
-
-                setTimeout(function() {
-                    $msg.remove();
-                }, 10000);
-            });
+  // Description read more/less
+  var desc = document.getElementById('book-description');
+  var toggleBtn = document.getElementById('description-toggle');
+  if (desc && toggleBtn) {
+    if (desc.scrollHeight > desc.clientHeight) {
+      toggleBtn.style.display = '';
+      desc.classList.add('truncated');
+    }
+    toggleBtn.addEventListener('click', function() {
+      var expanded = desc.classList.toggle('expanded');
+      toggleBtn.textContent = expanded ? 'Read less' : 'Read more';
     });
+  }
+
+  // Toggle read/unread
+  var readBtn = document.getElementById('toggle-read-btn');
+  if (readBtn) {
+    readBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var url = readBtn.getAttribute('data-href');
+      var isRead = readBtn.getAttribute('data-read') === 'true';
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken }
+      }).then(function(res) {
+        if (!res.ok) throw new Error('Failed');
+        var newRead = !isRead;
+        readBtn.setAttribute('data-read', newRead ? 'true' : 'false');
+        if (newRead) {
+          readBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 256 256"><path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path></svg><span>Mark As Unread</span>';
+        } else {
+          readBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg><span>Mark As Read</span>';
+        }
+      }).catch(function() {
+        console.error('Failed to toggle read status');
+      });
+    });
+  }
+
+  // Shelf add
+  var addContainer = document.getElementById('add-to-shelves');
+  if (addContainer) {
+    addContainer.addEventListener('click', function(e) {
+      var link = e.target.closest('[data-shelf-action="add"]');
+      if (!link) return;
+      e.preventDefault();
+
+      var url = link.getAttribute('data-href');
+      var formData = new FormData();
+      formData.append('csrf_token', csrfToken);
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+      }).then(function(res) {
+        if (!res.ok) throw new Error('Failed');
+        var shelfName = link.textContent.trim();
+        var shelfId = url.match(/\/shelf\/add\/(\d+)/);
+        shelfId = shelfId ? shelfId[1] : '';
+        link.remove();
+
+        // Add shelf tag to metadata section
+        var shelvesContainer = document.getElementById('book-detail-shelves');
+        if (!shelvesContainer) {
+          shelvesContainer = document.createElement('div');
+          shelvesContainer.className = 'book-detail-shelves';
+          shelvesContainer.id = 'book-detail-shelves';
+          var label = document.createElement('span');
+          label.className = 'book-detail-shelves-label';
+          label.textContent = 'On shelves:';
+          shelvesContainer.appendChild(label);
+          var metadata = document.querySelector('.book-detail-metadata');
+          if (metadata) {
+            metadata.insertBefore(shelvesContainer, metadata.firstChild);
+          }
+        }
+        var tag = document.createElement('span');
+        tag.className = 'book-detail-shelf-tag';
+        var tagLink = document.createElement('a');
+        tagLink.href = '/books?shelf=' + shelfId;
+        tagLink.textContent = shelfName;
+        var removeBtn = document.createElement('button');
+        removeBtn.className = 'book-detail-shelf-remove';
+        removeBtn.setAttribute('data-href', url.replace('/add/', '/remove/'));
+        removeBtn.setAttribute('data-shelf-name', shelfName);
+        removeBtn.innerHTML = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M168.49,104.49,145,128l23.52,23.51a12,12,0,0,1-17,17L128,145l-23.51,23.52a12,12,0,0,1-17-17L111,128,87.51,104.49a12,12,0,0,1,17-17L128,111l23.51-23.52a12,12,0,0,1,17,17ZM236,128A108,108,0,1,1,128,20,108.12,108.12,0,0,1,236,128Zm-24,0a84,84,0,1,0-84,84A84.09,84.09,0,0,0,212,128Z"></path></svg>';
+        tag.appendChild(tagLink);
+        tag.appendChild(removeBtn);
+        shelvesContainer.appendChild(tag);
+      }).catch(function() {
+        console.error('Failed to add to shelf');
+      });
+    });
+  }
+
+  // Shelf remove (x button on shelf tags)
+  var shelvesContainer = document.getElementById('book-detail-shelves');
+  if (shelvesContainer) {
+    shelvesContainer.addEventListener('click', function(e) {
+      var btn = e.target.closest('.book-detail-shelf-remove');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      var shelfName = btn.getAttribute('data-shelf-name');
+      if (!confirm('Remove from "' + shelfName + '"?')) return;
+
+      var url = btn.getAttribute('data-href');
+      var formData = new FormData();
+      formData.append('csrf_token', csrfToken);
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+      }).then(function(res) {
+        if (!res.ok) throw new Error('Failed');
+        btn.closest('.book-detail-shelf-tag').remove();
+      }).catch(function() {
+        console.error('Failed to remove from shelf');
+      });
+    });
+  }
+
+  // Close shelf popover on click outside
+  var shelfDropdown = document.getElementById('shelf-actions');
+  if (shelfDropdown) {
+    document.addEventListener('click', function(e) {
+      if (!shelfDropdown.contains(e.target)) {
+        shelfDropdown.removeAttribute('open');
+      }
+    });
+  }
 })();

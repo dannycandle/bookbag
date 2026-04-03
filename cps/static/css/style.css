@@ -27,6 +27,7 @@
 :root {
     --primary: #f34848;
     --primary-hover: color-mix(in srgb, var(--primary) 85%, black);
+    --danger-red: #e53535;
 }
 
 h2, h3, h4, p {
@@ -1696,6 +1697,11 @@ details[open] .detail-icon-popover {
 
 
 
+.book-detail-author,
+.book-detail-rating {
+    width: 100%;
+}
+
 .book-detail-author {
     display: flex;
     align-items: center;
@@ -1756,28 +1762,11 @@ details[open] .detail-icon-popover {
     color: #F5C518;
 }
 
-/* Tags & identifiers — flex rows */
-.book-detail-tags,
-.book-detail-identifiers {
-    display: flex;
-    align-items: center;
-    row-gap: 10px;
-    column-gap: 20px;
-    flex-wrap: wrap;
-    line-height: 1;
-}
-
-.book-detail-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
 /* Description — tame embedded HTML */
 #book-details-content .book-detail-description {
     padding-top: 0px;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.15;
     max-height: 350px;
     overflow: hidden;
     position: relative;
@@ -1843,13 +1832,13 @@ details[open] .detail-icon-popover {
 }
 
 .split-btn-main {
-    border-radius: 15px 0 0 15px;
+    border-radius: 10px 0 0 10px;
     padding-right: 16px;
     position: relative;
 }
 
 .split-btn-main:only-child {
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 .split-btn-toggle {
@@ -1859,7 +1848,7 @@ details[open] .detail-icon-popover {
     padding: 14px 10px;
     border: none;
     border-left: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 0 15px 15px 0;
+    border-radius: 0 10px 10px 0;
     cursor: pointer;
     background-color: var(--primary);
     color: white;
@@ -1872,27 +1861,111 @@ details[open] .detail-icon-popover {
 }
 
 
-
-
-
-
-
-/* Shelf management */
-
-.book-detail-shelf-actions {
+.book-detail-metadata {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.book-detail-shelves {
+    display: flex;
+    align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+}
+
+.book-detail-shelves-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.4;
+    width: 100%;
+}
+
+.book-detail-shelf-tag {
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 16px;
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, .03);
+    border-radius: 6px;
+    font-size: 13px;
+    color: rgba(0, 0, 0, .6);
+}
+
+a.book-detail-shelf-tag,
+a.book-detail-shelf-tag:hover,
+.book-detail-shelf-tag a,
+.book-detail-shelf-tag a:hover {
+    text-decoration: none;
+    color: rgba(0, 0, 0, .6) !important;
+}
+
+.shelf-add-dropdown {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+}
+
+.shelf-add-btn {
+    cursor: pointer;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.shelf-add-btn::-webkit-details-marker {
+    display: none;
+}
+
+.shelf-add-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.shelf-add-dropdown .detail-action-popover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    margin-top: 4px;
 }
 
 .book-detail-shelf-remove {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0;
+    line-height: 1;
+    max-width: 0;
+    overflow: hidden;
+    display: inline-flex;
     align-items: center;
+    transition: max-width 0.15s ease, margin-left 0.15s ease;
 }
+
+.book-detail-shelf-tag:hover .book-detail-shelf-remove {
+    max-width: 20px;
+    margin-left: 5px;
+}
+
+#book-details-content .book-detail-shelf-remove svg,
+#book-details-content .shelf-add-btn svg {
+    fill: #666;
+    opacity: 1;
+}
+
+#book-details-content .book-detail-shelf-remove:hover svg {
+    fill: var(--danger-red);
+}
+
+@media (hover: none) {
+    .book-detail-shelf-remove {
+        max-width: 20px;
+        margin-left: 5px;
+    }
+}
+
 
 /* Toggles */
 
@@ -3038,6 +3111,4 @@ select.setting-input {
         overflow-y: auto;
     }
 }
-
-
 
