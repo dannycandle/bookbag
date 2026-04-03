@@ -177,22 +177,45 @@
     <div><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#000000" viewBox="0 0 256 256"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"></path></svg></div>
     <div class="side-head-text"><h3 class="sidebar-header">Filters</h3></div>
   </div>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <button class="clear-filters-btn" id="clear-filters" style="display:none;">Clear Filters</button>
   <div class="side-wrapper" id="sidebar-filters">
 
-  {% if g.shelves_access %}
   <details class="filter-section" open>
-    <summary class="filter-section-title">Shelves</summary>
+    <summary class="filter-section-title">Shelves <span class="sidebar-create-shelf-btn" id="sidebar-create-shelf-btn">+</span></summary>
+    <div class="sidebar-create-shelf">
+      <div class="create-shelf-popover" id="sidebar-create-shelf-popover" style="display:none;">
+        <div class="create-shelf-form">
+          <span class="create-shelf-header">Create Shelf</span>
+          <input type="text" id="sidebar-new-shelf-name" placeholder="Shelf name" class="create-shelf-input" autocomplete="off">
+          <span class="create-shelf-error" id="sidebar-create-shelf-error"></span>
+          <label class="create-shelf-public"><input type="checkbox" id="sidebar-new-shelf-public"> Visible to all users</label>
+          <button type="button" id="sidebar-create-shelf-submit" class="create-shelf-submit">Save</button>
+        </div>
+      </div>
+    </div>
     <div class="filter-options" data-max-visible="5">
+      {% if g.shelves_access %}
       {% for shelf in g.shelves_access %}
-      <label{% if loop.index > 5 %} class="filter-overflow" style="display:none"{% endif %}><input type="checkbox" data-filter-type="shelf" data-filter-id="{{ shelf.id }}" data-filter-value="{{ shelf.name }}"> {{ shelf.name }}</label>
+      <div class="shelf-filter-item{% if loop.index > 5 %} filter-overflow{% endif %}"{% if loop.index > 5 %} style="display:none"{% endif %}>
+        <label><input type="checkbox" data-filter-type="shelf" data-filter-id="{{ shelf.id }}" data-filter-value="{{ shelf.name }}" data-book-count="{{ shelf.books.count() }}"> {{ shelf.name }}</label>
+        <div class="shelf-menu">
+          <span class="shelf-menu-btn">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M144,128a16,16,0,1,1-16-16A16,16,0,0,1,144,128ZM60,112a16,16,0,1,0,16,16A16,16,0,0,0,60,112Zm136,0a16,16,0,1,0,16,16A16,16,0,0,0,196,112Z"></path></svg>
+          </span>
+          <div class="shelf-menu-popover" style="display:none;">
+            <a class="shelf-menu-item shelf-edit-btn" data-shelf-id="{{ shelf.id }}" data-shelf-name="{{ shelf.name }}" data-shelf-public="{{ shelf.is_public }}">Edit</a>
+            <a class="shelf-menu-item shelf-delete-btn" data-shelf-id="{{ shelf.id }}" data-shelf-name="{{ shelf.name }}" data-href="{{ url_for('shelf.delete_shelf', shelf_id=shelf.id) }}">Delete</a>
+          </div>
+        </div>
+      </div>
       {% endfor %}
       {% if g.shelves_access|length > 5 %}
       <button class="filter-show-more" type="button">Show {{ g.shelves_access|length - 5 }} more</button>
       {% endif %}
+      {% endif %}
     </div>
   </details>
-  {% endif %}
 
   {% if filter_authors %}
   <details class="filter-section" open>
@@ -285,25 +308,21 @@
   {% endif %}
 
   </div>
-  <script>
-  (function() {
-    var btns = document.querySelectorAll('.filter-show-more');
-    btns.forEach(function(btn) {
-      var container = btn.closest('.filter-options');
-      var overflow = container.querySelectorAll('.filter-overflow');
-      var expanded = false;
-      var count = overflow.length;
-      btn.addEventListener('click', function() {
-        expanded = !expanded;
-        overflow.forEach(function(el) { el.style.display = expanded ? '' : 'none'; });
-        btn.textContent = expanded ? 'Show less' : 'Show ' + count + ' more';
-      });
-    });
-  })();
-  </script>
 {% endif %}
 
 </aside>
+
+<div id="delete-shelf-dialog" class="dialog-overlay" style="display:none;">
+  <div class="dialog-box">
+    <button class="dialog-close" type="button">&times;</button>
+    <h2 class="dialog-heading" id="delete-shelf-heading"></h2>
+    <p class="dialog-hint">Books in this shelf will not be deleted.</p>
+    <div class="dialog-actions">
+      <button type="button" class="btn-secondary" id="delete-shelf-cancel">Cancel</button>
+      <button type="button" class="btn-danger" id="delete-shelf-confirm">Delete</button>
+    </div>
+  </div>
+</div>
 
 
 
@@ -407,6 +426,7 @@
                  showOverlay: showOverlay, hideOverlay: hideOverlay };
       })();
     </script>
+    <script src="{{ url_for('static', filename='js/filterbar.js') }}"></script>
 
     <script>
     // --- SPA-like AJAX navigation ---

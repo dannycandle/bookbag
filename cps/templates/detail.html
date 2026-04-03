@@ -223,22 +223,31 @@
                 <svg width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm52-84a12,12,0,0,1-12,12H140v28a12,12,0,0,1-24,0V140H88a12,12,0,0,1,0-24h28V88a12,12,0,0,1,24,0v28h28A12,12,0,0,1,180,128Z"></path></svg>
               </summary>
               <div class="detail-action-popover" id="add-to-shelves">
-                {% if g.shelves_access %}
-                {% for shelf in g.shelves_access %}
-                  {% if not shelf.id in books_shelfs and (not shelf.is_public or current_user.role_edit_shelfs()) %}
-                  <a data-href="{{ url_for('shelf.add_to_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
-                    data-remove-href="{{ url_for('shelf.remove_from_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
-                    data-shelf-action="add"
-                    class="detail-action-popover-item">
-                    {{ shelf.name }}{% if shelf.is_public == 1 %} {{ _('(Public)') }}{% endif %}
-                  </a>
+                <div id="shelf-list-view">
+                  {% if g.shelves_access %}
+                  {% for shelf in g.shelves_access %}
+                    {% if not shelf.id in books_shelfs and (not shelf.is_public or current_user.role_edit_shelfs()) %}
+                    <a data-href="{{ url_for('shelf.add_to_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
+                      data-remove-href="{{ url_for('shelf.remove_from_shelf', book_id=entry.id, shelf_id=shelf.id) }}"
+                      data-shelf-action="add"
+                      class="detail-action-popover-item">
+                      {{ shelf.name }}{% if shelf.is_public == 1 %} {{ _('(Public)') }}{% endif %}
+                    </a>
+                    {% endif %}
+                  {% endfor %}
                   {% endif %}
-                {% endfor %}
-                {% endif %}
-                <a href="{{ url_for('shelf.create_shelf') }}" class="detail-action-popover-item">
-                  <svg width="14" height="14" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
-                  {{ _('New shelf') }}
-                </a>
+                  <a class="detail-action-popover-item" id="show-create-shelf">
+                    <svg width="14" height="14" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+                    {{ _('New shelf') }}
+                  </a>
+                </div>
+                <div id="create-shelf-form" class="create-shelf-form" style="display:none;">
+                  <span class="create-shelf-header">Create Shelf</span>
+                  <input type="text" id="new-shelf-name" placeholder="Shelf name" class="create-shelf-input" autocomplete="off">
+                  <span class="create-shelf-error" id="create-shelf-error"></span>
+                  <label class="create-shelf-public"><input type="checkbox" id="new-shelf-public"> Visible to all users</label>
+                  <button type="button" id="create-shelf-submit" class="create-shelf-submit">Save</button>
+                </div>
               </div>
             </details>
             {% endif %}

@@ -128,13 +128,85 @@
     });
   }
 
-  // Close shelf popover on click outside
+  // Close shelf popover on click outside and reset create form
   var shelfDropdown = document.getElementById('shelf-actions');
+  var listView = document.getElementById('shelf-list-view');
+  var createForm = document.getElementById('create-shelf-form');
+  var showCreateBtn = document.getElementById('show-create-shelf');
+  var createInput = document.getElementById('new-shelf-name');
+  var createPublic = document.getElementById('new-shelf-public');
+  var createSubmit = document.getElementById('create-shelf-submit');
+  var createError = document.getElementById('create-shelf-error');
+
+  function resetCreateForm() {
+    if (createForm) createForm.style.display = 'none';
+    if (listView) listView.style.display = '';
+    if (createInput) createInput.value = '';
+    if (createError) { createError.textContent = ''; createError.textContent = ''; }
+    if (createPublic) createPublic.checked = false;
+  }
+
   if (shelfDropdown) {
     document.addEventListener('click', function(e) {
       if (!shelfDropdown.contains(e.target)) {
         shelfDropdown.removeAttribute('open');
+        resetCreateForm();
       }
+    });
+  }
+
+  // Toggle to create form
+  if (showCreateBtn && createForm) {
+    showCreateBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      listView.style.display = 'none';
+      createForm.style.display = '';
+      createInput.focus();
+    });
+
+    createSubmit.addEventListener('click', function() {
+      var name = createInput.value.trim();
+      if (!name) return;
+
+      var formData = new FormData();
+      formData.append('csrf_token', csrfToken);
+      formData.append('title', name);
+      if (createPublic.checked) formData.append('is_public', 'on');
+
+      fetch('/shelf/ajax-create', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+      }).then(function(res) {
+        return res.json().then(function(data) {
+          if (!res.ok || data.error) {
+            if (createError) { createError.textContent = data.error || 'Failed to create shelf'; createError.style.display = ''; }
+            return;
+          }
+
+          // Add new shelf to the list view
+          var bookId = window.location.pathname.match(/\/book\/(\d+)/);
+          bookId = bookId ? bookId[1] : '';
+          var newLink = document.createElement('a');
+          newLink.setAttribute('data-href', '/shelf/add/' + data.id + '/' + bookId);
+          newLink.setAttribute('data-shelf-action', 'add');
+          newLink.className = 'detail-action-popover-item';
+          newLink.textContent = name;
+          listView.insertBefore(newLink, showCreateBtn);
+
+          resetCreateForm();
+        });
+      }).catch(function() {
+        console.error('Failed to create shelf');
+      });
+    });
+
+    createInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') createSubmit.click();
+    });
+
+    createInput.addEventListener('input', function() {
+      if (createError) { createError.textContent = ''; createError.textContent = ''; }
     });
   }
 })();

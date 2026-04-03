@@ -23,11 +23,11 @@
 import sys
 from datetime import datetime, timezone
 
-from flask import Blueprint, flash, redirect, request, url_for, abort
+from flask import Blueprint, flash, jsonify, redirect, request, url_for, abort
 from flask_babel import gettext as _
 from .cw_login import current_user
 from sqlalchemy.exc import InvalidRequestError, OperationalError
-from sqlalchemy.sql.expression import func, true
+from sqlalchemy.sql.expression import func, true, or_
 
 from . import calibre_db, config, db, logger, ub
 from .render_template import render_title_template
@@ -262,6 +262,55 @@ def create_shelf():
     return create_edit_shelf(shelf, page_title=_("Create a Shelf"), page="shelfcreate")
 
 
+@shelf.route("/shelf/ajax-create", methods=["POST"])
+@user_login_required
+def ajax_create_shelf():
+    title = request.form.get("title", "").strip()
+    if not title:
+        return jsonify({"error": "Shelf name is required"}), 400
+    is_public = 1 if request.form.get("is_public") == "on" else 0
+    if not current_user.role_edit_shelfs() and is_public:
+        return jsonify({"error": "Not allowed to create public shelves"}), 403
+    existing = ub.session.query(ub.Shelf).filter(ub.Shelf.name == title).filter(
+        or_(ub.Shelf.is_public == 1, ub.Shelf.user_id == current_user.id)).first()
+    if existing:
+        return jsonify({"error": "A shelf with that name already exists"}), 400
+    new_shelf = ub.Shelf(name=title, is_public=is_public, user_id=int(current_user.id))
+    try:
+        ub.session.add(new_shelf)
+        ub.session.commit()
+        return jsonify({"id": new_shelf.id, "name": new_shelf.name}), 201
+    except (OperationalError, InvalidRequestError) as e:
+        ub.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@shelf.route("/shelf/ajax-edit/<int:shelf_id>", methods=["POST"])
+@user_login_required
+def ajax_edit_shelf(shelf_id):
+    s = ub.session.query(ub.Shelf).filter(ub.Shelf.id == shelf_id).first()
+    if not s or not check_shelf_edit_permissions(s):
+        return jsonify({"error": "Not allowed to edit this shelf"}), 403
+    title = request.form.get("title", "").strip()
+    if not title:
+        return jsonify({"error": "Shelf name is required"}), 400
+    is_public = 1 if request.form.get("is_public") == "on" else 0
+    if not current_user.role_edit_shelfs() and is_public:
+        return jsonify({"error": "Not allowed to make shelves public"}), 403
+    existing = ub.session.query(ub.Shelf).filter(ub.Shelf.name == title, ub.Shelf.id != shelf_id).filter(
+        or_(ub.Shelf.is_public == 1, ub.Shelf.user_id == current_user.id)).first()
+    if existing:
+        return jsonify({"error": "A shelf with that name already exists"}), 400
+    s.name = title
+    s.is_public = is_public
+    try:
+        ub.session.commit()
+        return jsonify({"id": s.id, "name": s.name}), 200
+    except (OperationalError, InvalidRequestError) as e:
+        ub.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
 @shelf.route("/shelf/edit/<int:shelf_id>", methods=["GET", "POST"])
 @user_login_required
 def edit_shelf(shelf_id):
@@ -275,15 +324,22 @@ def edit_shelf(shelf_id):
 @shelf.route("/shelf/delete/<int:shelf_id>", methods=["POST"])
 @user_login_required
 def delete_shelf(shelf_id):
+    xhr = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     cur_shelf = ub.session.query(ub.Shelf).filter(ub.Shelf.id == shelf_id).first()
     try:
         if not delete_shelf_helper(cur_shelf):
+            if xhr:
+                return jsonify({"error": "Error deleting shelf"}), 400
             flash(_("Error deleting Shelf"), category="error")
         else:
+            if xhr:
+                return jsonify({"success": True}), 200
             flash(_("Shelf successfully deleted"), category="success")
     except InvalidRequestError as e:
         ub.session.rollback()
         log.error_or_exception("Settings Database error: {}".format(e))
+        if xhr:
+            return jsonify({"error": str(e)}), 500
         flash(_("Oops! Database Error: %(error)s.", error=e.orig), category="error")
     return redirect(url_for('web.index'))
 

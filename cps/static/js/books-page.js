@@ -152,10 +152,40 @@ window.initBooksPage = function() {
         });
     }
 
+    // Empty shelf dialog
+    var emptyShelfDialog = document.getElementById('empty-shelf-dialog');
+    var emptyShelfHeading = document.getElementById('empty-shelf-heading');
+
+    function showEmptyShelfDialog(name) {
+      if (!emptyShelfDialog) return;
+      emptyShelfHeading.textContent = '"' + name + '" is empty';
+      emptyShelfDialog.style.display = '';
+    }
+
+    function hideEmptyShelfDialog() {
+      if (emptyShelfDialog) emptyShelfDialog.style.display = 'none';
+    }
+
+    if (emptyShelfDialog) {
+      emptyShelfDialog.querySelector('.dialog-close').addEventListener('click', hideEmptyShelfDialog);
+      emptyShelfDialog.addEventListener('click', function(e) {
+        if (e.target === emptyShelfDialog) hideEmptyShelfDialog();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && emptyShelfDialog.style.display !== 'none') hideEmptyShelfDialog();
+      });
+    }
+
     // Listen for checkbox changes
     if (filterContainer) {
       filterContainer.addEventListener('change', function(e) {
         if (e.target.matches('input[type="checkbox"]')) {
+          // Check if an empty shelf was just checked
+          if (e.target.checked && e.target.dataset.filterType === 'shelf' && e.target.dataset.bookCount === '0') {
+            e.target.checked = false;
+            showEmptyShelfDialog(e.target.dataset.filterValue);
+            return;
+          }
           fetchFiltered();
         }
       });
