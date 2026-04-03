@@ -114,6 +114,7 @@ def render_title_template(*args, **kwargs):
     try:
         return render_template(instance=config.config_calibre_web_title, sidebar=sidebar, simple=simple,
                                accept=config.config_upload_formats.split(','),
+                               config=config,
                                *args, **kwargs)
     except PermissionError:
         log.error("No permission to access {} file.".format(args[0]))

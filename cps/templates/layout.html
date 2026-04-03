@@ -190,6 +190,9 @@
           <input type="text" id="sidebar-new-shelf-name" placeholder="Shelf name" class="create-shelf-input" autocomplete="off">
           <span class="create-shelf-error" id="sidebar-create-shelf-error"></span>
           <label class="create-shelf-public"><input type="checkbox" id="sidebar-new-shelf-public"> Visible to all users</label>
+          {% if config.config_kobo_sync %}
+          <label class="create-shelf-public"><input type="checkbox" id="sidebar-new-shelf-kobo"> Sync with Kobo</label>
+          {% endif %}
           <button type="button" id="sidebar-create-shelf-submit" class="create-shelf-submit">Save</button>
         </div>
       </div>
@@ -204,7 +207,7 @@
             <svg width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M144,128a16,16,0,1,1-16-16A16,16,0,0,1,144,128ZM60,112a16,16,0,1,0,16,16A16,16,0,0,0,60,112Zm136,0a16,16,0,1,0,16,16A16,16,0,0,0,196,112Z"></path></svg>
           </span>
           <div class="shelf-menu-popover" style="display:none;">
-            <a class="shelf-menu-item shelf-edit-btn" data-shelf-id="{{ shelf.id }}" data-shelf-name="{{ shelf.name }}" data-shelf-public="{{ shelf.is_public }}">Edit</a>
+            <a class="shelf-menu-item shelf-edit-btn" data-shelf-id="{{ shelf.id }}" data-shelf-name="{{ shelf.name }}" data-shelf-public="{{ shelf.is_public }}" data-shelf-kobo="{{ shelf.kobo_sync|int }}">Edit</a>
             <a class="shelf-menu-item shelf-delete-btn" data-shelf-id="{{ shelf.id }}" data-shelf-name="{{ shelf.name }}" data-href="{{ url_for('shelf.delete_shelf', shelf_id=shelf.id) }}">Delete</a>
           </div>
         </div>

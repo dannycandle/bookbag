@@ -52,11 +52,13 @@
   var submitEl = form.querySelector('#sidebar-create-shelf-submit');
   var errorEl = form.querySelector('#sidebar-create-shelf-error');
   var headerEl = form.querySelector('.create-shelf-header');
+  var koboEl = document.getElementById('sidebar-new-shelf-kobo');
   var createBtn = document.getElementById('sidebar-create-shelf-btn');
 
   function reset() {
     nameEl.value = '';
     if (pubEl) pubEl.checked = false;
+    if (koboEl) koboEl.checked = false;
     if (errorEl) errorEl.textContent = '';
     if (headerEl) headerEl.textContent = 'Create Shelf';
     submitEl.onclick = null;
@@ -68,6 +70,7 @@
   function getFormData() {
     var d = { title: nameEl.value.trim() };
     if (pubEl && pubEl.checked) d.is_public = 'on';
+    if (koboEl && koboEl.checked) d.kobo_sync = 'on';
     return d;
   }
 
@@ -117,6 +120,7 @@
       close();
       nameEl.value = editBtn.getAttribute('data-shelf-name');
       if (pubEl) pubEl.checked = editBtn.getAttribute('data-shelf-public') === '1';
+      if (koboEl) koboEl.checked = editBtn.getAttribute('data-shelf-kobo') === '1';
       if (headerEl) headerEl.textContent = 'Edit Shelf';
       if (errorEl) errorEl.textContent = '';
 

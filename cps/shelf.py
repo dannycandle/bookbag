@@ -275,7 +275,8 @@ def ajax_create_shelf():
         or_(ub.Shelf.is_public == 1, ub.Shelf.user_id == current_user.id)).first()
     if existing:
         return jsonify({"error": "A shelf with that name already exists"}), 400
-    new_shelf = ub.Shelf(name=title, is_public=is_public, user_id=int(current_user.id))
+    kobo_sync = True if request.form.get("kobo_sync") == "on" else False
+    new_shelf = ub.Shelf(name=title, is_public=is_public, kobo_sync=kobo_sync, user_id=int(current_user.id))
     try:
         ub.session.add(new_shelf)
         ub.session.commit()
@@ -303,6 +304,7 @@ def ajax_edit_shelf(shelf_id):
         return jsonify({"error": "A shelf with that name already exists"}), 400
     s.name = title
     s.is_public = is_public
+    s.kobo_sync = True if request.form.get("kobo_sync") == "on" else False
     try:
         ub.session.commit()
         return jsonify({"id": s.id, "name": s.name}), 200
