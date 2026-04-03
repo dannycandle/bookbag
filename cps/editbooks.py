@@ -1175,7 +1175,6 @@ def render_edit_book(book_id):
     return render_title_template('book_edit.html', book=book, authors=author_names, cc=cc,
                                  title=_("edit metadata"), page="editbook",
                                  conversion_formats=allowed_conversion_formats,
-                                 config=config,
                                  source_formats=valid_source_formats,
                                  upload_mode=request.args.get('upload', False))
 

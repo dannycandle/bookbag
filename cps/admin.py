@@ -249,7 +249,7 @@ def admin():
         dt = timedelta(hours=n // 60, minutes=n % 60)
         duration_field.append((n, format_timedelta(dt, threshold=.97)))
 
-    return render_title_template("admin.html", allUser=all_user, config=config, commit=commit,
+    return render_title_template("admin.html", allUser=all_user, commit=commit,
                                  feature_support=feature_support, provider=oauthblueprints,
                                  schedule_time=schedule_time,
                                  schedule_duration=schedule_duration,
@@ -272,7 +272,6 @@ def db_configuration():
 @admin_required
 def configuration():
     return render_title_template("config_edit.html",
-                                 config=config,
                                  provider=oauthblueprints,
                                  feature_support=feature_support,
                                  title=_("Basic Configuration"), page="config")
@@ -1314,7 +1313,7 @@ def new_user():
         content.locale = config.config_default_locale
         content.default_language = config.config_default_language
     return render_title_template("user_edit.html", new_user=1, content=content,
-                                 config=config, translations=translations,
+                                 translations=translations,
                                  languages=languages, title=_("Add New User"), page="newuser",
                                  kobo_support=kobo_support, registered_oauth=oauth_check)
 
@@ -1470,7 +1469,6 @@ def edit_user(user_id):
                                  languages=languages,
                                  new_user=0,
                                  content=content,
-                                 config=config,
                                  registered_oauth=oauth_check,
                                  mail_configured=config.get_mail_enabled(),
                                  kobo_support=kobo_support,
@@ -1980,7 +1978,6 @@ def _db_configuration_result(error_flash=None, gdrive_error=None):
         flash(_("Database Settings updated"), category="success")
 
     return render_title_template("config_db.html",
-                                 config=config,
                                  show_authenticate_google_drive=gdrive_authenticate,
                                  gdriveError=gdrive_error,
                                  gdrivefolders=gdrivefolders,
@@ -2013,7 +2010,6 @@ def _handle_new_user(to_save, content, languages, translations, kobo_support):
     except Exception as ex:
         flash(str(ex), category="error")
         return render_title_template("user_edit.html", new_user=1, content=content,
-                                     config=config,
                                      translations=translations,
                                      languages=languages, title=_("Add new user"), page="newuser",
                                      kobo_support=kobo_support, registered_oauth=oauth_check)
@@ -2143,7 +2139,6 @@ def _handle_edit_user(to_save, content, languages, translations, kobo_support):
                                          kobo_support=kobo_support,
                                          new_user=0,
                                          content=content,
-                                         config=config,
                                          registered_oauth=oauth_check,
                                          title=_("Edit User %(nick)s", nick=content.name),
                                          page="edituser")

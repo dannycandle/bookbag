@@ -1479,10 +1479,10 @@ def register():
         return redirect(url_for('web.index'))
     if not config.get_mail_enabled():
         flash(_("Oops! Email server is not configured, please contact your administrator."), category="error")
-        return render_title_template('register.html', config=config, oauth_check=oauth_check, title=_("Register"), page="register")
+        return render_title_template('register.html', oauth_check=oauth_check, title=_("Register"), page="register")
     if feature_support['oauth']:
         register_user_with_oauth()
-    return render_title_template('register.html', config=config, oauth_check=oauth_check, title=_("Register"), page="register")
+    return render_title_template('register.html', oauth_check=oauth_check, title=_("Register"), page="register")
 
 
 def handle_login_user(user, remember, message, category):
@@ -1499,7 +1499,6 @@ def render_login(username=""):
     return render_title_template('login.html',
                                  title=_("Login"),
                                  next_url=next_url,
-                                 config=config,
                                  username=username,
                                  oauth_check=oauth_check,
                                  mail=config.get_mail_enabled(), page="login")
@@ -1685,7 +1684,6 @@ def change_profile(kobo_support, local_oauth_check, oauth_status, translations, 
         flash(str(ex), category="error")
         return render_title_template("user_edit.html",
                                      content=current_user,
-                                     config=config,
                                      translations=translations,
                                      profile=1,
                                      languages=languages,
@@ -1737,7 +1735,6 @@ def profile():
                                  profile=1,
                                  languages=languages,
                                  content=current_user,
-                                 config=config,
                                  kobo_support=kobo_support,
                                  title=_("%(name)s's Profile", name=current_user.name),
                                  page="me",
