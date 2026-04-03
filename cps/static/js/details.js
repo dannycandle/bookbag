@@ -1,6 +1,5 @@
 (function() {
-  var csrfInput = document.querySelector('input[name="csrf_token"]');
-  var csrfToken = csrfInput ? csrfInput.value : '';
+  var csrfToken = document.querySelector('input[name="csrf_token"]').value;
 
   // Description read more/less
   var desc = document.getElementById('book-description');
@@ -61,25 +60,10 @@
       }).then(function(res) {
         if (!res.ok) throw new Error('Failed');
         var shelfName = link.textContent.trim();
-        var shelfId = url.match(/\/shelf\/add\/(\d+)/);
-        shelfId = shelfId ? shelfId[1] : '';
+        var shelfId = url.match(/\/shelf\/add\/(\d+)/)[1];
         link.remove();
 
-        // Add shelf tag to metadata section
         var shelvesContainer = document.getElementById('book-detail-shelves');
-        if (!shelvesContainer) {
-          shelvesContainer = document.createElement('div');
-          shelvesContainer.className = 'book-detail-shelves';
-          shelvesContainer.id = 'book-detail-shelves';
-          var label = document.createElement('span');
-          label.className = 'book-detail-shelves-label';
-          label.textContent = 'On shelves:';
-          shelvesContainer.appendChild(label);
-          var metadata = document.querySelector('.book-detail-metadata');
-          if (metadata) {
-            metadata.insertBefore(shelvesContainer, metadata.firstChild);
-          }
-        }
         var tag = document.createElement('span');
         tag.className = 'book-detail-shelf-tag';
         var tagLink = document.createElement('a');
@@ -93,6 +77,7 @@
         tag.appendChild(tagLink);
         tag.appendChild(removeBtn);
         shelvesContainer.insertBefore(tag, shelvesContainer.querySelector('.shelf-add-dropdown'));
+        document.getElementById('shelf-actions').removeAttribute('open');
       }).catch(function() {
         console.error('Failed to add to shelf');
       });
@@ -121,7 +106,17 @@
         body: formData
       }).then(function(res) {
         if (!res.ok) throw new Error('Failed');
-        btn.closest('.book-detail-shelf-tag').remove();
+        var shelfTag = btn.closest('.book-detail-shelf-tag');
+        var addUrl = url.replace('/remove/', '/add/');
+        var newLink = document.createElement('a');
+        newLink.setAttribute('data-href', addUrl);
+        newLink.setAttribute('data-shelf-action', 'add');
+        newLink.className = 'detail-action-popover-item';
+        newLink.textContent = shelfName;
+        var listView = document.getElementById('shelf-list-view');
+        var showBtn = document.getElementById('show-create-shelf');
+        listView.insertBefore(newLink, showBtn);
+        shelfTag.remove();
       }).catch(function() {
         console.error('Failed to remove from shelf');
       });
@@ -140,9 +135,9 @@
   var createError = document.getElementById('create-shelf-error');
 
   function resetCreateForm() {
-    if (createForm) createForm.style.display = 'none';
-    if (listView) listView.style.display = '';
-    if (createInput) createInput.value = '';
+    createForm.style.display = 'none';
+    listView.style.display = '';
+    createInput.value = '';
     if (createError) createError.textContent = '';
     if (createPublic) createPublic.checked = false;
     if (createKobo) createKobo.checked = false;
@@ -183,13 +178,11 @@
       }).then(function(res) {
         return res.json().then(function(data) {
           if (!res.ok || data.error) {
-            if (createError) { createError.textContent = data.error || 'Failed to create shelf'; createError.style.display = ''; }
+            if (createError) createError.textContent = data.error || 'Failed to create shelf';
             return;
           }
 
-          // Add new shelf to the list view
-          var bookId = window.location.pathname.match(/\/book\/(\d+)/);
-          bookId = bookId ? bookId[1] : '';
+          var bookId = window.location.pathname.match(/\/book\/(\d+)/)[1];
           var newLink = document.createElement('a');
           newLink.setAttribute('data-href', '/shelf/add/' + data.id + '/' + bookId);
           newLink.setAttribute('data-shelf-action', 'add');
@@ -209,7 +202,7 @@
     });
 
     createInput.addEventListener('input', function() {
-      if (createError) { createError.textContent = ''; createError.textContent = ''; }
+      if (createError) createError.textContent = '';
     });
   }
 })();

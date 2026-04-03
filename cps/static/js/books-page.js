@@ -119,7 +119,9 @@ window.initBooksPage = function() {
       if (activeController) activeController.abort();
       activeController = new AbortController();
 
-      fetch(buildFilterUrl(currentSort), { signal: activeController.signal })
+      var filterUrl = buildFilterUrl(currentSort);
+      history.pushState(null, '', filterUrl);
+      fetch(filterUrl, { signal: activeController.signal })
         .then(function(r) { return r.text(); })
         .then(function(html) {
           var doc = new DOMParser().parseFromString(html, 'text/html');
