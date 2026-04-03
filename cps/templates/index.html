@@ -1,7 +1,7 @@
 {% import 'image.html' as image %}
 {% extends "layout.html" %}
 {% block action_bar %}
-{% if entries[0] %}
+{% if entries[0] or filter_qs %}
   <details class="sort-dropdown" data-current-sort="{{ order or 'new' }}">
   <summary class="sort-button">
     {% if order == 'abc' %}Title: A–Z
