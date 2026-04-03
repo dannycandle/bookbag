@@ -92,7 +92,7 @@
         removeBtn.innerHTML = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M168.49,104.49,145,128l23.52,23.51a12,12,0,0,1-17,17L128,145l-23.51,23.52a12,12,0,0,1-17-17L111,128,87.51,104.49a12,12,0,0,1,17-17L128,111l23.51-23.52a12,12,0,0,1,17,17ZM236,128A108,108,0,1,1,128,20,108.12,108.12,0,0,1,236,128Zm-24,0a84,84,0,1,0-84,84A84.09,84.09,0,0,0,212,128Z"></path></svg>';
         tag.appendChild(tagLink);
         tag.appendChild(removeBtn);
-        shelvesContainer.appendChild(tag);
+        shelvesContainer.insertBefore(tag, shelvesContainer.querySelector('.shelf-add-dropdown'));
       }).catch(function() {
         console.error('Failed to add to shelf');
       });
@@ -135,6 +135,7 @@
   var showCreateBtn = document.getElementById('show-create-shelf');
   var createInput = document.getElementById('new-shelf-name');
   var createPublic = document.getElementById('new-shelf-public');
+  var createKobo = document.getElementById('new-shelf-kobo');
   var createSubmit = document.getElementById('create-shelf-submit');
   var createError = document.getElementById('create-shelf-error');
 
@@ -142,8 +143,9 @@
     if (createForm) createForm.style.display = 'none';
     if (listView) listView.style.display = '';
     if (createInput) createInput.value = '';
-    if (createError) { createError.textContent = ''; createError.textContent = ''; }
+    if (createError) createError.textContent = '';
     if (createPublic) createPublic.checked = false;
+    if (createKobo) createKobo.checked = false;
   }
 
   if (shelfDropdown) {
@@ -171,7 +173,8 @@
       var formData = new FormData();
       formData.append('csrf_token', csrfToken);
       formData.append('title', name);
-      if (createPublic.checked) formData.append('is_public', 'on');
+      if (createPublic && createPublic.checked) formData.append('is_public', 'on');
+      if (createKobo && createKobo.checked) formData.append('kobo_sync', 'on');
 
       fetch('/shelf/ajax-create', {
         method: 'POST',

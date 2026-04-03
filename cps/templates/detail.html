@@ -246,6 +246,9 @@
                   <input type="text" id="new-shelf-name" placeholder="Shelf name" class="create-shelf-input" autocomplete="off">
                   <span class="create-shelf-error" id="create-shelf-error"></span>
                   <label class="create-shelf-public"><input type="checkbox" id="new-shelf-public"> Visible to all users</label>
+                  {% if config.config_kobo_sync %}
+                  <label class="create-shelf-public"><input type="checkbox" id="new-shelf-kobo"> Sync with Kobo</label>
+                  {% endif %}
                   <button type="button" id="create-shelf-submit" class="create-shelf-submit">Save</button>
                 </div>
               </div>
