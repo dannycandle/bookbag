@@ -15,9 +15,10 @@ Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) that
 - **One-Time-Password Flow:** For password resets and public registrations.
 - **Most of what Calibre-Web Includes:** Retains features such as Kobo Sync, email to ereader, magic links, ldap & oauth, etc., although many need further testing.
 
+
 ## Planned Future Updates (Dates TBD):
 - **Responsive Design** (In progress)
-- **User & Magic Shelves** (In progress)
+- **Magic Shelves** (In progress)
 - **Dark Mode** (In progress)
 - **Bulk Editing**
 - **Author's Page**
@@ -29,12 +30,31 @@ Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) that
 - **Ebook upload sanitation (for security)**
 - **Website**
 
+## Change log
+v0.1.2: Shelves fully implemented. Create/edit/delete from books grid. Create/AddBook from book details page.
+v0.1.1: Use backend for filters & search, builds now support amd64.
+v0.1.0: Initial release. Base features implemented with redesign.
+
+## Install via Docker
+1. Download docker-compose.yml from this repo.
+2. In the file, replace "PATH/FOR/YOUR/LIBRARY/FOLDER" (stores metadata.db and book files) and "PATH/FOR/YOUR/CONFIG/FOLDER" (stores app.db and other install-specific files) with the paths you want. Map your desired port to container port 8084.
+3. Run `docker compose up -d`
+
+> ⚠️ While I have tested bookbag for release 0.1.0, I still advise against using it on a public server or as your primary book server. There may be vulnerabilities and bugs that prevent normal use. Bookbag is still in early development and is offered as-is.
+
+## First-Time User Setup
+Follow the setup wizard after starting the server.
+1. Create admin account.
+2. If you are bringing your own metadata.db, choose "Bring my own". You can then upload your metadata.db file. The book files themselves must still be manually placed in the folder your metadata.db expects, usually the same folder as the metadata.db file (/books in container, ./books for dev environments).
+3. If you want to start with a fresh (empty) library, choose "Start fresh". A new metadata.db file with a unique uuid is created.
+4. It is recommended you go to the settings page and set up email so you can easily reset passwords, etc.
+
 ## Set up a development environment
-1. Clone repository
+### 1. Clone repository
 
 `git clone https://codeberg.org/bookbag/bookbag.git && cd bookbag`
 
-2. Install system dependencies*
+### 2. Install system dependencies*
 
 - **Debian 13:** `sudo apt install -y python3-dev gcc g++ libffi-dev libmagic-dev libxml2-dev libxslt1-dev imagemagick libmagickwand-dev libldap2-dev libsasl2-dev unrar-free`
 
@@ -44,7 +64,7 @@ Bookbag is a fork of [Calibre-Web](https://github.com/janeczku/calibre-web) that
 
 *These are general guidelines, package names and requirements may vary based on your system. If you are missing system dependencies, pip installs in step 3 may fail.
 
-3. Create and activate python virtual environment
+### 3. Create venv and install python packages
 
 Linux
 ```
@@ -62,28 +82,12 @@ pip install -r requirements.txt -r optional-requirements.txt
 
 If builds in this stage fail, it is likely that you are missing a system dependency, go back to step 2.
 
-4. Define Environment
-`echo "BOOKBAG_LIBRARY_PATH=/FULL/PATH/TO/PROJECT/books"`
+### 4. Define environment
+`echo "BOOKBAG_LIBRARY_PATH=/FULL/PATH/TO/PROJECT/books" > .env`
 
-5. Start server in debug mode
+### 5. Start server in debug mode
 
 `FLASK_DEBUG=1 python cps.py`
-
-6. In a web browser, open http://localhost:8084
-
-## Install via Docker
-1. Download docker-compose.yml from this repo.
-2. In the file, replace "PATH/FOR/YOUR/LIBRARY/FOLDER" (stores metadata.db and book files) and "PATH/FOR/YOUR/CONFIG/FOLDER" (stores app.db and other install-specific files) with the paths you want. Map your desired port to container port 8084.
-3. Run `docker compose up -d`
-
-> ⚠️ While I have tested bookbag for release 0.1.0, I still advise against using it on a public server or as your primary book server. There may be vulnerabilities and bugs that prevent normal use. Bookbag is still in early development and is offered as-is.
-
-## First-Time User Setup
-Follow the setup wizard after starting the server.
-1. Create admin account.
-2. If you are bringing your own metadata.db, choose "Bring my own". You can then upload your metadata.db file. The book files themselves must still be manually placed in the folder your metadata.db expects, usually the same folder as the metadata.db file (/books in container, ./books for dev environments).
-3. If you want to start with a fresh (empty) library, choose "Start fresh". A new metadata.db file with a unique uuid is created.
-4. It is recommended you go to the settings page and set up email so you can easily reset passwords, etc.
 
 ## License
 

@@ -276,6 +276,17 @@
     </div> <!--book-detail-columns-->
   </div><!--content container-->
 </div> <!--Wrapper-->
+<div id="remove-shelf-dialog" class="dialog-overlay" style="display:none;">
+  <div class="dialog-box">
+    <button class="dialog-close" type="button">&times;</button>
+    <h2 class="dialog-heading" id="remove-shelf-heading"></h2>
+    <div class="dialog-actions">
+      <button type="button" class="btn-secondary" id="remove-shelf-cancel">Cancel</button>
+      <button type="button" class="btn-danger" id="remove-shelf-confirm">Remove</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block js %}
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

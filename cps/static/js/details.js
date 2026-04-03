@@ -94,32 +94,49 @@
       e.stopPropagation();
 
       var shelfName = btn.getAttribute('data-shelf-name');
-      if (!confirm('Remove from "' + shelfName + '"?')) return;
+      var dialog = document.getElementById('remove-shelf-dialog');
+      var heading = document.getElementById('remove-shelf-heading');
+      var confirmBtn = document.getElementById('remove-shelf-confirm');
+      var cancelBtn = document.getElementById('remove-shelf-cancel');
 
-      var url = btn.getAttribute('data-href');
-      var formData = new FormData();
-      formData.append('csrf_token', csrfToken);
+      heading.textContent = 'Remove Book from "' + shelfName + '"?';
+      dialog.style.display = '';
 
-      fetch(url, {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: formData
-      }).then(function(res) {
-        if (!res.ok) throw new Error('Failed');
-        var shelfTag = btn.closest('.book-detail-shelf-tag');
-        var addUrl = url.replace('/remove/', '/add/');
-        var newLink = document.createElement('a');
-        newLink.setAttribute('data-href', addUrl);
-        newLink.setAttribute('data-shelf-action', 'add');
-        newLink.className = 'detail-action-popover-item';
-        newLink.textContent = shelfName;
-        var listView = document.getElementById('shelf-list-view');
-        var showBtn = document.getElementById('show-create-shelf');
-        listView.insertBefore(newLink, showBtn);
-        shelfTag.remove();
-      }).catch(function() {
-        console.error('Failed to remove from shelf');
-      });
+      function closeDialog() {
+        dialog.style.display = 'none';
+      }
+
+      cancelBtn.onclick = closeDialog;
+      dialog.querySelector('.dialog-close').onclick = closeDialog;
+      dialog.onclick = function(ev) { if (ev.target === dialog) closeDialog(); };
+
+      confirmBtn.onclick = function() {
+        closeDialog();
+        var url = btn.getAttribute('data-href');
+        var formData = new FormData();
+        formData.append('csrf_token', csrfToken);
+
+        fetch(url, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: formData
+        }).then(function(res) {
+          if (!res.ok) throw new Error('Failed');
+          var shelfTag = btn.closest('.book-detail-shelf-tag');
+          var addUrl = url.replace('/remove/', '/add/');
+          var newLink = document.createElement('a');
+          newLink.setAttribute('data-href', addUrl);
+          newLink.setAttribute('data-shelf-action', 'add');
+          newLink.className = 'detail-action-popover-item';
+          newLink.textContent = shelfName;
+          var listView = document.getElementById('shelf-list-view');
+          var showBtn = document.getElementById('show-create-shelf');
+          listView.insertBefore(newLink, showBtn);
+          shelfTag.remove();
+        }).catch(function() {
+          console.error('Failed to remove from shelf');
+        });
+      };
     });
   }
 
